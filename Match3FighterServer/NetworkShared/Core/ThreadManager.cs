@@ -9,7 +9,9 @@ namespace NetworkShared.Core
         private static readonly List<Action> executeCopiedOnMainThread = new List<Action>();
         private static bool actionToExecuteOnMainThread = false;
 
-        /// <summary>Sets an action to be executed on the main thread.</summary>
+        /// <summary>
+        /// Sets an action to be executed on the main thread
+        /// </summary>
         /// <param name="action">The action to be executed on the main thread.</param>
         public static void ExecuteOnMainThread(Action action)
         {
@@ -26,7 +28,9 @@ namespace NetworkShared.Core
             }
         }
 
-        /// <summary>Executes all code meant to run on the main thread. NOTE: Call this ONLY from the main thread.</summary>
+        /// <summary>
+        /// Executes all code meant to run on the main thread. NOTE: Call this ONLY from the main thread
+        /// </summary>
         public static void UpdateMain()
         {
             if (actionToExecuteOnMainThread)

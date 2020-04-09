@@ -9,7 +9,7 @@ using NetworkShared.Core;
 namespace NetworkShared.Network
 {
     /// <summary>
-    /// Server
+    /// Server holds client connections and data sharing
     /// </summary>
     public class Server
     {
@@ -20,6 +20,11 @@ namespace NetworkShared.Network
 
         private static TcpListener tcpListener;
 
+        /// <summary>
+        /// Initializes clients and starts to listen
+        /// </summary>
+        /// <param name="maxPlayers">Max connections</param>
+        /// <param name="port">Port to start server on</param>
         public void Start(int maxPlayers, int port)
         {
             MaxPlayers = maxPlayers;
@@ -35,6 +40,10 @@ namespace NetworkShared.Network
             Console.WriteLine($"Server started on port {Port}.");
         }
 
+        /// <summary>
+        /// Callback when client is connected
+        /// </summary>
+        /// <param name="result"></param>
         private void TCPConnectCallback(IAsyncResult result)
         {
             TcpClient client = tcpListener.EndAcceptTcpClient(result);
@@ -53,6 +62,9 @@ namespace NetworkShared.Network
             Console.WriteLine($"{client.Client.RemoteEndPoint} failed to connect: Server is full!");
         }
 
+        /// <summary>
+        /// Initialize clients
+        /// </summary>
         private void InitializeServerData()
         {
             for (int i = 1; i <= MaxPlayers; i++)

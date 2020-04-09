@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace NetworkShared.Data
 {
+    /// <summary>
+    /// Response to clients attempt to login
+    /// </summary>
     [Serializable]
     public class LogInResponse
     {

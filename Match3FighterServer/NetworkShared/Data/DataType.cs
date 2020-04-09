@@ -1,5 +1,8 @@
 ﻿namespace NetworkShared.Data
 {
+    /// <summary>
+    /// Types for data server and client sends and receives
+    /// </summary>
     public enum DataTypes
     {
         ConnectResponse = 1,

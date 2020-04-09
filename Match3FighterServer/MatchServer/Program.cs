@@ -13,9 +13,11 @@ namespace MatchServer
         {
             Console.Title = "Match3Fighter Game Server";
 
+            // Starts game core loop
             GameCore core = new GameCore();
             Task.Factory.StartNew(core.Start);
 
+            // Starts server that holds client connections and receiving/sending data
             Server server = new Server();
             server.Listener = core;
             server.Start(maxPlayers, portNumber);

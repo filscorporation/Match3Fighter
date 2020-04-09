@@ -4,6 +4,9 @@ using System.Text;
 
 namespace NetworkShared.Network
 {
+    /// <summary>
+    /// Base object that holds bynary data that server and client send
+    /// </summary>
     public class Packet : IDisposable
     {
         private List<byte> buffer;
