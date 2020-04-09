@@ -8,5 +8,8 @@
         ConnectResponse = 1,
         LogInRequest = 2,
         LogInResponse = 3,
+
+        PutPlayerIntoQueueRequest = 10,
+        StartGameResponse = 11,
     }
 }

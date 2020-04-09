@@ -42,10 +42,16 @@
   <ItemGroup>
     <Compile Include="Core\IServerListener.cs" />
     <Compile Include="Core\ThreadManager.cs" />
+    <Compile Include="Data\Field\BlockData.cs" />
+    <Compile Include="Data\Field\BlockTypes.cs" />
+    <Compile Include="Data\Field\FeildData.cs" />
     <Compile Include="Data\LogInRequest.cs" />
     <Compile Include="Data\ConnectResponse.cs" />
     <Compile Include="Data\DataType.cs" />
     <Compile Include="Data\LogInResponse.cs" />
+    <Compile Include="Data\Player\PlayerData.cs" />
+    <Compile Include="Data\PutPlayerIntoQueueRequest.cs" />
+    <Compile Include="Data\StartGameResponse.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="Network\IConnectionHandler.cs" />
     <Compile Include="Network\Packet.cs" />

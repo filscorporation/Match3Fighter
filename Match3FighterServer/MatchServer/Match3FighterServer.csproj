@@ -58,9 +58,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FieldManagement\Block.cs" />
+    <Compile Include="FieldManagement\Field.cs" />
     <Compile Include="GameCore.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="FieldManagement\FieldManager.cs" />
+    <Compile Include="Players\GameMatch.cs" />
+    <Compile Include="Players\MatchManager.cs" />
+    <Compile Include="Players\PlayersManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -82,5 +88,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

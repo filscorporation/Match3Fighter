@@ -15,6 +15,7 @@ namespace MatchServer
 
             // Starts game core loop
             GameCore core = new GameCore();
+            core.Initialize();
             Task.Factory.StartNew(core.Start);
 
             // Starts server that holds client connections and receiving/sending data
