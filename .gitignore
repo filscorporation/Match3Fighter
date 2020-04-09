@@ -43,6 +43,10 @@ ExportedObj/
 *.opendb
 *.VC.db
 
+# Include sln and proj for Server
+!/Match3FighterServer/*.sln
+!/Match3FighterServer/*/*.csproj
+
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta
@@ -58,3 +62,7 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+/Match3FighterServer/MatchServer/bin/Debug
+/Match3FighterServer/MatchServer/obj/Debug
+/Match3FighterServer/NetworkShared/bin/Debug
+/Match3FighterServer/NetworkShared/obj/Debug
