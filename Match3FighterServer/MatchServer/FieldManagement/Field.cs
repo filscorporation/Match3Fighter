@@ -14,6 +14,19 @@ namespace MatchServer.FieldManagement
     {
         public Block[,] Blocks;
 
+        /// <summary>
+        /// Checks if index outside borders and returns block if not
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public Block GetBlock(int x, int y)
+        {
+            if (x < 0 || x >= Blocks.GetLength(0) || y < 0 || x >= Blocks.GetLength(1))
+                return null;
+            return Blocks[x, y];
+        }
+
         public FieldData ToData()
         {
             int w = Blocks.GetLength(0);

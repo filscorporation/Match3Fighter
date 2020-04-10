@@ -72,11 +72,11 @@ namespace MatchServer.Players
         public void TryMakeMatch()
         {
             // TODO: temp
-            //if (queue.Count >= 1)
-            //{
-            //    queue.TryTake(out Player player);
-            //    matchManager.MakeMatch(player, player);
-            //}
+            if (queue.Count >= 1)
+            {
+                queue.TryTake(out Player player);
+                matchManager.MakeMatch(player, player);
+            }
 
             if (queue.Count >= 2)
             {

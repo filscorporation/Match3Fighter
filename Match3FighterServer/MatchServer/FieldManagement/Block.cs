@@ -14,14 +14,49 @@ namespace MatchServer.FieldManagement
     {
         public BlockTypes Type;
 
+        public BlockState State = BlockState.Default;
+
+        public int X;
+
+        public int Y;
+
+        public Block ReplacedBlock;
+
+        /// <summary>
+        /// Returns randomly generated block
+        /// </summary>
+        /// <param name="random"></param>
+        /// <returns></returns>
         public static Block GetRandomBlock(Random random)
         {
             Block block = new Block();
 
-            int n = random.Next(Enum.GetNames(typeof(BlockTypes)).Length);
+            int n = random.Next(Enum.GetNames(typeof(BlockTypes)).Length - 1);
             block.Type = (BlockTypes)n;
 
             return block;
+        }
+
+        /// <summary>
+        /// Return true if blocks can make combo
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public bool CanCombo(Block block)
+        {
+            if (block.Type == BlockTypes.Chameleon || Type == BlockTypes.Chameleon)
+                return true;
+
+            return block.Type == Type;
+        }
+
+        /// <summary>
+        /// Returns if block state is any of destroyed
+        /// </summary>
+        /// <returns></returns>
+        public bool IsInDestroyedState()
+        {
+            return State == BlockState.DestroyedAsCombo || State == BlockState.DestroyedByDamage;
         }
 
         public BlockData ToData()

@@ -1,14 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NetworkShared.Data.Field
 {
+    public enum BlockState
+    {
+        Default,
+        Created,
+        DroppedAsNew,
+        Moved,
+        DestroyedAsCombo,
+        Damaged,
+        DestroyedByDamage,
+    }
+
     [Serializable]
     public class BlockData
     {
+        public BlockState State;
+
         public int ID;
+
+        public BlockData ReplacedBlock;
     }
 }

@@ -59,6 +59,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FieldManagement\Block.cs" />
+    <Compile Include="FieldManagement\BlockEffectsManager.cs" />
+    <Compile Include="FieldManagement\Effect.cs" />
     <Compile Include="FieldManagement\Field.cs" />
     <Compile Include="FieldManagement\Swap.cs" />
     <Compile Include="GameCore.cs" />

@@ -6,6 +6,7 @@
         Mana,
         Health,
         Arcane,
+        Gold,
         Chameleon,
     }
 }

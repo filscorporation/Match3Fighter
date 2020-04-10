@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using MatchServer.FieldManagement;
@@ -175,7 +176,8 @@ namespace MatchServer
 
             GameMatch match = player.CurrentMatch;
             Field field = match.Player1 == player ? match.Field1 : match.Field2;
-            if (!FieldManager.TryRebuildFieldFromSwap(field, new Swap(request.X, request.Y, request.Direction)))
+            List<Effect> effects = new List<Effect>();
+            if (!FieldManager.TryRebuildFieldFromSwap(field, new Swap(request.X, request.Y, request.Direction), out effects))
             {
                 Console.WriteLine($"Impossible turn from player {clientID}");
                 ErrorResponse error = new ErrorResponse();
