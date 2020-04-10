@@ -12,5 +12,10 @@ namespace Assets.Source.UIManagement
         {
             GameManager.Instance.QueueGame();
         }
+
+        public void BackGameButtonClick()
+        {
+            GameManager.Instance.FinishGame();
+        }
     }
 }

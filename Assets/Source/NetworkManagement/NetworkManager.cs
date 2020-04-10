@@ -73,14 +73,31 @@ namespace Assets.Source.NetworkManagement
                 case DataTypes.StartGameResponse:
                     HandleStartGameResponse((StartGameResponse) data);
                     break;
+                case DataTypes.GameStateResponse:
+                    HandleGameStateResponse((GameStateResponse) data);
+                    break;
+                case DataTypes.ErrorResponse:
+                    Debug.Log(((ErrorResponse)data));
+                    break;
                 case DataTypes.LogInRequest:
                 case DataTypes.PutPlayerIntoQueueRequest:
+                case DataTypes.BlockSwapRequest:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
 
         public void HandleStartGameResponse(StartGameResponse response)
+        {
+            GameManager.Instance.LoadGameScene(response);
+        }
+
+        public void HandleGameStateResponse(GameStateResponse response)
+        {
+            GameManager.Instance.ChangeGameState(response.GameState);
+        }
+
+        public void HandleGameStateResponse(StartGameResponse response)
         {
             GameManager.Instance.LoadGameScene(response);
         }
@@ -92,6 +109,11 @@ namespace Assets.Source.NetworkManagement
         public void SendPutPlayerIntoQueueRequestRequest(PutPlayerIntoQueueRequest request)
         {
             client.SendData((int)DataTypes.PutPlayerIntoQueueRequest, request);
+        }
+
+        public void SendBlockSwapData(BlockSwapRequest request)
+        {
+            client.SendData((int)DataTypes.BlockSwapRequest, request);
         }
 
         #endregion

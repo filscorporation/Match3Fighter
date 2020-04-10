@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using MatchServer.FieldManagement;
 using MatchServer.Players;
@@ -118,9 +119,14 @@ namespace MatchServer
                     case DataTypes.PutPlayerIntoQueueRequest:
                         PutPlayerIntoQueue(clientID, (PutPlayerIntoQueueRequest) data);
                         break;
+                    case DataTypes.BlockSwapRequest:
+                        ProcessBlockSwap(clientID, (BlockSwapRequest) data);
+                        break;
                     case DataTypes.LogInResponse:
                     case DataTypes.ConnectResponse:
                     case DataTypes.StartGameResponse:
+                    case DataTypes.GameStateResponse:
+                    case DataTypes.ErrorResponse:
                     default:
                         throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null);
                 }
@@ -139,10 +145,58 @@ namespace MatchServer
         public void PutPlayerIntoQueue(int clientID, PutPlayerIntoQueueRequest request)
         {
             Player player = PlayersManager.GetPlayer(clientID);
+            if (player == null)
+            {
+                Console.WriteLine($"Can't find player {clientID}");
+                return;
+            }
             Console.WriteLine($"Putting player {clientID} into queue");
             PlayersManager.PutPlayerIntoQueue(player);
         }
 
+        /// <summary>
+        /// Players turn processing
+        /// </summary>
+        /// <param name="clientID"></param>
+        /// <param name="request"></param>
+        public void ProcessBlockSwap(int clientID, BlockSwapRequest request)
+        {
+            Player player = PlayersManager.GetPlayer(clientID);
+            if (player == null)
+            {
+                Console.WriteLine($"Can't find player {clientID}");
+                return;
+            }
+            if (player.CurrentMatch == null)
+            {
+                Console.WriteLine($"Player {player.ClientID} is not in the game");
+                return;
+            }
+
+            GameMatch match = player.CurrentMatch;
+            Field field = match.Player1 == player ? match.Field1 : match.Field2;
+            if (!FieldManager.TryRebuildFieldFromSwap(field, new Swap(request.X, request.Y, request.Direction)))
+            {
+                Console.WriteLine($"Impossible turn from player {clientID}");
+                ErrorResponse error = new ErrorResponse();
+                Server.SendDataToClient(player.ClientID, (int)DataTypes.ErrorResponse, error);
+            }
+
+            GameStateResponse response = new GameStateResponse { GameState = GetPlayer1MatchStateData(match) };
+            Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
+
+            // TODO: temp
+            if (match.Player1 == match.Player2)
+                return;
+
+            response = new GameStateResponse { GameState = GetPlayer2MatchStateData(match) };
+            Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameStateResponse, response);
+        }
+
+        #endregion
+
+        #region Game Logic
+        
         /// <summary>
         /// Starts match between two players and sends them game info
         /// </summary>
@@ -151,25 +205,35 @@ namespace MatchServer
         {
             Console.WriteLine($"Starting match");
 
-            StartGameResponse response1 = new StartGameResponse();
-            response1.MainPlayer = match.Player1.ToData();
-            response1.EnemyPlayer = match.Player2.ToData();
-            response1.MainField = match.Field1.ToData();
-            response1.EnemyField = match.Field2.ToData();
-
-            Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.StartGameResponse, response1);
+            StartGameResponse response = new StartGameResponse { GameState = GetPlayer1MatchStateData(match) };
+            Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.StartGameResponse, response);
 
             // TODO: temp
             if (match.Player1 == match.Player2)
                 return;
 
-            StartGameResponse response2 = new StartGameResponse();
-            response1.MainPlayer = response1.EnemyPlayer;
-            response1.EnemyPlayer = response1.MainPlayer;
-            response1.MainField = response1.EnemyField;
-            response1.EnemyField = response1.MainField;
+            response = new StartGameResponse { GameState = GetPlayer2MatchStateData(match) };
+            Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.StartGameResponse, response);
+        }
 
-            Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.StartGameResponse, response2);
+        private GameStateData GetPlayer1MatchStateData(GameMatch match)
+        {
+            GameStateData data = new GameStateData();
+            data.MainPlayer = match.Player1.ToData();
+            data.EnemyPlayer = match.Player2.ToData();
+            data.MainField = match.Field1.ToData();
+            data.EnemyField = match.Field2.ToData();
+            return data;
+        }
+
+        private GameStateData GetPlayer2MatchStateData(GameMatch match)
+        {
+            GameStateData data = new GameStateData();
+            data.MainPlayer = match.Player2.ToData();
+            data.EnemyPlayer = match.Player1.ToData();
+            data.MainField = match.Field2.ToData();
+            data.EnemyField = match.Field1.ToData();
+            return data;
         }
 
         #endregion

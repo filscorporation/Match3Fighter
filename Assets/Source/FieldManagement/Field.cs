@@ -1,10 +1,23 @@
 ﻿namespace Assets.Source.FieldManagement
 {
+    public enum FieldType
+    {
+        Player,
+        Enemy,
+    }
+
     /// <summary>
     /// Stores one field info
     /// </summary>
     public class Field
     {
         public Block[,] Blocks;
+
+        public FieldType Type;
+
+        public Field(FieldType type)
+        {
+            Type = type;
+        }
     }
 }

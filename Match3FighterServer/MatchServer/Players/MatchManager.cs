@@ -19,7 +19,7 @@ namespace MatchServer.Players
         }
 
         /// <summary>
-        /// Begins fight between to players
+        /// Begins fight between two players
         /// </summary>
         /// <param name="player1"></param>
         /// <param name="player2"></param>

@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="FieldManagement\Block.cs" />
     <Compile Include="FieldManagement\Field.cs" />
+    <Compile Include="FieldManagement\Swap.cs" />
     <Compile Include="GameCore.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Player.cs" />

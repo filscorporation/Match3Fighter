@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MatchServer.Players
 {
@@ -10,11 +7,11 @@ namespace MatchServer.Players
     {
         private readonly MatchManager matchManager;
 
-        public Dictionary<string, Player> Players = new Dictionary<string, Player>();
+        public ConcurrentDictionary<string, Player> Players = new ConcurrentDictionary<string, Player>();
 
-        private readonly Dictionary<int, string> Sessions = new Dictionary<int, string>();
+        private readonly ConcurrentDictionary<int, string> Sessions = new ConcurrentDictionary<int, string>();
 
-        private readonly List<Player> queue = new List<Player>();
+        private readonly ConcurrentBag<Player> queue = new ConcurrentBag<Player>();
 
         public PlayersManager(MatchManager matchManager)
         {
@@ -28,12 +25,12 @@ namespace MatchServer.Players
         /// <param name="playerID"></param>
         public void LogIn(int clientID, string playerID)
         {
-            Sessions.Add(clientID, playerID);
+            Sessions.TryAdd(clientID, playerID);
 
             // TODO: temp, players will be stored
             Player player = new Player(clientID);
             player.PlayerID = playerID;
-            Players.Add(playerID, player);
+            Players.TryAdd(playerID, player);
         }
 
         /// <summary>
@@ -42,7 +39,7 @@ namespace MatchServer.Players
         /// <param name="clientID"></param>
         public void LogOut(int clientID)
         {
-            Sessions.Remove(clientID);
+            Sessions.TryRemove(clientID, out _);
         }
 
         /// <summary>
@@ -51,7 +48,11 @@ namespace MatchServer.Players
         /// <param name="index"></param>
         public Player GetPlayer(int index)
         {
-            return Players[Sessions[index]];
+            if (Sessions.TryGetValue(index, out string key)
+                && Players.TryGetValue(key, out Player player))
+                return player;
+                
+            return null;
         }
 
         /// <summary>
@@ -71,19 +72,16 @@ namespace MatchServer.Players
         public void TryMakeMatch()
         {
             // TODO: temp
-            if (queue.Count >= 1)
-            {
-                Player player = queue[0];
-                queue.RemoveAt(0);
-                matchManager.MakeMatch(player, player);
-            }
+            //if (queue.Count >= 1)
+            //{
+            //    queue.TryTake(out Player player);
+            //    matchManager.MakeMatch(player, player);
+            //}
 
             if (queue.Count >= 2)
             {
-                Player player1 = queue[0];
-                Player player2 = queue[1];
-                queue.RemoveAt(1);
-                queue.RemoveAt(0);
+                queue.TryTake(out Player player1);
+                queue.TryTake(out Player player2);
                 matchManager.MakeMatch(player1, player2);
             }
         }

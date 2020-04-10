@@ -13,6 +13,12 @@ namespace Assets.Source.FieldManagement
     /// </summary>
     public class Block : MonoBehaviour
     {
+        public int X;
+
+        public int Y;
+
         public BlockTypes Type;
+
+        public Field Field;
     }
 }

@@ -42,9 +42,13 @@
   <ItemGroup>
     <Compile Include="Core\IServerListener.cs" />
     <Compile Include="Core\ThreadManager.cs" />
+    <Compile Include="Data\BlockSwapRequest.cs" />
+    <Compile Include="Data\ErrorResponse.cs" />
     <Compile Include="Data\Field\BlockData.cs" />
     <Compile Include="Data\Field\BlockTypes.cs" />
     <Compile Include="Data\Field\FeildData.cs" />
+    <Compile Include="Data\GameStateData.cs" />
+    <Compile Include="Data\GameStateResponse.cs" />
     <Compile Include="Data\LogInRequest.cs" />
     <Compile Include="Data\ConnectResponse.cs" />
     <Compile Include="Data\DataType.cs" />

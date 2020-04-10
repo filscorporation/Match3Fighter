@@ -1,5 +1,6 @@
 ﻿using System;
 using Assets.Source.FieldManagement;
+using Assets.Source.InputManagement;
 using Assets.Source.NetworkManagement;
 using NetworkShared.Data;
 using UnityEngine;
@@ -23,7 +24,9 @@ namespace Assets.Source.GameManagement
             }
         }
 
-        private const string MainMenuSceneName = "MainMenu";
+        public InputManagerBase InputManager;
+
+        private const string MainMenuSceneName = "MainMenuScene";
         private const string GameSceneName = "GameScene";
 
         public static StartGameResponse GameDataToStart;
@@ -43,8 +46,8 @@ namespace Assets.Source.GameManagement
         {
             Debug.Log("Starting game");
 
-            FieldManager.Instance.GenerateMainField(response.MainField);
-            FieldManager.Instance.GenerateEnemyField(response.EnemyField);
+            FieldManager.Instance.GenerateMainField(response.GameState.MainField);
+            FieldManager.Instance.GenerateEnemyField(response.GameState.EnemyField);
         }
 
         /// <summary>
@@ -59,6 +62,16 @@ namespace Assets.Source.GameManagement
         }
 
         /// <summary>
+        /// Ends game
+        /// </summary>
+        public void FinishGame()
+        {
+            Debug.Log("Finish game");
+
+            SceneManager.LoadScene(MainMenuSceneName);
+        }
+
+        /// <summary>
         /// Starts game from game data
         /// </summary>
         /// <param name="response"></param>
@@ -68,6 +81,33 @@ namespace Assets.Source.GameManagement
 
             GameDataToStart = response;
             SceneManager.LoadScene(GameSceneName);
+        }
+
+        /// <summary>
+        /// Change game state - players, fields etc
+        /// </summary>
+        /// <param name="data"></param>
+        public void ChangeGameState(GameStateData data)
+        {
+            FieldManager.Instance.DeleteFields();
+
+            FieldManager.Instance.GenerateMainField(data.MainField);
+            FieldManager.Instance.GenerateEnemyField(data.EnemyField);
+        }
+
+        /// <summary>
+        /// Request field state after block swap
+        /// </summary>
+        public void OnPlayerBlockSwap(int x, int y, BlockSwipeDirection direction)
+        {
+            Debug.Log("Send swap");
+
+            BlockSwapRequest request = new BlockSwapRequest();
+            request.X = x;
+            request.Y = y;
+            request.Direction = (int) direction;
+
+            NetworkManager.Instance.SendBlockSwapData(request);
         }
     }
 }
