@@ -55,6 +55,8 @@ namespace MatchServer
         /// </summary>
         public float ManaPerSecond;
 
+        public float BlockSwapCost = 20F;
+
         private DateTime lastUpdate;
 
         public Player(int clientID)
@@ -62,13 +64,50 @@ namespace MatchServer
             ClientID = clientID;
 
             Name = "Player" + clientID;
-            MaxHealth = 35F;
+            MaxHealth = 100F;
             Health = MaxHealth;
-            MaxMana = 50F;
+            MaxMana = 200F;
             Mana = MaxMana;
             ManaPerSecond = 2.5F;
 
             lastUpdate = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Updates stats that has regeneration per second 
+        /// </summary>
+        public void Update()
+        {
+            float mana = (float)(DateTime.UtcNow - lastUpdate).TotalSeconds * ManaPerSecond;
+            Mana = Math.Min(Mana + mana, MaxMana);
+
+            lastUpdate = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Sets stats to max
+        /// </summary>
+        public void Refresh()
+        {
+            Mana = MaxMana;
+            Health = MaxHealth;
+            
+            lastUpdate = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Tries to spend mana
+        /// </summary>
+        /// <param name="mana"></param>
+        /// <returns></returns>
+        public bool TrySpendMana(float mana)
+        {
+            if (Mana < mana)
+                return false;
+
+            Mana -= mana;
+
+            return true;
         }
 
         public PlayerData ToData()

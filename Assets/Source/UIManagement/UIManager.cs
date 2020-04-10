@@ -44,15 +44,15 @@ namespace Assets.Source.UIManagement
         public void SetPlayerUI(Player player)
         {
             PlayerNameText.text = player.Name;
-            PlayerHPText.text = $"{player.Health}hp";
-            PlayerMPText.text = $"{player.Mana}mp";
+            PlayerHPText.text = $"{Mathf.RoundToInt(player.Health)}hp";
+            PlayerMPText.text = $"{Mathf.RoundToInt(player.Mana)}mp";
         }
 
         public void SetEnemyUI(Player player)
         {
             EnemyNameText.text = player.Name;
-            EnemyHPText.text = $"{player.Health}hp";
-            EnemyMPText.text = $"{player.Mana}mp";
+            EnemyHPText.text = $"{Mathf.RoundToInt(player.Health)}hp";
+            EnemyMPText.text = $"{Mathf.RoundToInt(player.Mana)}mp";
         }
     }
 }

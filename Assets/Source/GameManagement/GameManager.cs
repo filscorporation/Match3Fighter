@@ -47,6 +47,8 @@ namespace Assets.Source.GameManagement
         {
             Debug.Log("Starting game");
 
+            PlayerManager.Instance.Initialize();
+
             PlayerManager.Instance.SetPlayerState(response.GameState.MainPlayer);
             PlayerManager.Instance.SetEnemyState(response.GameState.EnemyPlayer);
 

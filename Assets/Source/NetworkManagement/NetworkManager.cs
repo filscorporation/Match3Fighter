@@ -77,7 +77,7 @@ namespace Assets.Source.NetworkManagement
                     HandleGameStateResponse((GameStateResponse) data);
                     break;
                 case DataTypes.ErrorResponse:
-                    Debug.Log(((ErrorResponse)data));
+                    Debug.Log(((ErrorResponse)data).Type);
                     break;
                 case DataTypes.LogInRequest:
                 case DataTypes.PutPlayerIntoQueueRequest:

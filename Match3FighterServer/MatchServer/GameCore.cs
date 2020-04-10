@@ -176,12 +176,18 @@ namespace MatchServer
 
             GameMatch match = player.CurrentMatch;
             Field field = match.Player1 == player ? match.Field1 : match.Field2;
+
+            player.Update();
+            if (!player.TrySpendMana(player.BlockSwapCost))
+            {
+                SendError(player.ClientID, ErrorType.NotEnoughMana);
+                return;
+            }
+
             List<Effect> effects = new List<Effect>();
             if (!FieldManager.TryRebuildFieldFromSwap(field, new Swap(request.X, request.Y, request.Direction), out effects))
             {
-                Console.WriteLine($"Impossible turn from player {clientID}");
-                ErrorResponse error = new ErrorResponse();
-                Server.SendDataToClient(player.ClientID, (int)DataTypes.ErrorResponse, error);
+                SendError(player.ClientID, ErrorType.ImpossibleTurn);
             }
 
             GameStateResponse response = new GameStateResponse { GameState = GetPlayer1MatchStateData(match) };
@@ -193,6 +199,13 @@ namespace MatchServer
 
             response = new GameStateResponse { GameState = GetPlayer2MatchStateData(match) };
             Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameStateResponse, response);
+        }
+
+        private void SendError(int clientID, ErrorType type)
+        {
+            ErrorResponse error = new ErrorResponse();
+            error.Type = type;
+            Server.SendDataToClient(clientID, (int)DataTypes.ErrorResponse, error);
         }
 
         #endregion

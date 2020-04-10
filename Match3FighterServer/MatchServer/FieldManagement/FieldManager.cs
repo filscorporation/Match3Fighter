@@ -14,7 +14,7 @@ namespace MatchServer.FieldManagement
 
         private const int minComboCount = 3;
 
-        private BlockEffectsManager blockEffectsManager;
+        private readonly BlockEffectsManager blockEffectsManager;
         private readonly Random random;
 
         public FieldManager()

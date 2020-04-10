@@ -28,8 +28,10 @@ namespace MatchServer.Players
             GameMatch match = new GameMatch();
             match.Player1 = player1;
             player1.CurrentMatch = match;
+            player1.Refresh();
             match.Player2 = player2;
             player2.CurrentMatch = match;
+            player2.Refresh();
 
             match.Field1 = fieldManager.GenerateFieldForPlayer(player1);
             match.Field2 = fieldManager.GenerateFieldForPlayer(player2);

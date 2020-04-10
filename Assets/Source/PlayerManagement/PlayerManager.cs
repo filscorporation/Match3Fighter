@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Assets.Source.UIManagement;
 using NetworkShared.Data.Player;
 using UnityEngine;
@@ -32,13 +28,35 @@ namespace Assets.Source.PlayerManagement
 
         private Player enemy;
 
+        public void FixedUpdate()
+        {
+            EstimatePlayersStats(player);
+            UIManager.Instance.SetPlayerUI(player);
+            EstimatePlayersStats(enemy);
+            UIManager.Instance.SetEnemyUI(enemy);
+        }
+
+        public void EstimatePlayersStats(Player p)
+        {
+            float mana = Time.fixedDeltaTime * p.ManaPerSecond;
+            p.Mana = Math.Min(p.Mana + mana, p.MaxMana);
+        }
+        
+        /// <summary>
+        /// Creates players info
+        /// </summary>
+        public void Initialize()
+        {
+            player = new Player();
+            enemy = new Player();
+        }
+
         /// <summary>
         /// Sets players UI and local data
         /// </summary>
         /// <param name="data"></param>
         public void SetPlayerState(PlayerData data)
         {
-            player = new Player();
             player.Name = data.Name;
             player.MaxHealth = data.MaxHealth;
             player.Health = data.Health;
@@ -55,7 +73,6 @@ namespace Assets.Source.PlayerManagement
         /// <param name="data"></param>
         public void SetEnemyState(PlayerData data)
         {
-            enemy = new Player();
             enemy.Name = data.Name;
             enemy.MaxHealth = data.MaxHealth;
             enemy.Health = data.Health;
