@@ -2,6 +2,7 @@
 using Assets.Source.FieldManagement;
 using Assets.Source.InputManagement;
 using Assets.Source.NetworkManagement;
+using Assets.Source.PlayerManagement;
 using NetworkShared.Data;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -45,6 +46,9 @@ namespace Assets.Source.GameManagement
         private void StartGame(StartGameResponse response)
         {
             Debug.Log("Starting game");
+
+            PlayerManager.Instance.SetPlayerState(response.GameState.MainPlayer);
+            PlayerManager.Instance.SetEnemyState(response.GameState.EnemyPlayer);
 
             FieldManager.Instance.GenerateMainField(response.GameState.MainField);
             FieldManager.Instance.GenerateEnemyField(response.GameState.EnemyField);
@@ -90,6 +94,9 @@ namespace Assets.Source.GameManagement
         public void ChangeGameState(GameStateData data)
         {
             FieldManager.Instance.DeleteFields();
+
+            PlayerManager.Instance.SetPlayerState(data.MainPlayer);
+            PlayerManager.Instance.SetPlayerState(data.EnemyPlayer);
 
             FieldManager.Instance.GenerateMainField(data.MainField);
             FieldManager.Instance.GenerateEnemyField(data.EnemyField);

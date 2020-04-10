@@ -1,9 +1,9 @@
-﻿using System;
-
-namespace NetworkShared.Data.Player
+﻿namespace Assets.Source.PlayerManagement
 {
-    [Serializable]
-    public class PlayerData
+    /// <summary>
+    /// Players stats in game
+    /// </summary>
+    public class Player
     {
         public string Name;
 
