@@ -20,6 +20,11 @@ namespace MatchServer
     {
         public static GameCore Instance;
 
+        /// <summary>
+        /// For debug purposes, allows to start match with one player taking both players slots
+        /// </summary>
+        public const bool AllowOnePlayerMode = false;
+
         public bool IsRunning = false;
         public const int TicksPerSec = 30;
         public const int MsPerTick = 1000 / TicksPerSec;
@@ -210,8 +215,7 @@ namespace MatchServer
             };
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
 
-            // TODO: temp
-            if (match.Player1 == match.Player2)
+            if (GameCore.AllowOnePlayerMode && match.Player1 == match.Player2)
                 return;
 
             response = new GameStateResponse
@@ -244,8 +248,7 @@ namespace MatchServer
             StartGameResponse response = new StartGameResponse { GameState = GetPlayer1MatchStateData(match) };
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.StartGameResponse, response);
 
-            // TODO: temp
-            if (match.Player1 == match.Player2)
+            if (AllowOnePlayerMode && match.Player1 == match.Player2)
                 return;
 
             response = new StartGameResponse { GameState = GetPlayer2MatchStateData(match) };

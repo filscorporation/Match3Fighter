@@ -98,7 +98,7 @@ namespace Assets.Source.GameManagement
             FieldManager.Instance.DeleteFields();
 
             PlayerManager.Instance.SetPlayerState(data.MainPlayer);
-            PlayerManager.Instance.SetPlayerState(data.EnemyPlayer);
+            PlayerManager.Instance.SetEnemyState(data.EnemyPlayer);
 
             FieldManager.Instance.GenerateMainField(data.MainField);
             FieldManager.Instance.GenerateEnemyField(data.EnemyField);

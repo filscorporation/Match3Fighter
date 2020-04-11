@@ -71,8 +71,7 @@ namespace MatchServer.Players
         /// </summary>
         public void TryMakeMatch()
         {
-            // TODO: temp
-            if (queue.Count >= 1)
+            if (GameCore.AllowOnePlayerMode && queue.Count >= 1)
             {
                 queue.TryTake(out Player player);
                 matchManager.MakeMatch(player, player);
