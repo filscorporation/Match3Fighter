@@ -22,6 +22,11 @@ namespace MatchServer.FieldManagement
 
         public Block ReplacedBlock;
 
+        private const float AttackBlockChance = 0.36F;
+        private const float HealBlockChance = 0.23F;
+        private const float ManaBlockChance = 0.23F;
+        private const float ArcaneBlockChance = 1F - AttackBlockChance - HealBlockChance - ManaBlockChance;
+
         /// <summary>
         /// Returns randomly generated block
         /// </summary>
@@ -31,8 +36,15 @@ namespace MatchServer.FieldManagement
         {
             Block block = new Block();
 
-            int n = random.Next(Enum.GetNames(typeof(BlockTypes)).Length - 1);
-            block.Type = (BlockTypes)n;
+            double n = random.NextDouble();
+            if (n < AttackBlockChance)
+                block.Type = BlockTypes.Attack;
+            else if (n < AttackBlockChance + HealBlockChance)
+                block.Type = BlockTypes.Health;
+            else if (n < AttackBlockChance + HealBlockChance + ManaBlockChance)
+                block.Type = BlockTypes.Mana;
+            else
+                block.Type = BlockTypes.Arcane;
 
             return block;
         }
