@@ -125,9 +125,6 @@ namespace Assets.Source.FieldManagement
                 case BlockTypes.Arcane:
                     sprite.color = Color.magenta;
                     break;
-                case BlockTypes.Gold:
-                    sprite.color = Color.yellow;
-                    break;
                 case BlockTypes.Chameleon:
                     sprite.color = Color.white;
                     break;

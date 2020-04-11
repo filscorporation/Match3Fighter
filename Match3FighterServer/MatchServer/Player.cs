@@ -102,12 +102,41 @@ namespace MatchServer
         /// <returns></returns>
         public bool TrySpendMana(float mana)
         {
+            Update();
+
             if (Mana < mana)
                 return false;
 
             Mana -= mana;
 
             return true;
+        }
+
+        /// <summary>
+        /// Adds mana
+        /// </summary>
+        /// <param name="mana"></param>
+        public void GainMana(float mana)
+        {
+            Mana = Math.Min(Mana + mana, MaxMana);
+        }
+
+        /// <summary>
+        /// Adds health
+        /// </summary>
+        /// <param name="health"></param>
+        public void GainHealth(float health)
+        {
+            Health = Math.Min(Health + health, MaxHealth);
+        }
+
+        /// <summary>
+        /// Makes player take damage
+        /// </summary>
+        /// <param name="damage"></param>
+        public void TakeDamage(float damage)
+        {
+            Health -= damage;
         }
 
         public PlayerData ToData()

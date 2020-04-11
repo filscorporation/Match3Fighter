@@ -61,6 +61,10 @@
     <Compile Include="FieldManagement\Block.cs" />
     <Compile Include="FieldManagement\BlockEffectsManager.cs" />
     <Compile Include="FieldManagement\Effect.cs" />
+    <Compile Include="FieldManagement\Effects\ArcaneBlockEffect.cs" />
+    <Compile Include="FieldManagement\Effects\AttackBlockEffect.cs" />
+    <Compile Include="FieldManagement\Effects\HealthBlockEffect.cs" />
+    <Compile Include="FieldManagement\Effects\ManaBlockEffect.cs" />
     <Compile Include="FieldManagement\Field.cs" />
     <Compile Include="FieldManagement\Swap.cs" />
     <Compile Include="GameCore.cs" />

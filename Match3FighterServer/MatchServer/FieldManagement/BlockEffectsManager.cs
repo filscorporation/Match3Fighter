@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using MatchServer.Players;
+using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
 
 namespace MatchServer.FieldManagement
@@ -10,37 +13,46 @@ namespace MatchServer.FieldManagement
     /// </summary>
     public class BlockEffectsManager
     {
+        private readonly FieldManager fieldManager;
+
+        private readonly Random random;
+
+        private Dictionary<BlockTypes, Effect> effects;
+
+        public BlockEffectsManager(FieldManager fieldManager)
+        {
+            this.fieldManager = fieldManager;
+
+            random = new Random();
+
+            InitializeEffects();
+        }
+
+        private void InitializeEffects()
+        {
+            effects = new Dictionary<BlockTypes, Effect>();
+            foreach (Type type in Assembly.GetAssembly(typeof(Effect)).GetTypes()
+                .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(Effect))))
+            {
+                Effect effect = (Effect)Activator.CreateInstance(type);
+                effects[effect.ComboEffectType] = effect;
+            }
+        }
+
         /// <summary>
         /// Returns effect from combo
         /// </summary>
+        /// <param name="match"></param>
+        /// <param name="playerUserIndex"></param>
         /// <param name="combo"></param>
         /// <returns></returns>
-        public Effect GetEffectFromCombo(List<Block> combo)
+        public EffectData ApplyEffectsFromCombo(GameMatch match, int playerUserIndex, List<Block> combo)
         {
-            Effect effect = new Effect();
-
             BlockTypes comboType = combo.FirstOrDefault(b => b.Type != BlockTypes.Chameleon)?.Type ?? BlockTypes.Chameleon;
-            effect.ComboEffectType = comboType;
-            // TODO:
-            switch (comboType)
-            {
-                case BlockTypes.Attack:
-                    break;
-                case BlockTypes.Mana:
-                    break;
-                case BlockTypes.Health:
-                    break;
-                case BlockTypes.Arcane:
-                    break;
-                case BlockTypes.Gold:
-                    break;
-                case BlockTypes.Chameleon:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            Effect effect = effects[comboType];
+            EffectData data = effect.Apply(fieldManager, random, match, playerUserIndex, combo);
             
-            return effect;
+            return data;
         }
     }
 }

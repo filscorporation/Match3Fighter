@@ -6,6 +6,8 @@ using MatchServer.FieldManagement;
 using MatchServer.Players;
 using NetworkShared.Core;
 using NetworkShared.Data;
+using NetworkShared.Data.Effects;
+using NetworkShared.Data.Field;
 using NetworkShared.Data.Player;
 using NetworkShared.Network;
 
@@ -26,6 +28,7 @@ namespace MatchServer
         public FieldManager FieldManager;
         public MatchManager MatchManager;
         public PlayersManager PlayersManager;
+        private BlockEffectsManager BlockEffectsManager;
 
         #region Core
 
@@ -38,6 +41,7 @@ namespace MatchServer
             FieldManager = new FieldManager();
             MatchManager = new MatchManager(FieldManager);
             PlayersManager = new PlayersManager(MatchManager);
+            BlockEffectsManager = new BlockEffectsManager(FieldManager);
         }
 
         public void Start()
@@ -175,29 +179,46 @@ namespace MatchServer
             }
 
             GameMatch match = player.CurrentMatch;
-            Field field = match.Player1 == player ? match.Field1 : match.Field2;
+            Field playerField = match.Player1 == player ? match.Field1 : match.Field2;
+            Field enemyField = match.Player1 == player ? match.Field2 : match.Field1;
 
-            player.Update();
             if (!player.TrySpendMana(player.BlockSwapCost))
             {
                 SendError(player.ClientID, ErrorType.NotEnoughMana);
                 return;
             }
 
-            List<Effect> effects = new List<Effect>();
-            if (!FieldManager.TryRebuildFieldFromSwap(field, new Swap(request.X, request.Y, request.Direction), out effects))
+            if (!FieldManager.TryRebuildFieldFromSwap(playerField, new Swap(request.X, request.Y, request.Direction), out List<Block> blocks))
             {
                 SendError(player.ClientID, ErrorType.ImpossibleTurn);
             }
+            
+            List<EffectData> effectsData = new List<EffectData>();
+            List<List<Block>> combos = FieldManager.CheckForCombos(playerField, blocks);
+            foreach (List<Block> combo in combos)
+            {
+                FieldManager.DestroyBlocks(playerField, combo, BlockState.DestroyedAsCombo);
+                effectsData.Add(BlockEffectsManager.ApplyEffectsFromCombo(match, match.Player1 == player ? 1 : 2, combo));
+            }
 
-            GameStateResponse response = new GameStateResponse { GameState = GetPlayer1MatchStateData(match) };
+            FieldManager.FillHoles(playerField);
+            FieldManager.FillHoles(enemyField);
+
+            GameStateResponse response = new GameStateResponse {
+                GameState = GetPlayer1MatchStateData(match),
+                Effects = effectsData.ToArray()
+            };
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
 
             // TODO: temp
             if (match.Player1 == match.Player2)
                 return;
 
-            response = new GameStateResponse { GameState = GetPlayer2MatchStateData(match) };
+            response = new GameStateResponse
+            {
+                GameState = GetPlayer2MatchStateData(match),
+                Effects = effectsData.ToArray()
+            };
             Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameStateResponse, response);
         }
 

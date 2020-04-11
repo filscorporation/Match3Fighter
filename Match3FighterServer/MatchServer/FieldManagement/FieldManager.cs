@@ -14,12 +14,10 @@ namespace MatchServer.FieldManagement
 
         private const int minComboCount = 3;
 
-        private readonly BlockEffectsManager blockEffectsManager;
         private readonly Random random;
 
         public FieldManager()
         {
-            blockEffectsManager = new BlockEffectsManager();
             random = new Random();
         }
 
@@ -46,14 +44,15 @@ namespace MatchServer.FieldManagement
         }
 
         /// <summary>
-        /// Processes block swap and rebuilds field
+        /// Processes block swap
         /// </summary>
         /// <param name="field"></param>
         /// <param name="swap"></param>
+        /// <param name="affected">Blocks that was affected by swap</param>
         /// <returns>True if swap is possible</returns>
-        public bool TryRebuildFieldFromSwap(Field field, Swap swap, out List<Effect> effects)
+        public bool TryRebuildFieldFromSwap(Field field, Swap swap, out List<Block> affected)
         {
-            effects = new List<Effect>();
+            affected = new List<Block>();
 
             int w = field.Blocks.GetLength(0);
             int h = field.Blocks.GetLength(1);
@@ -83,16 +82,48 @@ namespace MatchServer.FieldManagement
             blockA.X = nx;
             blockA.Y = ny;
 
-            List<List<Block>> combos = CheckForCombos(field, new List<Block> { blockA, blockB });
-            foreach (List<Block> combo in combos)
-            {
-                effects.Add(blockEffectsManager.GetEffectFromCombo(combo));
-                DestroyBlocks(field, combo, BlockState.DestroyedAsCombo);
-            }
-
-            FillHoles(field);
+            affected.Add(blockA);
+            affected.Add(blockB);
 
             return true;
+        }
+
+        /// <summary>
+        /// Returns random block on a field that is not in destroyed state
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public Block GetRandomNonDestroyedBlock(Field field)
+        {
+            int totalNonDestroyed = 0;
+            for (int i = 0; i < fieldWidth; i++)
+            {
+                for (int j = 0; j < fieldHeight; j++)
+                {
+                    if (!field.Blocks[i, j].IsInDestroyedState())
+                        totalNonDestroyed++;
+                }
+            }
+
+            if (totalNonDestroyed == 0)
+                return null;
+
+            int randomIndex = random.Next(0, totalNonDestroyed);
+
+            for (int i = 0; i < fieldWidth; i++)
+            {
+                for (int j = 0; j < fieldHeight; j++)
+                {
+                    if (!field.Blocks[i, j].IsInDestroyedState())
+                    {
+                        if (randomIndex == 0)
+                            return field.Blocks[i, j];
+                        randomIndex--;
+                    }
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -100,7 +131,7 @@ namespace MatchServer.FieldManagement
         /// </summary>
         /// <param name="field"></param>
         /// <param name="includeAny"></param>
-        private List<List<Block>> CheckForCombos(Field field, List<Block> includeAny)
+        public List<List<Block>> CheckForCombos(Field field, List<Block> includeAny)
         {
             List<List<Block>> combos = new List<List<Block>>();
 
@@ -118,6 +149,64 @@ namespace MatchServer.FieldManagement
             }
 
             return combos;
+        }
+
+        /// <summary>
+        /// Put all blocks into destroyed state
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="blocks"></param>
+        /// <param name="destroyedState"></param>
+        public void DestroyBlocks(Field field, List<Block> blocks, BlockState destroyedState)
+        {
+            foreach (Block block in blocks)
+            {
+                block.State = destroyedState;
+            }
+        }
+
+        /// <summary>
+        /// Fills all destroyed blocks with new from above
+        /// </summary>
+        /// <param name="field"></param>
+        public void FillHoles(Field field)
+        {
+            int w = field.Blocks.GetLength(0);
+            int h = field.Blocks.GetLength(1);
+
+            for (int i = 0; i < w; i++)
+            {
+                int offset = 0;
+                for (int j = 0; j < h; j++)
+                {
+                    Block block = field.Blocks[i, j];
+                    if (block.IsInDestroyedState())
+                    {
+                        offset++;
+                    }
+                    else
+                    {
+                        if (offset > 0)
+                        {
+                            block.ReplacedBlock = field.Blocks[i, j - offset];
+                            field.Blocks[i, j - offset] = block;
+                            block.X = i;
+                            block.Y = j - offset;
+                            field.Blocks[i, j] = null;
+                        }
+                    }
+                }
+
+                for (int j = h - 1; j >= 0; j--)
+                {
+                    if (offset <= 0)
+                        break;
+                    field.Blocks[i, j] = Block.GetRandomBlock(random);
+                    field.Blocks[i, j].X = i;
+                    field.Blocks[i, j].Y = j;
+                    offset--;
+                }
+            }
         }
 
         private void AddAllSameHorizontally(Field field, List<Block> outResult, Block start)
@@ -159,54 +248,6 @@ namespace MatchServer.FieldManagement
                     outResult.Add(block);
                 else
                     break;
-            }
-        }
-
-        private void DestroyBlocks(Field field, List<Block> blocks, BlockState destroyedState)
-        {
-            foreach (Block block in blocks)
-            {
-                block.State = destroyedState;
-            }
-        }
-
-        private void FillHoles(Field field)
-        {
-            int w = field.Blocks.GetLength(0);
-            int h = field.Blocks.GetLength(1);
-            
-            for (int i = 0; i < w; i++)
-            {
-                int offset = 0;
-                for (int j = 0; j < h; j++)
-                {
-                    Block block = field.Blocks[i, j];
-                    if (block.IsInDestroyedState())
-                    {
-                        offset++;
-                    }
-                    else
-                    {
-                        if (offset > 0)
-                        {
-                            block.ReplacedBlock = field.Blocks[i, j - offset];
-                            field.Blocks[i, j - offset] = block;
-                            block.X = i;
-                            block.Y = j - offset;
-                            field.Blocks[i, j] = null;
-                        }
-                    }
-                }
-
-                for (int j = h - 1; j >= 0; j--)
-                {
-                    if (offset <= 0)
-                        break;
-                    field.Blocks[i, j] = Block.GetRandomBlock(random);
-                    field.Blocks[i, j].X = i;
-                    field.Blocks[i, j].Y = j;
-                    offset--;
-                }
             }
         }
     }
