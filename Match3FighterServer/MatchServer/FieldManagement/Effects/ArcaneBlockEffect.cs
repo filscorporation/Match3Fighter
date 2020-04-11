@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MatchServer.Players;
 using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
@@ -26,6 +23,25 @@ namespace MatchServer.FieldManagement.Effects
             Field playerField = playerUserIndex == 1 ? match.Field1 : match.Field2;
             Field enemyField = playerUserIndex == 1 ? match.Field2 : match.Field1;
 
+            // TODO: fill data what happend
+            EffectData data = new EffectData();
+
+            int effectsCount = Math.Max(1, combo.Count - FieldManager.MinComboCount);
+            for (int i = 0; i < effectsCount; i++)
+            {
+                Action(manager, data, random, player, playerField, enemy, enemyField);
+            }
+
+            if (combo.Count > 3)
+            {
+                manager.CreateBlockInRange(playerField, BlockTypes.Chameleon, combo);
+            }
+
+            return data;
+        }
+
+        private void Action(FieldManager manager, EffectData data, Random random, Player player, Field playerField, Player enemy, Field enemyField)
+        {
             int r = random.Next(0, 3);
 
             switch (r)
@@ -62,12 +78,6 @@ namespace MatchServer.FieldManagement.Effects
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-
-            // TODO: fill data what happend
-            EffectData data = new EffectData();
-
-            return data;
         }
     }
 }

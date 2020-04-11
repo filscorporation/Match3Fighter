@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NetworkShared.Data.Field;
 
 namespace MatchServer.FieldManagement
@@ -12,7 +13,7 @@ namespace MatchServer.FieldManagement
         private const int fieldWidth = 6;
         private const int fieldHeight = 6;
 
-        private const int minComboCount = 3;
+        public const int MinComboCount = 3;
 
         private readonly Random random;
 
@@ -137,12 +138,10 @@ namespace MatchServer.FieldManagement
 
             foreach (Block block in includeAny)
             {
-                List<Block> ver = new List<Block>();
-                AddAllSameVertically(field, ver, block);
-                List<Block> hor = new List<Block>();
-                AddAllSameHorizontally(field, hor, block);
+                List<Block> ver = AddAllSameVertically(field, block);
+                List<Block> hor = AddAllSameHorizontally(field, block);
 
-                if (Math.Max(ver.Count, hor.Count) >= minComboCount)
+                if (Math.Max(ver.Count, hor.Count) >= MinComboCount)
                 {
                     combos.Add(ver.Count > hor.Count ? ver : hor);
                 }
@@ -163,6 +162,30 @@ namespace MatchServer.FieldManagement
             {
                 block.State = destroyedState;
             }
+        }
+
+        /// <summary>
+        /// Creates new block of passed type at position of random block in range
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="blockType"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public Block CreateBlockInRange(Field field, BlockTypes blockType, List<Block> range)
+        {
+            Block block = new Block();
+            block.Type = blockType;
+            block.State = BlockState.CreatedAsComboResult;
+
+            int n = random.Next(0, range.Count);
+            Block blockToReplace = range[n];
+            block.X = blockToReplace.X;
+            block.Y = blockToReplace.Y;
+            block.ReplacedBlock = blockToReplace;
+
+            field.Blocks[block.X, block.Y] = block;
+
+            return block;
         }
 
         /// <summary>
@@ -204,51 +227,143 @@ namespace MatchServer.FieldManagement
                     field.Blocks[i, j] = Block.GetRandomBlock(random);
                     field.Blocks[i, j].X = i;
                     field.Blocks[i, j].Y = j;
+                    field.Blocks[i, j].State = BlockState.Created;
                     offset--;
                 }
             }
         }
 
-        private void AddAllSameHorizontally(Field field, List<Block> outResult, Block start)
+        // TODO: merge next two methods
+        private List<Block> AddAllSameHorizontally(Field field, Block start)
         {
+            List<Block> outResult = new List<Block>();
             outResult.Add(start);
+
+            BlockTypes comboType = start.Type;
             for (int i = start.X + 1; i < field.Blocks.GetLength(0); i++)
             {
                 Block block = field.GetBlock(i, start.Y);
-                if (block != null && block.CanCombo(start))
+                if (comboType == BlockTypes.Chameleon)
+                    comboType = block.Type;
+                if (block != null && block.CanCombo(comboType))
                     outResult.Add(block);
                 else
                     break;
             }
+
+            if (start.Type == BlockTypes.Chameleon)
+                comboType = BlockTypes.Chameleon;
+            List<Block> altResult = new List<Block>();
+
             for (int i = start.X - 1; i >= 0; i--)
             {
                 Block block = field.GetBlock(i, start.Y);
-                if (block != null && block.CanCombo(start))
-                    outResult.Add(block);
+                if (comboType == BlockTypes.Chameleon)
+                    comboType = block.Type;
+                if (block != null && block.CanCombo(comboType))
+                    altResult.Add(block);
                 else
                     break;
             }
+
+            if (start.Type == BlockTypes.Chameleon)
+            {
+                // Middle block for combo was chameleon, we should look which side combo is longer
+                Block altNonChameleon = altResult.FirstOrDefault(b => b.Type != BlockTypes.Chameleon);
+                if (altNonChameleon == null)
+                {
+                    // Alternative side are all chameleons, adding it to combo
+                    outResult.AddRange(altResult);
+                }
+                else
+                {
+                    if (outResult.All(b => b.CanCombo(altNonChameleon.Type)))
+                    {
+                        // All at alternative side can combo with first part, adding
+                        outResult.AddRange(altResult);
+                    }
+                    else
+                    {
+                        // To sides make different combo, taking the longest one
+                        if (outResult.Count - 1 < altResult.Count)
+                        {
+                            outResult = altResult;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                outResult.AddRange(altResult);
+            }
+
+            return outResult;
         }
 
-        private void AddAllSameVertically(Field field, List<Block> outResult, Block start)
+        private List<Block> AddAllSameVertically(Field field, Block start)
         {
+            List<Block> outResult = new List<Block>();
             outResult.Add(start);
+
+            BlockTypes comboType = start.Type;
             for (int j = start.Y + 1; j < field.Blocks.GetLength(1); j++)
             {
                 Block block = field.GetBlock(start.X, j);
-                if (block != null && block.CanCombo(start))
+                if (comboType == BlockTypes.Chameleon)
+                    comboType = block.Type;
+                if (block != null && block.CanCombo(comboType))
                     outResult.Add(block);
                 else
                     break;
             }
+            
+            if (start.Type == BlockTypes.Chameleon)
+                comboType = BlockTypes.Chameleon;
+            List<Block> altResult = new List<Block>();
+
             for (int j = start.Y - 1; j >= 0; j--)
             {
                 Block block = field.GetBlock(start.X, j);
-                if (block != null && block.CanCombo(start))
+                if (comboType == BlockTypes.Chameleon)
+                    comboType = block.Type;
+                if (block != null && block.CanCombo(comboType))
                     outResult.Add(block);
                 else
                     break;
             }
+
+            if (start.Type == BlockTypes.Chameleon)
+            {
+                // Middle block for combo was chameleon, we should look which side combo is longer
+                Block altNonChameleon = altResult.FirstOrDefault(b => b.Type != BlockTypes.Chameleon);
+                if (altNonChameleon == null)
+                {
+                    // Alternative side are all chameleons, adding it to combo
+                    outResult.AddRange(altResult);
+                }
+                else
+                {
+                    if (outResult.All(b => b.CanCombo(altNonChameleon.Type)))
+                    {
+                        // All at alternative side can combo with first part, adding
+                        outResult.AddRange(altResult);
+                    }
+                    else
+                    {
+                        // To sides make different combo, taking the longest one
+                        if (outResult.Count - 1 < altResult.Count)
+                        {
+                            outResult = altResult;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                outResult.AddRange(altResult);
+            }
+
+            return outResult;
         }
     }
 }

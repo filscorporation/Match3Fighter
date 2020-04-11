@@ -40,14 +40,14 @@ namespace MatchServer.FieldManagement
         /// <summary>
         /// Return true if blocks can make combo
         /// </summary>
-        /// <param name="block"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
-        public bool CanCombo(Block block)
+        public bool CanCombo(BlockTypes type)
         {
-            if (block.Type == BlockTypes.Chameleon || Type == BlockTypes.Chameleon)
+            if (type == BlockTypes.Chameleon || Type == BlockTypes.Chameleon)
                 return true;
 
-            return block.Type == Type;
+            return type == Type;
         }
 
         /// <summary>

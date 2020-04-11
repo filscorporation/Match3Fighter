@@ -63,6 +63,7 @@
     <Compile Include="FieldManagement\Effect.cs" />
     <Compile Include="FieldManagement\Effects\ArcaneBlockEffect.cs" />
     <Compile Include="FieldManagement\Effects\AttackBlockEffect.cs" />
+    <Compile Include="FieldManagement\Effects\ChameleonBlockEffect.cs" />
     <Compile Include="FieldManagement\Effects\HealthBlockEffect.cs" />
     <Compile Include="FieldManagement\Effects\ManaBlockEffect.cs" />
     <Compile Include="FieldManagement\Field.cs" />

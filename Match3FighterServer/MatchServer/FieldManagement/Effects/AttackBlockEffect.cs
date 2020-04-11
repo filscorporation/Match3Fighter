@@ -16,11 +16,30 @@ namespace MatchServer.FieldManagement.Effects
 
         public override EffectData Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, List<Block> combo)
         {
+            Field playerField = playerUserIndex == 1 ? match.Field1 : match.Field2;
             Player enemy = playerUserIndex == 1 ? match.Player2 : match.Player1;
             Field enemyField = playerUserIndex == 1 ? match.Field2 : match.Field1;
 
-            if (playerUserIndex == 1)
-                enemy.TakeDamage(DamageToEnemyHealth);
+            // TODO: fill data what happend
+            EffectData data = new EffectData();
+
+            int effectsCount = Math.Max(1, combo.Count - FieldManager.MinComboCount);
+            for (int i = 0; i < effectsCount; i++)
+            {
+                Action(manager, data, enemy, enemyField);
+            }
+
+            if (combo.Count > 3)
+            {
+                manager.CreateBlockInRange(playerField, BlockTypes.Chameleon, combo);
+            }
+
+            return data;
+        }
+
+        private void Action(FieldManager manager, EffectData data, Player enemy, Field enemyField)
+        {
+            enemy.TakeDamage(DamageToEnemyHealth);
 
             for (int i = 0; i < BlocksToAttackCount; i++)
             {
@@ -29,11 +48,6 @@ namespace MatchServer.FieldManagement.Effects
                 if (block != null)
                     manager.DestroyBlocks(enemyField, new List<Block> { block }, BlockState.DestroyedByDamage);
             }
-
-            // TODO: fill data what happend
-            EffectData data = new EffectData();
-
-            return data;
         }
     }
 }

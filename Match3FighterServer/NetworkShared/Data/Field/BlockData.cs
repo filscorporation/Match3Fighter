@@ -11,6 +11,7 @@ namespace NetworkShared.Data.Field
         DestroyedAsCombo,
         Damaged,
         DestroyedByDamage,
+        CreatedAsComboResult,
     }
 
     [Serializable]
