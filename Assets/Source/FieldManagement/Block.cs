@@ -24,6 +24,8 @@ namespace Assets.Source.FieldManagement
 
         public Animation Animation;
 
+        public GameObject DestructionEfect;
+
         private const string destroyedAnimationName = "BlockDestroyed";
         private const string appearedAnimationName = "BlockAppeared";
 
@@ -105,6 +107,10 @@ namespace Assets.Source.FieldManagement
         {
             Animation.PlayQueued(destroyedAnimationName);
             Destroy(gameObject, 2.5F);
+
+            GameObject eff = Instantiate(DestructionEfect, transform.position + new Vector3(0, 0, 5), Quaternion.identity);
+            eff.transform.SetAsFirstSibling();
+            Destroy(eff, 2F);
         }
 
         public void AnimateAppeared()

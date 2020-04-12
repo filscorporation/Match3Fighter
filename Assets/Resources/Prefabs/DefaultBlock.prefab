@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 4115847293272188596}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.95, y: 0.95, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -100,6 +100,8 @@ MonoBehaviour:
   Y: 0
   Type: 0
   Animation: {fileID: 5431381057424581010}
+  DestructionEfect: {fileID: 4778556716296596567, guid: 58fde9cadae0a24418429f5777e07b2d,
+    type: 3}
 --- !u!61 &-587289775231650400
 BoxCollider2D:
   m_ObjectHideFlags: 0

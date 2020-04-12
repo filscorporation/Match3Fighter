@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Assets.Source.GameManagement;
 using Assets.Source.InputManagement;
@@ -30,6 +31,8 @@ namespace Assets.Source.FieldManagement
 
         private Field mainField;
         private Field enemyField;
+
+        public List<Sprite> BlockSprites;
 
         public void Start()
         {
@@ -186,29 +189,9 @@ namespace Assets.Source.FieldManagement
             block.Type = type;
             block.X = i;
             block.Y = j;
-
-            // TODO: textures and dictionary
+            
             SpriteRenderer sprite = block.GetComponent<SpriteRenderer>();
-            switch (block.Type)
-            {
-                case BlockTypes.Attack:
-                    sprite.color = Color.red;
-                    break;
-                case BlockTypes.Mana:
-                    sprite.color = Color.blue;
-                    break;
-                case BlockTypes.Health:
-                    sprite.color = Color.green;
-                    break;
-                case BlockTypes.Arcane:
-                    sprite.color = Color.magenta;
-                    break;
-                case BlockTypes.Chameleon:
-                    sprite.color = Color.white;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            sprite.sprite = BlockSprites[(int) type];
 
             return block;
         }
