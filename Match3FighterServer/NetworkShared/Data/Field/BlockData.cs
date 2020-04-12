@@ -4,10 +4,9 @@ namespace NetworkShared.Data.Field
 {
     public enum BlockState
     {
-        Default,
-        Created,
         DroppedAsNew,
         Moved,
+        Swapped,
         DestroyedAsCombo,
         Damaged,
         DestroyedByDamage,
@@ -17,10 +16,24 @@ namespace NetworkShared.Data.Field
     [Serializable]
     public class BlockData
     {
-        public BlockState State;
-
         public int ID;
 
+        public int X;
+
+        public int Y;
+
+        public BlockStateData[] PreviousStates;
+
         public BlockData ReplacedBlock;
+    }
+
+    [Serializable]
+    public class BlockStateData
+    {
+        public BlockState State;
+
+        public int X;
+
+        public int Y;
     }
 }

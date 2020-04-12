@@ -36,12 +36,27 @@ namespace MatchServer.FieldManagement
                 for (int j = 0; j < fieldHeight; j++)
                 {
                     field.Blocks[i, j] = Block.GetRandomBlock(random);
-                    field.Blocks[i, j].X = i;
-                    field.Blocks[i, j].Y = j;
+                    field.Blocks[i, j].SetXY(i, j);
                 }
             }
 
             return field;
+        }
+
+        /// <summary>
+        /// Sets default state to all blocks
+        /// </summary>
+        /// <param name="field"></param>
+        public void SetDefaultState(Field field)
+        {
+            for (int i = 0; i < fieldWidth; i++)
+            {
+                for (int j = 0; j < fieldHeight; j++)
+                {
+                    field.Blocks[i, j].ReplacedBlock = null;
+                    field.Blocks[i, j].PreviousStates.Clear();
+                }
+            }
         }
 
         /// <summary>
@@ -77,11 +92,11 @@ namespace MatchServer.FieldManagement
                 return false;
 
             field.Blocks[swap.X, swap.Y] = blockB;
-            blockB.X = swap.X;
-            blockB.Y = swap.Y;
+            blockB.RememberState(BlockState.Swapped);
+            blockB.SetXY(swap.X, swap.Y);
             field.Blocks[nx, ny] = blockA;
-            blockA.X = nx;
-            blockA.Y = ny;
+            blockA.RememberState(BlockState.Swapped);
+            blockA.SetXY(nx, ny);
 
             affected.Add(blockA);
             affected.Add(blockB);
@@ -101,7 +116,7 @@ namespace MatchServer.FieldManagement
             {
                 for (int j = 0; j < fieldHeight; j++)
                 {
-                    if (!field.Blocks[i, j].IsInDestroyedState())
+                    if (!field.Blocks[i, j].IsLastDestroyedState())
                         totalNonDestroyed++;
                 }
             }
@@ -115,7 +130,7 @@ namespace MatchServer.FieldManagement
             {
                 for (int j = 0; j < fieldHeight; j++)
                 {
-                    if (!field.Blocks[i, j].IsInDestroyedState())
+                    if (!field.Blocks[i, j].IsLastDestroyedState())
                     {
                         if (randomIndex == 0)
                             return field.Blocks[i, j];
@@ -160,7 +175,7 @@ namespace MatchServer.FieldManagement
         {
             foreach (Block block in blocks)
             {
-                block.State = destroyedState;
+                block.RememberState(destroyedState);
             }
         }
 
@@ -175,12 +190,11 @@ namespace MatchServer.FieldManagement
         {
             Block block = new Block();
             block.Type = blockType;
-            block.State = BlockState.CreatedAsComboResult;
 
             int n = random.Next(0, range.Count);
             Block blockToReplace = range[n];
-            block.X = blockToReplace.X;
-            block.Y = blockToReplace.Y;
+            block.SetXY(blockToReplace.X, blockToReplace.Y);
+            block.RememberState(BlockState.CreatedAsComboResult);
             block.ReplacedBlock = blockToReplace;
 
             field.Blocks[block.X, block.Y] = block;
@@ -203,7 +217,7 @@ namespace MatchServer.FieldManagement
                 for (int j = 0; j < h; j++)
                 {
                     Block block = field.Blocks[i, j];
-                    if (block.IsInDestroyedState())
+                    if (block.IsLastDestroyedState())
                     {
                         offset++;
                     }
@@ -211,11 +225,16 @@ namespace MatchServer.FieldManagement
                     {
                         if (offset > 0)
                         {
+                            field.Blocks[i, j] = null;
+                            if (block.ReplacedBlock != null)
+                            {
+                                // If this block already replaced some - put replaced on this old 
+                                field.Blocks[i, j] = block.ReplacedBlock;
+                            }
                             block.ReplacedBlock = field.Blocks[i, j - offset];
                             field.Blocks[i, j - offset] = block;
-                            block.X = i;
-                            block.Y = j - offset;
-                            field.Blocks[i, j] = null;
+                            block.RememberState(BlockState.Moved);
+                            block.SetXY(i, j - offset);
                         }
                     }
                 }
@@ -224,10 +243,11 @@ namespace MatchServer.FieldManagement
                 {
                     if (offset <= 0)
                         break;
-                    field.Blocks[i, j] = Block.GetRandomBlock(random);
-                    field.Blocks[i, j].X = i;
-                    field.Blocks[i, j].Y = j;
-                    field.Blocks[i, j].State = BlockState.Created;
+                    Block newBlock = Block.GetRandomBlock(random);
+                    newBlock.ReplacedBlock = field.Blocks[i, j];
+                    field.Blocks[i, j] = newBlock;
+                    field.Blocks[i, j].SetXY(i, j);
+                    field.Blocks[i, j].RememberState(BlockState.DroppedAsNew);
                     offset--;
                 }
             }

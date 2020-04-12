@@ -441,6 +441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55d54e67d89f0e644b6e25a159895f3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InputManager: {fileID: 0}
 --- !u!4 &1135475479
 Transform:
   m_ObjectHideFlags: 0
@@ -484,6 +485,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41047c9c8c94f48499f41d3f39cb1326, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerNameText: {fileID: 0}
+  PlayerHPText: {fileID: 0}
+  PlayerMPText: {fileID: 0}
+  EnemyNameText: {fileID: 0}
+  EnemyHPText: {fileID: 0}
+  EnemyMPText: {fileID: 0}
 --- !u!4 &1313491605
 Transform:
   m_ObjectHideFlags: 0

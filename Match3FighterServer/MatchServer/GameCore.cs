@@ -23,7 +23,7 @@ namespace MatchServer
         /// <summary>
         /// For debug purposes, allows to start match with one player taking both players slots
         /// </summary>
-        public const bool AllowOnePlayerMode = false;
+        public const bool AllowOnePlayerMode = true;
 
         public bool IsRunning = false;
         public const int TicksPerSec = 30;
@@ -216,7 +216,11 @@ namespace MatchServer
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
 
             if (GameCore.AllowOnePlayerMode && match.Player1 == match.Player2)
+            {
+                FieldManager.SetDefaultState(playerField);
+                FieldManager.SetDefaultState(enemyField);
                 return;
+            }
 
             response = new GameStateResponse
             {
@@ -224,6 +228,9 @@ namespace MatchServer
                 Effects = effectsData.ToArray()
             };
             Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameStateResponse, response);
+            
+            FieldManager.SetDefaultState(playerField);
+            FieldManager.SetDefaultState(enemyField);
         }
 
         private void SendError(int clientID, ErrorType type)

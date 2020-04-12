@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4115847293272188603}
   - component: {fileID: 4115847293272188601}
   - component: {fileID: -587289775231650400}
+  - component: {fileID: 5431381057424581010}
   m_Layer: 0
   m_Name: DefaultBlock
   m_TagString: Untagged
@@ -81,7 +82,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
+  m_MaskInteraction: 1
   m_SpriteSortPoint: 0
 --- !u!114 &4115847293272188601
 MonoBehaviour:
@@ -98,6 +99,7 @@ MonoBehaviour:
   X: 0
   Y: 0
   Type: 0
+  Animation: {fileID: 5431381057424581010}
 --- !u!61 &-587289775231650400
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -124,3 +126,20 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!111 &5431381057424581010
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4115847293272188596}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations:
+  - {fileID: 7400000, guid: f3de30559f837da428d65f22c9127e34, type: 2}
+  - {fileID: 7400000, guid: 673c4cdca0a03bf429d059b7b7fbfdfc, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0

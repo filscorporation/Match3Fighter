@@ -27,6 +27,22 @@ namespace Assets.Source.InputManagement
         protected abstract void CheckForInput();
 
         /// <summary>
+        /// Freeze input for some time
+        /// </summary>
+        /// <param name="seconds"></param>
+        public void FreezeFor(float seconds)
+        {
+            IsNeedToCheckForInput = false;
+            CancelInvoke(nameof(Unfreeze));
+            Invoke(nameof(Unfreeze), seconds);
+        }
+
+        private void Unfreeze()
+        {
+            IsNeedToCheckForInput = true;
+        }
+
+        /// <summary>
         /// Begin input processing
         /// </summary>
         /// <param name="inputPoint"></param>
@@ -68,17 +84,7 @@ namespace Assets.Source.InputManagement
 
             if (Vector2.Distance(position, swipeStartPoint) > minSwipeDistance)
             {
-                float dx = position.x - swipeStartPoint.x;
-                float dy = position.y - swipeStartPoint.y;
-                BlockSwipeDirection direction;
-                if (Mathf.Abs(dx) > Mathf.Abs(dy))
-                {
-                    direction = dx > 0 ? BlockSwipeDirection.Right : BlockSwipeDirection.Left;
-                }
-                else
-                {
-                    direction = dy > 0 ? BlockSwipeDirection.Top : BlockSwipeDirection.Bottom;
-                }
+                BlockSwipeDirection direction = GetDirection(swipeStartPoint.x, swipeStartPoint.y, position.x, position.y);
 
                 InputEvent inputEvent = new BlockSwipeEvent() { InputObject = swipeStartObject,  Direction = direction };
                 foreach (IInputSubscriber subscriber in subs)
@@ -92,6 +98,29 @@ namespace Assets.Source.InputManagement
 
             swipeStartObject = null;
             return false;
+        }
+
+        /// <summary>
+        /// Returns direction from old point to new
+        /// </summary>
+        /// <param name="oldX"></param>
+        /// <param name="oldY"></param>
+        /// <param name="newX"></param>
+        /// <param name="newY"></param>
+        /// <returns></returns>
+        public static BlockSwipeDirection GetDirection(float oldX, float oldY, float newX, float newY)
+        {
+            float dx = newX - oldX;
+            float dy = newY - oldY;
+
+            if (Mathf.Abs(dx) > Mathf.Abs(dy))
+            {
+                return dx > 0 ? BlockSwipeDirection.Right : BlockSwipeDirection.Left;
+            }
+            else
+            {
+                return dy > 0 ? BlockSwipeDirection.Top : BlockSwipeDirection.Bottom;
+            }
         }
 
         private bool IsPointerOverUIObject(Vector2 inputPoint)

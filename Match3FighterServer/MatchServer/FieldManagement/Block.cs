@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NetworkShared.Data.Field;
 
 namespace MatchServer.FieldManagement
@@ -14,11 +12,11 @@ namespace MatchServer.FieldManagement
     {
         public BlockTypes Type;
 
-        public BlockState State = BlockState.Default;
-
         public int X;
 
         public int Y;
+
+        public Stack<BlockPreviousState> PreviousStates = new Stack<BlockPreviousState>();
 
         public Block ReplacedBlock;
 
@@ -26,6 +24,26 @@ namespace MatchServer.FieldManagement
         private const float HealBlockChance = 0.23F;
         private const float ManaBlockChance = 0.23F;
         private const float ArcaneBlockChance = 1F - AttackBlockChance - HealBlockChance - ManaBlockChance;
+
+        /// <summary>
+        /// Sets block coordinates
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void SetXY(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        /// <summary>
+        /// Saves previous state
+        /// </summary>
+        /// <param name="newState"></param>
+        public void RememberState(BlockState newState)
+        {
+            PreviousStates.Push(new BlockPreviousState(newState, X, Y));
+        }
 
         /// <summary>
         /// Returns randomly generated block
@@ -66,16 +84,52 @@ namespace MatchServer.FieldManagement
         /// Returns if block state is any of destroyed
         /// </summary>
         /// <returns></returns>
-        public bool IsInDestroyedState()
+        public bool IsLastDestroyedState()
         {
-            return State == BlockState.DestroyedAsCombo || State == BlockState.DestroyedByDamage;
+            if (PreviousStates.Any())
+            {
+                BlockState state = PreviousStates.Peek().State;
+                return state == BlockState.DestroyedAsCombo || state == BlockState.DestroyedByDamage;
+            }
+
+            return false;
         }
 
         public BlockData ToData()
         {
             return new BlockData
             {
+                X = X,
+                Y = Y,
                 ID = (int) Type,
+                PreviousStates = PreviousStates.Select(s => s.ToData()).ToArray(),
+                ReplacedBlock = ReplacedBlock?.ToData() ?? null,
+            };
+        }
+    }
+
+    public class BlockPreviousState
+    {
+        public BlockState State;
+
+        public int X;
+
+        public int Y;
+
+        public BlockPreviousState(BlockState state, int x, int y)
+        {
+            State = state;
+            X = x;
+            Y = y;
+        }
+
+        public BlockStateData ToData()
+        {
+            return new BlockStateData
+            {
+                State = State,
+                X = X,
+                Y = Y,
             };
         }
     }

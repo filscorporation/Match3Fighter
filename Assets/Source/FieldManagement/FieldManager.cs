@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Assets.Source.GameManagement;
 using Assets.Source.InputManagement;
 using NetworkShared.Data.Field;
@@ -55,7 +56,7 @@ namespace Assets.Source.FieldManagement
             {
                 for (int j = 0; j < h; j++)
                 {
-                    Destroy(field.Blocks[i, j]);
+                    Destroy(field.Blocks[i, j].gameObject);
                 }
             }
         }
@@ -81,9 +82,16 @@ namespace Assets.Source.FieldManagement
         private Field GenerateField(FieldData data, FieldType type, Vector2 center)
         {
             Field field = new Field(type);
-
+            
             int w = data.Blocks.GetLength(0);
             int h = data.Blocks.GetLength(1);
+
+            float dropY = h + center.y - h / 2F - 0.5F;
+            int[] dropYoffset = new int[w];
+            for (int i = 0; i < w; i++)
+            {
+                dropYoffset[i] = 0;
+            }
 
             field.Blocks = new Block[w, h];
             for (int i = 0; i < w; i++)
@@ -92,18 +100,88 @@ namespace Assets.Source.FieldManagement
                 {
                     float x = i + center.x - w / 2F + 0.5F;
                     float y = j + center.y - h / 2F - 0.5F;
-                    field.Blocks[i, j] = InstantiateBlock(x, y, i, j, (BlockTypes)data.Blocks[i, j].ID);
-                    field.Blocks[i, j].Field = field;
+
+                    void AnimateAllBlockTransitions(Block block, BlockData blockData)
+                    {
+                        if (!(blockData.PreviousStates?.Any() ?? false))
+                            return;
+
+                        foreach (BlockStateData prevState in blockData.PreviousStates)
+                        {
+                            // Block dropped from above as new
+                            if (prevState.State == BlockState.DroppedAsNew)
+                            {
+                                block.AnimateDropped(new Vector2(x, dropY + dropYoffset[i] + 1), true);
+                                dropYoffset[i]++;
+                            }
+
+                            // Block was moved
+                            if (prevState.State == BlockState.Moved)
+                            {
+                                float oldx = prevState.X + center.x - w / 2F + 0.5F;
+                                float oldy = prevState.Y + center.y - h / 2F - 0.5F;
+                                block.AnimateDropped(new Vector2(oldx, oldy));
+                            }
+
+                            // Blocks that swapped
+                            if (prevState.State == BlockState.Swapped)
+                            {
+                                float oldx = prevState.X + center.x - w / 2F + 0.5F;
+                                float oldy = prevState.Y + center.y - h / 2F - 0.5F;
+                                block.AnimateSwap(new Vector2(oldx, oldy));
+                            }
+
+                            // Adding block that was generated from combo
+                            if (prevState.State == BlockState.CreatedAsComboResult)
+                            {
+                                block.AnimateAppeared();
+                            }
+
+                            // Show if previous was destroyed by damage
+                            if (prevState.State == BlockState.DestroyedByDamage)
+                            {
+                                block.AnimateDestroyed();
+                            }
+
+                            // Show if previous was destroyed as combo part
+                            if (prevState.State == BlockState.DestroyedAsCombo)
+                            {
+                                block.AnimateDestroyed();
+                            }
+
+                            if (blockData.ReplacedBlock != null)
+                            {
+                                float oldx = blockData.ReplacedBlock.X + center.x - w / 2F + 0.5F;
+                                float oldy = blockData.ReplacedBlock.Y + center.y - h / 2F - 0.5F;
+                                Block destroyedBlock = InstantiateBlock(field, oldx, oldy, i, j, (BlockTypes)blockData.ReplacedBlock.ID);
+                                
+                                AnimateAllBlockTransitions(destroyedBlock, blockData.ReplacedBlock);
+                            }
+                        }
+                    }
+
+                    Block newBlock = InstantiateBlock(field, x, y, i, j, (BlockTypes)data.Blocks[i, j].ID);
+                    field.Blocks[i, j] = newBlock;
+
+                    AnimateAllBlockTransitions(newBlock, data.Blocks[i, j]);
                 }
             }
+
+            AutoInputInitializer.InputManager.FreezeFor(0.5F);
 
             return field;
         }
 
-        private Block InstantiateBlock(float x, float y, int i, int j, BlockTypes type)
+        private Block InstantiateBlock(Field field, float x, float y, int i, int j, BlockTypes type)
         {
             GameObject go = Instantiate(BlockPrefab, new Vector2(x, y), Quaternion.identity, transform);
             Block block = go.GetComponent<Block>();
+            go.name = $"Block {i} {j}";
+            block.Field = field;
+            if (field.Type == FieldType.Player)
+                block.SetPlayerLayer();
+            else
+                block.SetEnemyLayer();
 
             block.Type = type;
             block.X = i;
@@ -144,6 +222,11 @@ namespace Assets.Source.FieldManagement
             if (input is BlockSwipeEvent swipe)
             {
                 Block block = input.InputObject.GetComponent<Block>();
+                if (block.Field == null)
+                {
+                    // Destroyed block
+                    return;
+                }
                 if (block.Field.Type == FieldType.Enemy)
                 {
                     return;
