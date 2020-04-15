@@ -38,12 +38,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Default
-    uniqueID: 0
-    locked: 0
   - name: PlayerBlocks
     uniqueID: 121929573
     locked: 0
   - name: EnemyBlocks
     uniqueID: 250094913
+    locked: 0
+  - name: Default
+    uniqueID: 0
     locked: 0

@@ -66,9 +66,9 @@ namespace MatchServer
             Name = "Player" + clientID;
             MaxHealth = 100F;
             Health = MaxHealth;
-            MaxMana = 200F;
+            MaxMana = 100F;
             Mana = MaxMana;
-            ManaPerSecond = 2.5F;
+            ManaPerSecond = 1.5F;
 
             lastUpdate = DateTime.UtcNow;
         }

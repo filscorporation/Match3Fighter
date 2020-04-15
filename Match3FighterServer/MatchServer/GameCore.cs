@@ -23,7 +23,7 @@ namespace MatchServer
         /// <summary>
         /// For debug purposes, allows to start match with one player taking both players slots
         /// </summary>
-        public const bool AllowOnePlayerMode = true;
+        public const bool AllowOnePlayerMode = false;
 
         public bool IsRunning = false;
         public const int TicksPerSec = 30;

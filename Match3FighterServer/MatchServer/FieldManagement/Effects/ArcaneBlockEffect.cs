@@ -10,7 +10,7 @@ namespace MatchServer.FieldManagement.Effects
     {
         public int BlocksToAttackCount = 1;
         public float DamageToBlockHealth = 0.7F;
-        public float DamageToEnemyHealth = 10F;
+        public float DamageToEnemyHealth = 5F;
         public float HealthToRestore = 5F;
         public float ManaToRestore = 15F;
 
@@ -49,25 +49,11 @@ namespace MatchServer.FieldManagement.Effects
                 // Attack and small heal
                 case 0:
                     enemy.TakeDamage(DamageToEnemyHealth);
-                    for (int i = 0; i < BlocksToAttackCount; i++)
-                    {
-                        Block block = manager.GetRandomNonDestroyedBlock(enemyField);
-                        // TODO: block damage
-                        if (block != null)
-                            manager.DestroyBlocks(enemyField, new List<Block> { block }, BlockState.DestroyedByDamage);
-                    }
                     player.GainHealth(HealthToRestore);
                     break;
                 // Attack and mana
                 case 1:
                     enemy.TakeDamage(DamageToEnemyHealth);
-                    for (int i = 0; i < BlocksToAttackCount; i++)
-                    {
-                        Block block = manager.GetRandomNonDestroyedBlock(enemyField);
-                        // TODO: block damage
-                        if (block != null)
-                            manager.DestroyBlocks(enemyField, new List<Block> { block }, BlockState.DestroyedByDamage);
-                    }
                     player.GainMana(ManaToRestore);
                     break;
                 // Heal and mana

@@ -10,7 +10,7 @@ namespace MatchServer.FieldManagement.Effects
     {
         public int BlocksToAttackCount = 1;
         public float DamageToBlockHealth = 1F;
-        public float DamageToEnemyHealth = 15F;
+        public float DamageToEnemyHealth = 10F;
 
         public override BlockTypes ComboEffectType => BlockTypes.Attack;
 
