@@ -14,15 +14,16 @@ namespace MatchServer.FieldManagement.Effects
 
         public override BlockTypes ComboEffectType => BlockTypes.Health;
 
-        public override EffectData Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, List<Block> combo)
+        public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, List<Block> combo)
         {
             Player player = playerUserIndex == 1 ? match.Player1 : match.Player2;
             Field playerField = playerUserIndex == 1 ? match.Field1 : match.Field2;
 
-            // TODO: fill data what happend
-            EffectData data = new EffectData();
-
             int effectsCount = Math.Max(1, combo.Count - FieldManager.MinComboCount);
+
+            List<EffectData> data = new List<EffectData>();
+            data.Add(HealthData(player, HealthToRestore * effectsCount));
+
             for (int i = 0; i < effectsCount; i++)
             {
                 Action(manager, data, player, playerField);
@@ -36,7 +37,7 @@ namespace MatchServer.FieldManagement.Effects
             return data;
         }
 
-        private void Action(FieldManager manager, EffectData data, Player player, Field playerField)
+        private void Action(FieldManager manager, List<EffectData> data, Player player, Field playerField)
         {
             player.GainHealth(HealthToRestore);
 

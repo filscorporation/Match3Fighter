@@ -1415,6 +1415,8 @@ MonoBehaviour:
   EnemyNameText: {fileID: 980446389}
   EnemyHPText: {fileID: 1179996958}
   EnemyMPText: {fileID: 1583911928}
+  PlayerStatsEffect: {fileID: 3548091398418767951, guid: 0452394ff0e96134ea6489d772d0cea7,
+    type: 3}
 --- !u!1 &1302159484
 GameObject:
   m_ObjectHideFlags: 0
@@ -1549,8 +1551,8 @@ SpriteMask:
   m_MaskAlphaCutoff: 0.2
   m_FrontSortingLayerID: 121929573
   m_BackSortingLayerID: 121929573
-  m_FrontSortingLayer: 1
-  m_BackSortingLayer: 1
+  m_FrontSortingLayer: -2
+  m_BackSortingLayer: -2
   m_FrontSortingOrder: 1
   m_BackSortingOrder: -1
   m_IsCustomRangeActive: 1
@@ -1900,8 +1902,8 @@ SpriteMask:
   m_MaskAlphaCutoff: 0.2
   m_FrontSortingLayerID: 250094913
   m_BackSortingLayerID: 250094913
-  m_FrontSortingLayer: 2
-  m_BackSortingLayer: 2
+  m_FrontSortingLayer: -1
+  m_BackSortingLayer: -1
   m_FrontSortingOrder: 1
   m_BackSortingOrder: -1
   m_IsCustomRangeActive: 1

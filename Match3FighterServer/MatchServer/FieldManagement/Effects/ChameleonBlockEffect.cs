@@ -10,12 +10,12 @@ namespace MatchServer.FieldManagement.Effects
     {
         public override BlockTypes ComboEffectType => BlockTypes.Chameleon;
 
-        public override EffectData Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, List<Block> combo)
+        public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, List<Block> combo)
         {
             Player enemy = playerUserIndex == 1 ? match.Player2 : match.Player1;
 
-            // TODO: fill data what happend
-            EffectData data = new EffectData();
+            // TODO: fill data what happened
+            List<EffectData> data = new List<EffectData>();
 
             return data;
         }

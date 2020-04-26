@@ -23,7 +23,7 @@ namespace MatchServer
         /// <summary>
         /// For debug purposes, allows to start match with one player taking both players slots
         /// </summary>
-        public const bool AllowOnePlayerMode = false;
+        public const bool AllowOnePlayerMode = true;
 
         public bool IsRunning = false;
         public const int TicksPerSec = 30;
@@ -186,11 +186,21 @@ namespace MatchServer
             GameMatch match = player.CurrentMatch;
             Field playerField = match.Player1 == player ? match.Field1 : match.Field2;
             Field enemyField = match.Player1 == player ? match.Field2 : match.Field1;
+            List<EffectData> effectsData = new List<EffectData>();
 
             if (!player.TrySpendMana(player.BlockSwapCost))
             {
                 SendError(player.ClientID, ErrorType.NotEnoughMana);
                 return;
+            }
+            else
+            {
+                EffectData hData = new EffectData();
+                hData.EffectType = EffectType.ManaChanged;
+                hData.Data = new Dictionary<string, object>();
+                hData.Data["Target"] = player.InGameID;
+                hData.Data["Value"] = -player.BlockSwapCost;
+                effectsData.Add(hData);
             }
 
             if (!FieldManager.TryRebuildFieldFromSwap(playerField, new Swap(request.X, request.Y, request.Direction), out List<Block> blocks))
@@ -198,12 +208,11 @@ namespace MatchServer
                 SendError(player.ClientID, ErrorType.ImpossibleTurn);
             }
             
-            List<EffectData> effectsData = new List<EffectData>();
             List<List<Block>> combos = FieldManager.CheckForCombos(playerField, blocks);
             foreach (List<Block> combo in combos)
             {
                 FieldManager.DestroyBlocks(playerField, combo, BlockState.DestroyedAsCombo);
-                effectsData.Add(BlockEffectsManager.ApplyEffectsFromCombo(match, match.Player1 == player ? 1 : 2, combo));
+                effectsData.AddRange(BlockEffectsManager.ApplyEffectsFromCombo(match, match.Player1 == player ? 1 : 2, combo));
             }
 
             FieldManager.FillHoles(playerField);

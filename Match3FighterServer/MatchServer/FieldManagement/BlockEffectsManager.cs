@@ -46,11 +46,11 @@ namespace MatchServer.FieldManagement
         /// <param name="playerUserIndex"></param>
         /// <param name="combo"></param>
         /// <returns></returns>
-        public EffectData ApplyEffectsFromCombo(GameMatch match, int playerUserIndex, List<Block> combo)
+        public List<EffectData> ApplyEffectsFromCombo(GameMatch match, int playerUserIndex, List<Block> combo)
         {
             BlockTypes comboType = combo.FirstOrDefault(b => b.Type != BlockTypes.Chameleon)?.Type ?? BlockTypes.Chameleon;
             Effect effect = effects[comboType];
-            EffectData data = effect.Apply(fieldManager, random, match, playerUserIndex, combo);
+            List<EffectData> data = effect.Apply(fieldManager, random, match, playerUserIndex, combo);
             
             return data;
         }

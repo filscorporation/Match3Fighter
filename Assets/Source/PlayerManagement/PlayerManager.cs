@@ -1,5 +1,6 @@
 ﻿using System;
 using Assets.Source.UIManagement;
+using NetworkShared.Data.Effects;
 using NetworkShared.Data.Player;
 using UnityEngine;
 
@@ -57,6 +58,7 @@ namespace Assets.Source.PlayerManagement
         /// <param name="data"></param>
         public void SetPlayerState(PlayerData data)
         {
+            player.InGameID = data.InGameID;
             player.Name = data.Name;
             player.MaxHealth = data.MaxHealth;
             player.Health = data.Health;
@@ -81,6 +83,40 @@ namespace Assets.Source.PlayerManagement
             enemy.ManaPerSecond = data.ManaPerSecond;
 
             UIManager.Instance.SetEnemyUI(enemy);
+        }
+
+        /// <summary>
+        /// Animates health loss or gain
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public void AnimateHealthEffect(EffectData data)
+        {
+            if (player.InGameID == (int)data.Data["Target"])
+            {
+                UIManager.Instance.AnimatePlayerHealthUI(player, (float)data.Data["Value"]);
+            }
+            else
+            {
+                UIManager.Instance.AnimateEnemyHealthUI(enemy, (float)data.Data["Value"]);
+            }
+        }
+
+        /// <summary>
+        /// Animates mana loss or gain
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public void AnimateManaEffect(EffectData data)
+        {
+            if (player.InGameID == (int)data.Data["Target"])
+            {
+                UIManager.Instance.AnimatePlayerManaUI(player, (float)data.Data["Value"]);
+            }
+            else
+            {
+                UIManager.Instance.AnimateEnemyManaUI(enemy, (float)data.Data["Value"]);
+            }
         }
     }
 }

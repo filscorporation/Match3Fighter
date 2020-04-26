@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MatchServer.Players;
 using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
@@ -14,19 +15,20 @@ namespace MatchServer.FieldManagement.Effects
 
         public override BlockTypes ComboEffectType => BlockTypes.Attack;
 
-        public override EffectData Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, List<Block> combo)
+        public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, List<Block> combo)
         {
             Field playerField = playerUserIndex == 1 ? match.Field1 : match.Field2;
             Player enemy = playerUserIndex == 1 ? match.Player2 : match.Player1;
             Field enemyField = playerUserIndex == 1 ? match.Field2 : match.Field1;
 
-            // TODO: fill data what happend
-            EffectData data = new EffectData();
-
             int effectsCount = Math.Max(1, combo.Count - FieldManager.MinComboCount);
+
+            List<EffectData> data = new List<EffectData>();
+            data.Add(HealthData(enemy, -DamageToEnemyHealth * effectsCount));
+
             for (int i = 0; i < effectsCount; i++)
             {
-                Action(manager, data, enemy, enemyField);
+                Action(manager, data, playerField, enemy, enemyField, combo.First());
             }
 
             if (combo.Count > 3)
@@ -37,7 +39,7 @@ namespace MatchServer.FieldManagement.Effects
             return data;
         }
 
-        private void Action(FieldManager manager, EffectData data, Player enemy, Field enemyField)
+        private void Action(FieldManager manager, List<EffectData> data, Field playerField, Player enemy, Field enemyField, Block init)
         {
             enemy.TakeDamage(DamageToEnemyHealth);
 
@@ -46,7 +48,10 @@ namespace MatchServer.FieldManagement.Effects
                 Block block = manager.GetRandomNonDestroyedBlock(enemyField);
                 // TODO: block damage
                 if (block != null)
-                    manager.DestroyBlocks(enemyField, new List<Block> { block }, BlockState.DestroyedByDamage);
+                {
+                    manager.DestroyBlocks(enemyField, new List<Block> {block}, BlockState.DestroyedByDamage);
+                    data.Add(ShotData(playerField, enemyField, init, block, -DamageToBlockHealth));
+                }
             }
         }
     }

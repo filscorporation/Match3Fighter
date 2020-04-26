@@ -3,7 +3,9 @@ using Assets.Source.FieldManagement;
 using Assets.Source.InputManagement;
 using Assets.Source.NetworkManagement;
 using Assets.Source.PlayerManagement;
+using Assets.Source.UIManagement;
 using NetworkShared.Data;
+using NetworkShared.Data.Effects;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -93,15 +95,32 @@ namespace Assets.Source.GameManagement
         /// Change game state - players, fields etc
         /// </summary>
         /// <param name="data"></param>
-        public void ChangeGameState(GameStateData data)
+        public void ChangeGameState(GameStateResponse data)
         {
             FieldManager.Instance.DeleteFields();
 
-            PlayerManager.Instance.SetPlayerState(data.MainPlayer);
-            PlayerManager.Instance.SetEnemyState(data.EnemyPlayer);
+            PlayerManager.Instance.SetPlayerState(data.GameState.MainPlayer);
+            PlayerManager.Instance.SetEnemyState(data.GameState.EnemyPlayer);
 
-            FieldManager.Instance.GenerateMainField(data.MainField);
-            FieldManager.Instance.GenerateEnemyField(data.EnemyField);
+            FieldManager.Instance.GenerateMainField(data.GameState.MainField);
+            FieldManager.Instance.GenerateEnemyField(data.GameState.EnemyField);
+
+            foreach (EffectData effect in data.Effects)
+            {
+                switch (effect.EffectType)
+                {
+                    case EffectType.HealthChanged:
+                        PlayerManager.Instance.AnimateHealthEffect(effect);
+                        break;
+                    case EffectType.ManaChanged:
+                        PlayerManager.Instance.AnimateManaEffect(effect);
+                        break;
+                    case EffectType.BlockShot:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
         }
 
         /// <summary>

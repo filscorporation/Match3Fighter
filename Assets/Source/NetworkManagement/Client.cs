@@ -9,7 +9,7 @@ namespace Assets.Source.NetworkManagement
     /// </summary>
     public class Client : IConnectionHandler
     {
-        public string IP = "10.0.0.106";
+        public string IP = "127.0.0.1";
         public int Port = 26910;
         public TCPConnection ClientTCP;
         public NetworkManager Manager;

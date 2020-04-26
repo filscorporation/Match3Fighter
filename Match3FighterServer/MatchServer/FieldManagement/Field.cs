@@ -12,6 +12,11 @@ namespace MatchServer.FieldManagement
     /// </summary>
     public class Field
     {
+        /// <summary>
+        /// Ingame unique identifier
+        /// </summary>
+        public int InGameID;
+
         public Block[,] Blocks;
 
         /// <summary>
@@ -33,6 +38,7 @@ namespace MatchServer.FieldManagement
             int h = Blocks.GetLength(1);
 
             FieldData data = new FieldData();
+            data.InGameID = InGameID;
             data.Blocks = new BlockData[w, h];
             for (int i = 0; i < w; i++)
             {

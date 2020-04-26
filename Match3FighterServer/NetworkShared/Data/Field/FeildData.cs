@@ -9,6 +9,8 @@ namespace NetworkShared.Data.Field
     [Serializable]
     public class FieldData
     {
+        public int InGameID;
+
         public BlockData[,] Blocks;
     }
 }

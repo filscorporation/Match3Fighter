@@ -5,6 +5,8 @@ namespace NetworkShared.Data.Player
     [Serializable]
     public class PlayerData
     {
+        public int InGameID;
+
         public string Name;
 
         public float MaxHealth;

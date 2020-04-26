@@ -5,6 +5,8 @@
     /// </summary>
     public class Player
     {
+        public int InGameID;
+
         public string Name;
 
         public float MaxHealth;

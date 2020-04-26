@@ -21,6 +21,11 @@ namespace MatchServer
         public string PlayerID;
 
         /// <summary>
+        /// Ingame unique identifier
+        /// </summary>
+        public int InGameID;
+
+        /// <summary>
         /// Current match this player is in
         /// </summary>
         public GameMatch CurrentMatch;
@@ -143,6 +148,7 @@ namespace MatchServer
         {
             return new PlayerData
             {
+                InGameID = InGameID,
                 Name = Name,
                 MaxHealth = MaxHealth,
                 Health = Health,

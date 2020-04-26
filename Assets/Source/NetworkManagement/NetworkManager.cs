@@ -94,7 +94,7 @@ namespace Assets.Source.NetworkManagement
 
         public void HandleGameStateResponse(GameStateResponse response)
         {
-            GameManager.Instance.ChangeGameState(response.GameState);
+            GameManager.Instance.ChangeGameState(response);
         }
 
         public void HandleGameStateResponse(StartGameResponse response)
