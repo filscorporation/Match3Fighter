@@ -1128,7 +1128,7 @@ GameObject:
   - component: {fileID: 1040039773}
   - component: {fileID: 1040039772}
   m_Layer: 0
-  m_Name: FieldManaqer
+  m_Name: FieldManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1147,6 +1147,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BlockPrefab: {fileID: 4115847293272188596, guid: d39b7430603a68849acd1b73ce12b8f9,
+    type: 3}
+  ShootEffectPrefab: {fileID: 5189662200948597548, guid: f0737446144716241ba6e6dc069d24c5,
     type: 3}
   BlockSprites:
   - {fileID: 21300000, guid: 3e2dcd83b52cc974d949a6d214850adb, type: 3}
@@ -1417,6 +1419,10 @@ MonoBehaviour:
   EnemyMPText: {fileID: 1583911928}
   PlayerStatsEffect: {fileID: 3548091398418767951, guid: 0452394ff0e96134ea6489d772d0cea7,
     type: 3}
+  PlayerHPEffects: []
+  PlayerMPEffects: []
+  EnemyHPEffects: []
+  EnemyMPEffects: []
 --- !u!1 &1302159484
 GameObject:
   m_ObjectHideFlags: 0

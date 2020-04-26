@@ -116,6 +116,7 @@ namespace Assets.Source.GameManagement
                         PlayerManager.Instance.AnimateManaEffect(effect);
                         break;
                     case EffectType.BlockShot:
+                        FieldManager.Instance.DrawShootEffect(effect);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

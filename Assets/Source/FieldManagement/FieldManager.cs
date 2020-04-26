@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Assets.Source.GameManagement;
 using Assets.Source.InputManagement;
+using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
 using UnityEngine;
 
@@ -26,8 +27,9 @@ namespace Assets.Source.FieldManagement
                 return instance;
             }
         }
-
+        
         public GameObject BlockPrefab;
+        public GameObject ShootEffectPrefab;
 
         private Field mainField;
         private Field enemyField;
@@ -71,6 +73,7 @@ namespace Assets.Source.FieldManagement
         public void GenerateMainField(FieldData data)
         {
             mainField = GenerateField(data, FieldType.Player, new Vector2(0, -data.Blocks.GetLength(1) / 2F));
+            mainField.InGameID = data.InGameID;
         }
 
         /// <summary>
@@ -80,6 +83,27 @@ namespace Assets.Source.FieldManagement
         public void GenerateEnemyField(FieldData data)
         {
             enemyField = GenerateField(data, FieldType.Enemy, new Vector2(0, data.Blocks.GetLength(1) / 2F + 1));
+            enemyField.InGameID = data.InGameID;
+        }
+
+        private Vector2 GetPositionForPlayerBlock(int i, int j)
+        {
+            float w = mainField.Blocks.GetLength(0);
+            float h = mainField.Blocks.GetLength(1);
+            Vector2 center = new Vector2(0, -h / 2F);
+            float x = i + center.x - w / 2F + 0.5F;
+            float y = j + center.y - h / 2F - 0.5F;
+            return new Vector2(x, y);
+        }
+
+        private Vector2 GetPositionForEnemyBlock(int i, int j)
+        {
+            float w = enemyField.Blocks.GetLength(0);
+            float h = enemyField.Blocks.GetLength(1);
+            Vector2 center = new Vector2(0, h / 2F + 1);
+            float x = i + center.x - w / 2F + 0.5F;
+            float y = j + center.y - h / 2F - 0.5F;
+            return new Vector2(x, y);
         }
 
         private Field GenerateField(FieldData data, FieldType type, Vector2 center)
@@ -194,6 +218,22 @@ namespace Assets.Source.FieldManagement
             sprite.sprite = BlockSprites[(int) type];
 
             return block;
+        }
+
+        /// <summary>
+        /// Draws effect of block shooting another block
+        /// </summary>
+        /// <param name="data"></param>
+        public void DrawShootEffect(EffectData data)
+        {
+            Vector2 from = (int)data.Data["InitField"] == mainField.InGameID ?
+                GetPositionForPlayerBlock((int)data.Data["InitX"], (int)data.Data["InitY"]) :
+                GetPositionForEnemyBlock((int)data.Data["TargetX"], (int)data.Data["TargetY"]);
+            Vector2 to = (int)data.Data["TargetField"] == enemyField.InGameID ?
+                GetPositionForEnemyBlock((int)data.Data["TargetX"], (int)data.Data["TargetY"]) :
+                GetPositionForPlayerBlock((int)data.Data["InitX"], (int)data.Data["InitY"]);
+            GameObject go = Instantiate(ShootEffectPrefab, Vector3.zero, Quaternion.identity, transform);
+            StartCoroutine(go.GetComponent<ShootEffect>().Initialize(from, to));
         }
 
         #endregion

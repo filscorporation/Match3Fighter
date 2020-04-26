@@ -11,6 +11,8 @@
     /// </summary>
     public class Field
     {
+        public int InGameID;
+
         public Block[,] Blocks;
 
         public FieldType Type;
