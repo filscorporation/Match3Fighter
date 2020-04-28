@@ -85,6 +85,18 @@ namespace Assets.Source.PlayerManagement
             UIManager.Instance.SetEnemyUI(enemy);
         }
 
+        public void ActivateShieldEffect(EffectData data)
+        {
+            if (player.InGameID == (int)data.Data["Target"])
+            {
+                UIManager.Instance.ActivatePlayerShieldEffect((bool)data.Data["Created"]);
+            }
+            else
+            {
+                UIManager.Instance.ActivateEnemyShieldEffect((bool)data.Data["Created"]);
+            }
+        }
+
         /// <summary>
         /// Animates health loss or gain
         /// </summary>

@@ -48,6 +48,7 @@
     <Compile Include="Data\Field\BlockData.cs" />
     <Compile Include="Data\Field\BlockTypes.cs" />
     <Compile Include="Data\Field\FeildData.cs" />
+    <Compile Include="Data\Field\GlobalEffectData.cs" />
     <Compile Include="Data\GameStateData.cs" />
     <Compile Include="Data\GameStateResponse.cs" />
     <Compile Include="Data\LogInRequest.cs" />

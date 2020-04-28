@@ -18,6 +18,8 @@ namespace NetworkShared.Data.Field
     {
         public int ID;
 
+        public string UniqueBlock;
+
         public int X;
 
         public int Y;

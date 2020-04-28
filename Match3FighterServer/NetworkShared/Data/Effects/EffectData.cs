@@ -8,6 +8,8 @@ namespace NetworkShared.Data.Effects
         HealthChanged = 1,
         ManaChanged = 2,
         BlockShot = 3,
+        GlobalEffect = 10,
+        UniqueEffect = 20,
     }
 
     [Serializable]

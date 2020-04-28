@@ -143,13 +143,75 @@ namespace MatchServer.FieldManagement
         }
 
         /// <summary>
+        /// Returns random block on a field that is not in destroyed state and not at field borders
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public Block GetRandomNonDestroyedBlockExceptBorders(Field field)
+        {
+            int totalNonDestroyed = 0;
+            for (int i = 1; i < fieldWidth - 1; i++)
+            {
+                for (int j = 1; j < fieldHeight - 1; j++)
+                {
+                    if (!field.Blocks[i, j].IsLastDestroyedState())
+                        totalNonDestroyed++;
+                }
+            }
+
+            if (totalNonDestroyed == 0)
+                return null;
+
+            int randomIndex = random.Next(0, totalNonDestroyed);
+
+            for (int i = 1; i < fieldWidth - 1; i++)
+            {
+                for (int j = 1; j < fieldHeight - 1; j++)
+                {
+                    if (!field.Blocks[i, j].IsLastDestroyedState())
+                    {
+                        if (randomIndex == 0)
+                            return field.Blocks[i, j];
+                        randomIndex--;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns blocks next to target one
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="block"></param>
+        /// <param name="cross">Include diagonal</param>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public IEnumerable<Block> GetNeighbours(Field field, Block block, bool cross = false, int range = 1)
+        {
+            for (int i = -range; i <= range; i++)
+            {
+                for (int j = -range; j <= range; j++)
+                {
+                    if (i != 0 && j != 0 && !cross)
+                        continue;
+
+                    if (block.X + i >= 0 && block.X + i < field.Blocks.GetLength(0) &&
+                        block.Y + j >= 0 && block.Y + j < field.Blocks.GetLength(1))
+                        yield return field.Blocks[block.X + i, block.Y + j];
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns list of possile combos, that includes any of passed blocks
         /// </summary>
         /// <param name="field"></param>
         /// <param name="includeAny"></param>
-        public List<List<Block>> CheckForCombos(Field field, List<Block> includeAny)
+        public List<Combo> CheckForCombos(Field field, List<Block> includeAny)
         {
-            List<List<Block>> combos = new List<List<Block>>();
+            List<Combo> combos = new List<Combo>();
 
             foreach (Block block in includeAny)
             {
@@ -158,7 +220,7 @@ namespace MatchServer.FieldManagement
 
                 if (Math.Max(ver.Count, hor.Count) >= MinComboCount)
                 {
-                    combos.Add(ver.Count > hor.Count ? ver : hor);
+                    combos.Add(new Combo(ver.Count > hor.Count ? ver : hor));
                 }
             }
 
@@ -171,25 +233,27 @@ namespace MatchServer.FieldManagement
         /// <param name="field"></param>
         /// <param name="blocks"></param>
         /// <param name="destroyedState"></param>
-        public void DestroyBlocks(Field field, List<Block> blocks, BlockState destroyedState)
+        public void DestroyBlocks(Field field, IEnumerable<Block> blocks, BlockState destroyedState)
         {
             foreach (Block block in blocks)
             {
-                block.RememberState(destroyedState);
+                if (!block.IsLastDestroyedState())
+                    block.RememberState(destroyedState);
             }
         }
 
         /// <summary>
-        /// Creates new block of passed type at position of random block in range
+        /// Creates new block at position of random block in range
         /// </summary>
         /// <param name="field"></param>
-        /// <param name="blockType"></param>
+        /// <param name="uniqueBlock"></param>
         /// <param name="range"></param>
         /// <returns></returns>
-        public Block CreateBlockInRange(Field field, BlockTypes blockType, List<Block> range)
+        public Block CreateBlockInRange(Field field, UniqueBlock uniqueBlock, List<Block> range)
         {
             Block block = new Block();
-            block.Type = blockType;
+            block.Type = uniqueBlock.BaseType;
+            block.UniqueBlock = uniqueBlock;
 
             int n = random.Next(0, range.Count);
             Block blockToReplace = range[n];

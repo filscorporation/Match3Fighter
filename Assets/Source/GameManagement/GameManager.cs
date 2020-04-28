@@ -118,6 +118,13 @@ namespace Assets.Source.GameManagement
                     case EffectType.BlockShot:
                         FieldManager.Instance.DrawShootEffect(effect);
                         break;
+                    case EffectType.UniqueEffect:
+                        // TODO: temporary
+                        FieldManager.Instance.DrawShootEffect(effect);
+                        break;
+                    case EffectType.GlobalEffect:
+                        PlayerManager.Instance.ActivateShieldEffect(effect);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

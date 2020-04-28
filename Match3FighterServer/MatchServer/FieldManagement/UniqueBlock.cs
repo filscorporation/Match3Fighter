@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using MatchServer.Players;
 using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
@@ -7,11 +10,13 @@ using NetworkShared.Data.Field;
 namespace MatchServer.FieldManagement
 {
     /// <summary>
-    /// Some ingame effect after event - deal damage, add health, add mana..
+    /// Unique block that drops from 4-5-6 combos
     /// </summary>
-    public abstract class Effect
+    public abstract class UniqueBlock
     {
-        public abstract BlockTypes ComboEffectType { get; }
+        public abstract string Name { get; }
+
+        public abstract BlockTypes BaseType { get; }
 
         /// <summary>
         /// Applies effect from a combo to the game match
@@ -21,28 +26,7 @@ namespace MatchServer.FieldManagement
         /// <param name="match"></param>
         /// <param name="playerUserIndex"></param>
         /// <param name="combo"></param>
-        public abstract List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo);
-
-        protected void CreateUniqueBlock(FieldManager manager, Field field, Player player, Combo combo, BlockTypes type)
-        {
-            UniqueBlock block;
-            switch (combo.Blocks.Count)
-            {
-                case 4:
-                    block = player.UniqueBlockCollection.Level1Blocks[type];
-                    break;
-                case 5:
-                    block = player.UniqueBlockCollection.Level2Blocks[type];
-                    break;
-                case 6:
-                    block = player.UniqueBlockCollection.Level3Blocks[type];
-                    break;
-                default:
-                    return;
-            }
-
-            manager.CreateBlockInRange(field, block, combo.Blocks);
-        }
+        public abstract List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo, Block block);
 
         protected EffectData HealthData(Player player, float value)
         {
@@ -64,6 +48,17 @@ namespace MatchServer.FieldManagement
             return mData;
         }
 
+        protected EffectData GlobalEffectData(Player player, GlobalEffect effect)
+        {
+            EffectData geData = new EffectData();
+            geData.EffectType = EffectType.GlobalEffect;
+            geData.Data = new Dictionary<string, object>();
+            geData.Data["Target"] = player.InGameID;
+            geData.Data["Type"] = effect.Type;
+            geData.Data["Created"] = true;
+            return geData;
+        }
+
         protected EffectData GlobalEffectRemovedData(Player player, GlobalEffect effect)
         {
             EffectData geData = new EffectData();
@@ -75,10 +70,10 @@ namespace MatchServer.FieldManagement
             return geData;
         }
 
-        protected EffectData ShotData(Field fromField, Field toField, Block fromBlock, Block toBlock, float dmg)
+        protected EffectData UniqueShotData(Field fromField, Field toField, Block fromBlock, Block toBlock, string name)
         {
             EffectData sData = new EffectData();
-            sData.EffectType = EffectType.BlockShot;
+            sData.EffectType = EffectType.UniqueEffect;
             sData.Data = new Dictionary<string, object>();
             sData.Data["InitX"] = fromBlock.X;
             sData.Data["InitY"] = fromBlock.Y;
@@ -86,7 +81,7 @@ namespace MatchServer.FieldManagement
             sData.Data["TargetX"] = toBlock.X;
             sData.Data["TargetY"] = toBlock.Y;
             sData.Data["TargetField"] = toField.InGameID;
-            sData.Data["Value"] = -dmg;
+            sData.Data["Value"] = name;
             return sData;
         }
     }

@@ -33,7 +33,7 @@ namespace MatchServer
         public FieldManager FieldManager;
         public MatchManager MatchManager;
         public PlayersManager PlayersManager;
-        private BlockEffectsManager BlockEffectsManager;
+        public BlockEffectsManager BlockEffectsManager;
 
         #region Core
 
@@ -208,10 +208,10 @@ namespace MatchServer
                 SendError(player.ClientID, ErrorType.ImpossibleTurn);
             }
             
-            List<List<Block>> combos = FieldManager.CheckForCombos(playerField, blocks);
-            foreach (List<Block> combo in combos)
+            List<Combo> combos = FieldManager.CheckForCombos(playerField, blocks);
+            foreach (Combo combo in combos)
             {
-                FieldManager.DestroyBlocks(playerField, combo, BlockState.DestroyedAsCombo);
+                FieldManager.DestroyBlocks(playerField, combo.Blocks, BlockState.DestroyedAsCombo);
                 effectsData.AddRange(BlockEffectsManager.ApplyEffectsFromCombo(match, match.Player1 == player ? 1 : 2, combo));
             }
 

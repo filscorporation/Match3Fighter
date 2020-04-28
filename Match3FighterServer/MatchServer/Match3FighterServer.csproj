@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="FieldManagement\Block.cs" />
     <Compile Include="FieldManagement\BlockEffectsManager.cs" />
+    <Compile Include="FieldManagement\Combo.cs" />
     <Compile Include="FieldManagement\Effect.cs" />
     <Compile Include="FieldManagement\Effects\ArcaneBlockEffect.cs" />
     <Compile Include="FieldManagement\Effects\AttackBlockEffect.cs" />
@@ -67,7 +68,17 @@
     <Compile Include="FieldManagement\Effects\HealthBlockEffect.cs" />
     <Compile Include="FieldManagement\Effects\ManaBlockEffect.cs" />
     <Compile Include="FieldManagement\Field.cs" />
+    <Compile Include="FieldManagement\GlobalEffect.cs" />
     <Compile Include="FieldManagement\Swap.cs" />
+    <Compile Include="FieldManagement\UniqueBlock.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\Arcane5Block.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\Arcane6Block.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\BoulderBlock.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\ChameleonBlock.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\KillerBlock.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\LifeBlock.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\ShieldBlock.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\SuperManaBlock.cs" />
     <Compile Include="GameCore.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Player.cs" />
@@ -75,6 +86,7 @@
     <Compile Include="Players\GameMatch.cs" />
     <Compile Include="Players\MatchManager.cs" />
     <Compile Include="Players\PlayersManager.cs" />
+    <Compile Include="Players\UniqueBlockCollection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -96,6 +108,8 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="FieldManagement\GlobalEffect\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

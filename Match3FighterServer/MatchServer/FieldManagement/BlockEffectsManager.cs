@@ -19,6 +19,8 @@ namespace MatchServer.FieldManagement
 
         private Dictionary<BlockTypes, Effect> effects;
 
+        public readonly Dictionary<string, UniqueBlock> UniqueBlocks = new Dictionary<string, UniqueBlock>();
+
         public BlockEffectsManager(FieldManager fieldManager)
         {
             this.fieldManager = fieldManager;
@@ -26,6 +28,7 @@ namespace MatchServer.FieldManagement
             random = new Random();
 
             InitializeEffects();
+            InitializeUniqueBlocks();
         }
 
         private void InitializeEffects()
@@ -39,6 +42,16 @@ namespace MatchServer.FieldManagement
             }
         }
 
+        private void InitializeUniqueBlocks()
+        {
+            foreach (Type type in Assembly.GetAssembly(typeof(UniqueBlock)).GetTypes()
+                .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(UniqueBlock))))
+            {
+                UniqueBlock block = (UniqueBlock)Activator.CreateInstance(type);
+                UniqueBlocks[block.Name] = block;
+            }
+        }
+
         /// <summary>
         /// Returns effect from combo
         /// </summary>
@@ -46,11 +59,17 @@ namespace MatchServer.FieldManagement
         /// <param name="playerUserIndex"></param>
         /// <param name="combo"></param>
         /// <returns></returns>
-        public List<EffectData> ApplyEffectsFromCombo(GameMatch match, int playerUserIndex, List<Block> combo)
+        public List<EffectData> ApplyEffectsFromCombo(GameMatch match, int playerUserIndex, Combo combo)
         {
-            BlockTypes comboType = combo.FirstOrDefault(b => b.Type != BlockTypes.Chameleon)?.Type ?? BlockTypes.Chameleon;
-            Effect effect = effects[comboType];
-            List<EffectData> data = effect.Apply(fieldManager, random, match, playerUserIndex, combo);
+            List<EffectData> data = new List<EffectData>();
+            foreach (Block uniqueBlock in combo.Blocks.Where(b => b.IsUnique))
+            {
+                data.AddRange(uniqueBlock.UniqueBlock.Apply(
+                    fieldManager, random, match, playerUserIndex, combo, uniqueBlock));
+            }
+
+            Effect effect = effects[combo.Type];
+            data.AddRange(effect.Apply(fieldManager, random, match, playerUserIndex, combo));
             
             return data;
         }

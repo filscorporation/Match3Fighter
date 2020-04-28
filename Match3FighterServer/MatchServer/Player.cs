@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using MatchServer.FieldManagement;
+using MatchServer.FieldManagement.UniqueEffect;
 using MatchServer.Players;
+using NetworkShared.Data.Field;
 using NetworkShared.Data.Player;
 
 namespace MatchServer
@@ -34,6 +38,11 @@ namespace MatchServer
         /// Shows to both players
         /// </summary>
         public string Name;
+
+        /// <summary>
+        /// Unique blocks player is using
+        /// </summary>
+        public UniqueBlockCollection UniqueBlockCollection;
 
         /// <summary>
         /// Player starts fight with that much hp
@@ -75,7 +84,32 @@ namespace MatchServer
             Mana = MaxMana;
             ManaPerSecond = 1.5F;
 
+            UniqueBlockCollection = new UniqueBlockCollection();
+            SetDefaultUniqueBlocks();
+
             lastUpdate = DateTime.UtcNow;
+        }
+
+        private void SetDefaultUniqueBlocks()
+        {
+            // TODO: refactoring
+
+            Dictionary<string, UniqueBlock> uBlocks = GameCore.Instance.BlockEffectsManager.UniqueBlocks;
+            
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Attack] = uBlocks[nameof(ChameleonBlock)];
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Health] = uBlocks[nameof(ChameleonBlock)];
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Mana] = uBlocks[nameof(ChameleonBlock)];
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Arcane] = uBlocks[nameof(ChameleonBlock)];
+
+            UniqueBlockCollection.Level2Blocks[BlockTypes.Attack] = uBlocks[nameof(BoulderBlock)];
+            UniqueBlockCollection.Level2Blocks[BlockTypes.Health] = uBlocks[nameof(LifeBlock)];
+            UniqueBlockCollection.Level2Blocks[BlockTypes.Mana] = uBlocks[nameof(SuperManaBlock)];
+            UniqueBlockCollection.Level2Blocks[BlockTypes.Arcane] = uBlocks[nameof(Arcane5Block)];
+
+            UniqueBlockCollection.Level3Blocks[BlockTypes.Attack] = uBlocks[nameof(KillerBlock)];
+            UniqueBlockCollection.Level3Blocks[BlockTypes.Health] = uBlocks[nameof(ShieldBlock)];
+            UniqueBlockCollection.Level3Blocks[BlockTypes.Mana] = uBlocks[nameof(SuperManaBlock)];
+            UniqueBlockCollection.Level3Blocks[BlockTypes.Arcane] = uBlocks[nameof(Arcane6Block)];
         }
 
         /// <summary>

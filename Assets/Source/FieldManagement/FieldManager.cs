@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Assets.Source.GameManagement;
 using Assets.Source.InputManagement;
@@ -35,6 +36,7 @@ namespace Assets.Source.FieldManagement
         private Field enemyField;
 
         public List<Sprite> BlockSprites;
+        private const string uniqueBlockSpritesPath = "UniqueBlockSprites";
 
         public void Start()
         {
@@ -180,14 +182,14 @@ namespace Assets.Source.FieldManagement
                             {
                                 float oldx = blockData.ReplacedBlock.X + center.x - w / 2F + 0.5F;
                                 float oldy = blockData.ReplacedBlock.Y + center.y - h / 2F - 0.5F;
-                                Block destroyedBlock = InstantiateBlock(field, oldx, oldy, i, j, (BlockTypes)blockData.ReplacedBlock.ID);
+                                Block destroyedBlock = InstantiateBlock(field, oldx, oldy, i, j, blockData.ReplacedBlock);
                                 
                                 AnimateAllBlockTransitions(destroyedBlock, blockData.ReplacedBlock);
                             }
                         }
                     }
 
-                    Block newBlock = InstantiateBlock(field, x, y, i, j, (BlockTypes)data.Blocks[i, j].ID);
+                    Block newBlock = InstantiateBlock(field, x, y, i, j, data.Blocks[i, j]);
                     field.Blocks[i, j] = newBlock;
 
                     AnimateAllBlockTransitions(newBlock, data.Blocks[i, j]);
@@ -199,7 +201,7 @@ namespace Assets.Source.FieldManagement
             return field;
         }
 
-        private Block InstantiateBlock(Field field, float x, float y, int i, int j, BlockTypes type)
+        private Block InstantiateBlock(Field field, float x, float y, int i, int j, BlockData data)
         {
             GameObject go = Instantiate(BlockPrefab, new Vector2(x, y), Quaternion.identity, transform);
             Block block = go.GetComponent<Block>();
@@ -210,14 +212,26 @@ namespace Assets.Source.FieldManagement
             else
                 block.SetEnemyLayer();
 
-            block.Type = type;
+            block.Type = (BlockTypes)data.ID;
             block.X = i;
             block.Y = j;
             
             SpriteRenderer sprite = block.GetComponent<SpriteRenderer>();
-            sprite.sprite = BlockSprites[(int) type];
+            if (!string.IsNullOrWhiteSpace(data.UniqueBlock))
+            {
+                sprite.sprite = GetUniqueBlockSprite(data.UniqueBlock);
+            }
+            else
+            {
+                sprite.sprite = BlockSprites[data.ID];
+            }
 
             return block;
+        }
+
+        private Sprite GetUniqueBlockSprite(string blockName)
+        {
+            return Resources.Load<Sprite>(Path.Combine(uniqueBlockSpritesPath, blockName));
         }
 
         /// <summary>

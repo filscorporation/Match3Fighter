@@ -12,6 +12,8 @@ namespace MatchServer.FieldManagement
     {
         public BlockTypes Type;
 
+        public UniqueBlock UniqueBlock;
+
         public int X;
 
         public int Y;
@@ -24,6 +26,11 @@ namespace MatchServer.FieldManagement
         private const float HealBlockChance = 0.23F;
         private const float ManaBlockChance = 0.23F;
         private const float ArcaneBlockChance = 1F - AttackBlockChance - HealBlockChance - ManaBlockChance;
+
+        /// <summary>
+        /// Returns true if block is unique
+        /// </summary>
+        public bool IsUnique => UniqueBlock != null;
 
         /// <summary>
         /// Sets block coordinates
@@ -102,6 +109,7 @@ namespace MatchServer.FieldManagement
                 X = X,
                 Y = Y,
                 ID = (int) Type,
+                UniqueBlock = UniqueBlock?.Name,
                 PreviousStates = PreviousStates.Select(s => s.ToData()).ToArray(),
                 ReplacedBlock = ReplacedBlock?.ToData() ?? null,
             };

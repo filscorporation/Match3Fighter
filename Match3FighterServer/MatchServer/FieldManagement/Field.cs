@@ -17,6 +17,8 @@ namespace MatchServer.FieldManagement
         /// </summary>
         public int InGameID;
 
+        public List<GlobalEffect> GlobalEffects = new List<GlobalEffect>();
+
         public Block[,] Blocks;
 
         /// <summary>
@@ -32,6 +34,21 @@ namespace MatchServer.FieldManagement
             return Blocks[x, y];
         }
 
+        /// <summary>
+        /// Removes shield effect if has one
+        /// </summary>
+        /// <returns></returns>
+        public bool TryBlock(out GlobalEffect effect)
+        {
+            if ((effect = GlobalEffects.FirstOrDefault(
+                ge => ge.Type == GlobalEffectType.Shield)) != null)
+            {
+                return GlobalEffects.Remove(effect);
+            }
+
+            return false;
+        }
+
         public FieldData ToData()
         {
             int w = Blocks.GetLength(0);
@@ -39,6 +56,7 @@ namespace MatchServer.FieldManagement
 
             FieldData data = new FieldData();
             data.InGameID = InGameID;
+            data.GlobalEffects = GlobalEffects.Select(e => e.ToData()).ToArray();
             data.Blocks = new BlockData[w, h];
             for (int i = 0; i < w; i++)
             {

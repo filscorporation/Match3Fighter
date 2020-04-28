@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NetworkShared.Data.Field
 {
@@ -10,6 +6,8 @@ namespace NetworkShared.Data.Field
     public class FieldData
     {
         public int InGameID;
+
+        public GlobalEffectData[] GlobalEffects;
 
         public BlockData[,] Blocks;
     }

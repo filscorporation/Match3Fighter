@@ -10,7 +10,7 @@ namespace MatchServer.FieldManagement.Effects
     {
         public override BlockTypes ComboEffectType => BlockTypes.Chameleon;
 
-        public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, List<Block> combo)
+        public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo)
         {
             Player enemy = playerUserIndex == 1 ? match.Player2 : match.Player1;
 

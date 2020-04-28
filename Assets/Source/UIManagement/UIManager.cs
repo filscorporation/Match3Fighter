@@ -5,6 +5,7 @@ using Assets.Source.GameManagement;
 using Assets.Source.PlayerManagement;
 using UnityEngine;
 using UnityEngine.UI;
+using Image = UnityEngine.UIElements.Image;
 
 namespace Assets.Source.UIManagement
 {
@@ -33,6 +34,8 @@ namespace Assets.Source.UIManagement
         public Text EnemyNameText;
         public Text EnemyHPText;
         public Text EnemyMPText;
+        public GameObject EnemyShieldIcon;
+        public GameObject PlayerShieldIcon;
 
         public GameObject PlayerStatsEffect;
         public List<GameObject> PlayerHPEffects = new List<GameObject>();
@@ -140,6 +143,16 @@ namespace Assets.Source.UIManagement
             EnemyMPEffects.Add(go);
 
             StartCoroutine(DestroyAndDelete(EnemyMPEffects, go));
+        }
+
+        public void ActivatePlayerShieldEffect(bool isActive = true)
+        {
+            PlayerShieldIcon.SetActive(isActive);
+        }
+
+        public void ActivateEnemyShieldEffect(bool isActive = true)
+        {
+            EnemyShieldIcon.SetActive(isActive);
         }
     }
 }
