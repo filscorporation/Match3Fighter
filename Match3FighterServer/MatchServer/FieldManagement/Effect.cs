@@ -26,11 +26,11 @@ namespace MatchServer.FieldManagement
 
         protected void CreateUniqueBlock(FieldManager manager, Field field, Player player, Combo combo, BlockTypes type)
         {
-            if (combo.Blocks.Any(b => b.IsUnique))
-            {
-                // Unique block is not created from combo with already unique
-                return;
-            }
+            //if (combo.Blocks.Any(b => b.IsUnique && b.Type != BlockTypes.Chameleon))
+            //{
+            //    // Unique block is not created from combo with already unique
+            //    return;
+            //}
 
             UniqueBlock block;
             switch (combo.Blocks.Count)

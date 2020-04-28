@@ -76,6 +76,9 @@ namespace Assets.Source.NetworkManagement
                 case DataTypes.GameStateResponse:
                     HandleGameStateResponse((GameStateResponse) data);
                     break;
+                case DataTypes.GameEndResponse:
+                    HandleGameEndResponse((GameEndResponse)data);
+                    break;
                 case DataTypes.ErrorResponse:
                     Debug.Log(((ErrorResponse)data).Type);
                     break;
@@ -95,6 +98,11 @@ namespace Assets.Source.NetworkManagement
         public void HandleGameStateResponse(GameStateResponse response)
         {
             GameManager.Instance.ChangeGameState(response);
+        }
+
+        public void HandleGameEndResponse(GameEndResponse response)
+        {
+            GameManager.Instance.EndGame(response);
         }
 
         public void HandleGameStateResponse(StartGameResponse response)

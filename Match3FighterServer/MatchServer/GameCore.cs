@@ -203,6 +203,9 @@ namespace MatchServer
                 effectsData.Add(hData);
             }
 
+            FieldManager.RefreshDurationEffects(playerField);
+            FieldManager.RefreshDurationEffects(enemyField);
+
             if (!FieldManager.TryRebuildFieldFromSwap(playerField, new Swap(request.X, request.Y, request.Direction), out List<Block> blocks))
             {
                 SendError(player.ClientID, ErrorType.ImpossibleTurn);
@@ -240,6 +243,20 @@ namespace MatchServer
             
             FieldManager.SetDefaultState(playerField);
             FieldManager.SetDefaultState(enemyField);
+
+            if (CheckForGameEnd(match, out var gameEndResponse))
+            {
+                MatchManager.DropMatch(player.CurrentMatch);
+
+                Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameEndResponse, gameEndResponse);
+                if (GameCore.AllowOnePlayerMode && match.Player1 == match.Player2)
+                {
+                    return;
+                }
+                Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameEndResponse, gameEndResponse);
+
+                return;
+            }
         }
 
         private void SendError(int clientID, ErrorType type)
@@ -269,6 +286,37 @@ namespace MatchServer
 
             response = new StartGameResponse { GameState = GetPlayer2MatchStateData(match) };
             Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.StartGameResponse, response);
+        }
+
+        /// <summary>
+        /// Check if any player dead
+        /// </summary>
+        /// <param name="match"></param>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        private bool CheckForGameEnd(GameMatch match, out GameEndResponse response)
+        {
+            if (match.Player1.Health <= 0)
+            {
+                response = new GameEndResponse
+                {
+                    PlayerWon = match.Player2.InGameID,
+                };
+
+                return true;
+            }
+            if (match.Player2.Health <= 0)
+            {
+                response = new GameEndResponse
+                {
+                    PlayerWon = match.Player1.InGameID,
+                };
+
+                return true;
+            }
+
+            response = null;
+            return false;
         }
 
         private GameStateData GetPlayer1MatchStateData(GameMatch match)

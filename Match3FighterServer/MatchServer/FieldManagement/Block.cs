@@ -22,6 +22,8 @@ namespace MatchServer.FieldManagement
 
         public Block ReplacedBlock;
 
+        public List<OnBlockEffect> OnBlockEffects = new List<OnBlockEffect>();
+
         private const float AttackBlockChance = 0.36F;
         private const float HealBlockChance = 0.23F;
         private const float ManaBlockChance = 0.23F;
@@ -102,6 +104,12 @@ namespace MatchServer.FieldManagement
             return false;
         }
 
+        public void RemoveExpiredEffects()
+        {
+            OnBlockEffects.RemoveAll(e => 
+                (DateTime.UtcNow - e.StartTime).TotalMilliseconds/1000F > e.Duration);
+        }
+
         public BlockData ToData()
         {
             return new BlockData
@@ -112,6 +120,7 @@ namespace MatchServer.FieldManagement
                 UniqueBlock = UniqueBlock?.Name,
                 PreviousStates = PreviousStates.Select(s => s.ToData()).ToArray(),
                 ReplacedBlock = ReplacedBlock?.ToData() ?? null,
+                OnBlockEffects = OnBlockEffects.Select(e => e.ToData()).ToArray(),
             };
         }
     }

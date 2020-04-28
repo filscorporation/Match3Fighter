@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Assets.Source.PlayerManagement
 {
     /// <summary>
-    /// Controlls players UI and interations
+    /// Controls players UI and interactions
     /// </summary>
     public class PlayerManager : MonoBehaviour
     {
@@ -29,7 +29,7 @@ namespace Assets.Source.PlayerManagement
 
         private Player enemy;
 
-        public void FixedUpdate()
+        public void Update()
         {
             EstimatePlayersStats(player);
             UIManager.Instance.SetPlayerUI(player);
@@ -39,7 +39,7 @@ namespace Assets.Source.PlayerManagement
 
         public void EstimatePlayersStats(Player p)
         {
-            float mana = Time.fixedDeltaTime * p.ManaPerSecond;
+            float mana = Time.deltaTime * p.ManaPerSecond;
             p.Mana = Math.Min(p.Mana + mana, p.MaxMana);
         }
         
@@ -50,6 +50,24 @@ namespace Assets.Source.PlayerManagement
         {
             player = new Player();
             enemy = new Player();
+        }
+
+        /// <summary>
+        /// Shows message depending on which player won
+        /// </summary>
+        /// <param name="playerID"></param>
+        public void ShowPlayerWonOrLost(int playerID)
+        {
+            if (player.InGameID == playerID)
+            {
+                // You won
+                Debug.Log("You won");
+            }
+            else
+            {
+                // You lost
+                Debug.Log("You lost");
+            }
         }
 
         /// <summary>

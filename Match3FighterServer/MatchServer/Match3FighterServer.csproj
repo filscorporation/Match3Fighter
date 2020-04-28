@@ -69,12 +69,14 @@
     <Compile Include="FieldManagement\Effects\ManaBlockEffect.cs" />
     <Compile Include="FieldManagement\Field.cs" />
     <Compile Include="FieldManagement\GlobalEffect.cs" />
+    <Compile Include="FieldManagement\OnBlockEffect.cs" />
     <Compile Include="FieldManagement\Swap.cs" />
     <Compile Include="FieldManagement\UniqueBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\Arcane5Block.cs" />
     <Compile Include="FieldManagement\UniqueEffect\Arcane6Block.cs" />
     <Compile Include="FieldManagement\UniqueEffect\BoulderBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\ChameleonBlock.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\FreezeBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\KillerBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\LifeBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\ShieldBlock.cs" />
@@ -108,8 +110,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="FieldManagement\GlobalEffect\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

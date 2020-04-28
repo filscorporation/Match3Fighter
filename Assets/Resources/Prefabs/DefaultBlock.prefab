@@ -100,7 +100,7 @@ MonoBehaviour:
   Y: 0
   Type: 0
   Animation: {fileID: 5431381057424581010}
-  DestructionEfect: {fileID: 4778556716296596567, guid: 58fde9cadae0a24418429f5777e07b2d,
+  DestructionEffect: {fileID: 4778556716296596567, guid: 58fde9cadae0a24418429f5777e07b2d,
     type: 3}
 --- !u!61 &-587289775231650400
 BoxCollider2D:

@@ -132,6 +132,17 @@ namespace Assets.Source.GameManagement
         }
 
         /// <summary>
+        /// End game when one of players won
+        /// </summary>
+        /// <param name="data"></param>
+        public void EndGame(GameEndResponse data)
+        {
+            FieldManager.Instance.CanControl = false;
+
+            PlayerManager.Instance.ShowPlayerWonOrLost(data.PlayerWon);
+        }
+
+        /// <summary>
         /// Request field state after block swap
         /// </summary>
         public void OnPlayerBlockSwap(int x, int y, BlockSwipeDirection direction)

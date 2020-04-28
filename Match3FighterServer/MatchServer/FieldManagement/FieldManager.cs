@@ -60,6 +60,21 @@ namespace MatchServer.FieldManagement
         }
 
         /// <summary>
+        /// Removes expired effects from field and blocks
+        /// </summary>
+        /// <param name="field"></param>
+        public void RefreshDurationEffects(Field field)
+        {
+            for (int i = 0; i < fieldWidth; i++)
+            {
+                for (int j = 0; j < fieldHeight; j++)
+                {
+                    field.Blocks[i, j].RemoveExpiredEffects();
+                }
+            }
+        }
+
+        /// <summary>
         /// Processes block swap
         /// </summary>
         /// <param name="field"></param>
@@ -89,6 +104,10 @@ namespace MatchServer.FieldManagement
             Block blockB = field.Blocks[nx, ny];
 
             if (blockA.Type == blockB.Type)
+                return false;
+
+            if (blockA.OnBlockEffects.Any(e => e.Type == OnBlockEffectType.Frozen)
+                || blockB.OnBlockEffects.Any(e => e.Type == OnBlockEffectType.Frozen))
                 return false;
 
             field.Blocks[swap.X, swap.Y] = blockB;

@@ -27,6 +27,8 @@ namespace NetworkShared.Data.Field
         public BlockStateData[] PreviousStates;
 
         public BlockData ReplacedBlock;
+
+        public OnBlockEffectData[] OnBlockEffects;
     }
 
     [Serializable]

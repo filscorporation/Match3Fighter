@@ -491,6 +491,13 @@ MonoBehaviour:
   EnemyNameText: {fileID: 0}
   EnemyHPText: {fileID: 0}
   EnemyMPText: {fileID: 0}
+  EnemyShieldIcon: {fileID: 0}
+  PlayerShieldIcon: {fileID: 0}
+  PlayerStatsEffect: {fileID: 0}
+  PlayerHPEffects: []
+  PlayerMPEffects: []
+  EnemyHPEffects: []
+  EnemyMPEffects: []
 --- !u!4 &1313491605
 Transform:
   m_ObjectHideFlags: 0

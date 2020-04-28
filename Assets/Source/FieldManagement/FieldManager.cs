@@ -28,6 +28,8 @@ namespace Assets.Source.FieldManagement
                 return instance;
             }
         }
+
+        public bool CanControl = true;
         
         public GameObject BlockPrefab;
         public GameObject ShootEffectPrefab;
@@ -37,6 +39,8 @@ namespace Assets.Source.FieldManagement
 
         public List<Sprite> BlockSprites;
         private const string uniqueBlockSpritesPath = "UniqueBlockSprites";
+        private const string onBlockEffectsSpritesPath = "Prefabs";
+        private const string onBlockEffectsSpritesPostfix = "Effect";
 
         public void Start()
         {
@@ -226,7 +230,24 @@ namespace Assets.Source.FieldManagement
                 sprite.sprite = BlockSprites[data.ID];
             }
 
+            foreach (OnBlockEffectData onBlockEffectData in data.OnBlockEffects)
+            {
+                OnBlockEffect effect = new OnBlockEffect(onBlockEffectData.Type, onBlockEffectData.Duration);
+                effect.Prefab = Instantiate(
+                    GetEffectPrefab(onBlockEffectData.Type),
+                    block.transform.position,
+                    Quaternion.identity,
+                    block.transform);
+                block.OnBlockEffects.Add(effect);
+            }
+
             return block;
+        }
+
+        private GameObject GetEffectPrefab(OnBlockEffectType type)
+        {
+            return Resources.Load<GameObject>(
+                Path.Combine(onBlockEffectsSpritesPath, type + onBlockEffectsSpritesPostfix));
         }
 
         private Sprite GetUniqueBlockSprite(string blockName)
@@ -256,6 +277,9 @@ namespace Assets.Source.FieldManagement
 
         public void Handle(InputEvent input)
         {
+            if (!CanControl)
+                return;
+
             if (input is BlockSwipeEvent swipe)
             {
                 Block block = input.InputObject.GetComponent<Block>();

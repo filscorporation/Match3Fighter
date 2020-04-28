@@ -17,6 +17,7 @@
         // Game process
         BlockSwapRequest = 20,
         GameStateResponse = 21,
+        GameEndResponse = 22,
 
         // Error
         ErrorResponse = 1000,

@@ -103,7 +103,7 @@ namespace MatchServer
 
             UniqueBlockCollection.Level2Blocks[BlockTypes.Attack] = uBlocks[nameof(BoulderBlock)];
             UniqueBlockCollection.Level2Blocks[BlockTypes.Health] = uBlocks[nameof(LifeBlock)];
-            UniqueBlockCollection.Level2Blocks[BlockTypes.Mana] = uBlocks[nameof(SuperManaBlock)];
+            UniqueBlockCollection.Level2Blocks[BlockTypes.Mana] = uBlocks[nameof(FreezeBlock)];
             UniqueBlockCollection.Level2Blocks[BlockTypes.Arcane] = uBlocks[nameof(Arcane5Block)];
 
             UniqueBlockCollection.Level3Blocks[BlockTypes.Attack] = uBlocks[nameof(KillerBlock)];

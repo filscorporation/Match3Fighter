@@ -20,11 +20,13 @@ namespace Assets.Source.FieldManagement
 
         public BlockTypes Type;
 
+        public List<OnBlockEffect> OnBlockEffects = new List<OnBlockEffect>();
+
         public Field Field;
 
         public Animation Animation;
 
-        public GameObject DestructionEfect;
+        public GameObject DestructionEffect;
 
         private const string destroyedAnimationName = "BlockDestroyed";
         private const string appearedAnimationName = "BlockAppeared";
@@ -108,7 +110,7 @@ namespace Assets.Source.FieldManagement
             Animation.PlayQueued(destroyedAnimationName);
             Destroy(gameObject, 2.5F);
 
-            GameObject eff = Instantiate(DestructionEfect, transform.position + new Vector3(0, 0, 5), Quaternion.identity);
+            GameObject eff = Instantiate(DestructionEffect, transform.position + new Vector3(0, 0, 5), Quaternion.identity);
             eff.transform.SetAsFirstSibling();
             Destroy(eff, 2F);
         }
