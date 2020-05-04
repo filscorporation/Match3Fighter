@@ -63,7 +63,15 @@ namespace MatchServer.Players
         {
             if (queue.Contains(player))
                 return;
-            queue.Add(player);
+
+            if (player.IsInDebugMode)
+            {
+                matchManager.MakeMatch(player, player);
+            }
+            else
+            {
+                queue.Add(player);
+            }
         }
 
         /// <summary>
@@ -71,12 +79,6 @@ namespace MatchServer.Players
         /// </summary>
         public void TryMakeMatch()
         {
-            if (GameCore.AllowOnePlayerMode && queue.Count >= 1)
-            {
-                queue.TryTake(out Player player);
-                matchManager.MakeMatch(player, player);
-            }
-
             if (queue.Count >= 2)
             {
                 queue.TryTake(out Player player1);

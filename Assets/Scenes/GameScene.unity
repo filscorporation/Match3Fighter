@@ -1148,9 +1148,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f5fa076e3cf95447805b58aa1b54d8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CanControl: 1
   BlockPrefab: {fileID: 4115847293272188596, guid: d39b7430603a68849acd1b73ce12b8f9,
     type: 3}
-  ShootEffectPrefab: {fileID: 5189662200948597548, guid: f0737446144716241ba6e6dc069d24c5,
+  ShootEffectPrefab: {fileID: 1500768001241937619, guid: d33086d2f525f5b4c85cadab9a07f052,
     type: 3}
   BlockSprites:
   - {fileID: 21300000, guid: 3e2dcd83b52cc974d949a6d214850adb, type: 3}

@@ -144,7 +144,7 @@ namespace Assets.Source.FieldManagement
                             // Block dropped from above as new
                             if (prevState.State == BlockState.DroppedAsNew)
                             {
-                                block.AnimateDropped(new Vector2(x, dropY + dropYoffset[i] + 1), true);
+                                StartCoroutine(block.AnimateDropped(new Vector2(x, dropY + dropYoffset[i] + 1), true));
                                 dropYoffset[i]++;
                             }
 
@@ -153,7 +153,7 @@ namespace Assets.Source.FieldManagement
                             {
                                 float oldx = prevState.X + center.x - w / 2F + 0.5F;
                                 float oldy = prevState.Y + center.y - h / 2F - 0.5F;
-                                block.AnimateDropped(new Vector2(oldx, oldy));
+                                StartCoroutine(block.AnimateDropped(new Vector2(oldx, oldy)));
                             }
 
                             // Blocks that swapped
@@ -167,19 +167,31 @@ namespace Assets.Source.FieldManagement
                             // Adding block that was generated from combo
                             if (prevState.State == BlockState.CreatedAsComboResult)
                             {
-                                block.AnimateAppeared();
+                                StartCoroutine(block.AnimateAppeared());
                             }
 
                             // Show if previous was destroyed by damage
                             if (prevState.State == BlockState.DestroyedByDamage)
                             {
-                                block.AnimateDestroyed();
+                                StartCoroutine(block.AnimateDestroyed());
                             }
 
                             // Show if previous was destroyed as combo part
                             if (prevState.State == BlockState.DestroyedAsCombo)
                             {
-                                block.AnimateDestroyed();
+                                StartCoroutine(block.AnimateDestroyed());
+                            }
+
+                            // Show if previous was flipped over
+                            if (prevState.State == BlockState.FlippedOver)
+                            {
+                                StartCoroutine(block.AnimateFlipped());
+                            }
+
+                            // Show if previous was created on flipped one place
+                            if (prevState.State == BlockState.CreatedFromFlip)
+                            {
+                                StartCoroutine(block.AnimateAppeared());
                             }
 
                             if (blockData.ReplacedBlock != null)
@@ -268,7 +280,7 @@ namespace Assets.Source.FieldManagement
                 GetPositionForEnemyBlock((int)data.Data["TargetX"], (int)data.Data["TargetY"]) :
                 GetPositionForPlayerBlock((int)data.Data["InitX"], (int)data.Data["InitY"]);
             GameObject go = Instantiate(ShootEffectPrefab, Vector3.zero, Quaternion.identity, transform);
-            StartCoroutine(go.GetComponent<ShootEffect>().Initialize(from, to));
+            StartCoroutine(go.GetComponent<IPointToPointEffect>().Initialize(from, to));
         }
 
         #endregion

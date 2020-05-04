@@ -53,11 +53,11 @@ namespace MatchServer.FieldManagement.Effects
 
             for (int i = 0; i < BlocksToAttackCount; i++)
             {
-                Block block = manager.GetRandomNonDestroyedBlock(enemyField);
+                Block block = manager.GetRandomNonDestroyedBlocks(enemyField).FirstOrDefault();
                 // TODO: block damage
                 if (block != null)
                 {
-                    manager.DestroyBlocks(enemyField, new List<Block> {block}, BlockState.DestroyedByDamage);
+                    manager.DestroyBlocks(new List<Block> {block}, BlockState.DestroyedByDamage);
                     data.Add(ShotData(playerField, enemyField, init, block, -DamageToBlockHealth));
                 }
             }

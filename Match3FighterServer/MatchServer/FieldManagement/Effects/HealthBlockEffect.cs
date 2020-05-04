@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MatchServer.Players;
 using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
@@ -41,12 +42,12 @@ namespace MatchServer.FieldManagement.Effects
         {
             player.GainHealth(HealthToRestore * combo.EffectScale);
 
-            for (int i = 0; i < BlocksToGainArmourCount; i++)
-            {
-                Block block = manager.GetRandomNonDestroyedBlock(playerField);
-                // TODO: block armour
+            //for (int i = 0; i < BlocksToGainArmourCount; i++)
+            //{
+            //    Block block = manager.GetRandomNonDestroyedBlocks(playerField).FirstOrDefault();
+            //    // TODO: block armour
 
-            }
+            //}
         }
     }
 }

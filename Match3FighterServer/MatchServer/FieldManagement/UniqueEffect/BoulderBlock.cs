@@ -27,7 +27,7 @@ namespace MatchServer.FieldManagement.UniqueEffect
             else
             {
                 Block toBlock = manager.GetRandomNonDestroyedBlockExceptBorders(enemyField);
-                manager.DestroyBlocks(enemyField, manager.GetNeighbours(enemyField, toBlock), BlockState.DestroyedByDamage);
+                manager.DestroyBlocks(manager.GetNeighbours(enemyField, toBlock), BlockState.DestroyedByDamage);
                 data.Add(UniqueShotData(playerField, enemyField, block, toBlock, "BoulderEffect"));
             }
 

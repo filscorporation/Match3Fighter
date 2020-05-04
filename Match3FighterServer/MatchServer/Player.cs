@@ -35,6 +35,11 @@ namespace MatchServer
         public GameMatch CurrentMatch;
 
         /// <summary>
+        /// Allows player to start match as single player
+        /// </summary>
+        public bool IsInDebugMode = false;
+
+        /// <summary>
         /// Shows to both players
         /// </summary>
         public string Name;
@@ -104,7 +109,7 @@ namespace MatchServer
             UniqueBlockCollection.Level2Blocks[BlockTypes.Attack] = uBlocks[nameof(BoulderBlock)];
             UniqueBlockCollection.Level2Blocks[BlockTypes.Health] = uBlocks[nameof(LifeBlock)];
             UniqueBlockCollection.Level2Blocks[BlockTypes.Mana] = uBlocks[nameof(FreezeBlock)];
-            UniqueBlockCollection.Level2Blocks[BlockTypes.Arcane] = uBlocks[nameof(Arcane5Block)];
+            UniqueBlockCollection.Level2Blocks[BlockTypes.Arcane] = uBlocks[nameof(MassFlipBlock)];
 
             UniqueBlockCollection.Level3Blocks[BlockTypes.Attack] = uBlocks[nameof(KillerBlock)];
             UniqueBlockCollection.Level3Blocks[BlockTypes.Health] = uBlocks[nameof(ShieldBlock)];
@@ -180,6 +185,8 @@ namespace MatchServer
 
         public PlayerData ToData()
         {
+            Update();
+
             return new PlayerData
             {
                 InGameID = InGameID,

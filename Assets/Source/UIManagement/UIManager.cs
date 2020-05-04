@@ -1,11 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using Assets.Source.GameManagement;
 using Assets.Source.PlayerManagement;
 using UnityEngine;
 using UnityEngine.UI;
-using Image = UnityEngine.UIElements.Image;
 
 namespace Assets.Source.UIManagement
 {
@@ -46,6 +44,11 @@ namespace Assets.Source.UIManagement
         public void StartGameButtonClick()
         {
             GameManager.Instance.QueueGame();
+        }
+
+        public void DebugButtonClick()
+        {
+            GameManager.Instance.QueueDebugGame();
         }
 
         public void BackGameButtonClick()

@@ -79,6 +79,7 @@
     <Compile Include="FieldManagement\UniqueEffect\FreezeBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\KillerBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\LifeBlock.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\MassSwapBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\ShieldBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\SuperManaBlock.cs" />
     <Compile Include="GameCore.cs" />

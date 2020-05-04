@@ -124,11 +124,12 @@ namespace MatchServer.FieldManagement
         }
 
         /// <summary>
-        /// Returns random block on a field that is not in destroyed state
+        /// Returns random blocks on a field that are not in destroyed state
         /// </summary>
         /// <param name="field"></param>
+        /// <param name="count"></param>
         /// <returns></returns>
-        public Block GetRandomNonDestroyedBlock(Field field)
+        public IEnumerable<Block> GetRandomNonDestroyedBlocks(Field field, int count = 1)
         {
             int totalNonDestroyed = 0;
             for (int i = 0; i < fieldWidth; i++)
@@ -141,9 +142,13 @@ namespace MatchServer.FieldManagement
             }
 
             if (totalNonDestroyed == 0)
-                return null;
+                yield break;
 
-            int randomIndex = random.Next(0, totalNonDestroyed);
+            if (totalNonDestroyed < count)
+                count = totalNonDestroyed;
+
+            List<int> randoms = UniqueRandom(totalNonDestroyed, count).OrderBy(i => i).ToList();
+            int index = 0;
 
             for (int i = 0; i < fieldWidth; i++)
             {
@@ -151,14 +156,37 @@ namespace MatchServer.FieldManagement
                 {
                     if (!field.Blocks[i, j].IsLastDestroyedState())
                     {
-                        if (randomIndex == 0)
-                            return field.Blocks[i, j];
-                        randomIndex--;
+                        if (index == randoms.First())
+                        {
+                            randoms.RemoveAt(0);
+                            yield return field.Blocks[i, j];
+                            if (!randoms.Any())
+                                yield break;
+                        }
+                        index++;
                     }
                 }
             }
 
-            return null;
+            yield break;
+        }
+
+        /// <summary>
+        /// Returns count size list of random unique integers less than max
+        /// </summary>
+        /// <param name="max"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        private IEnumerable<int> UniqueRandom(int max, int count)
+        {
+            int[] list = new int[max];
+
+            for (int i = 0; i < max; i++)
+            {
+                list[i] = i;
+            }
+
+            return list.Shuffle().Take(count);
         }
 
         /// <summary>
@@ -249,15 +277,26 @@ namespace MatchServer.FieldManagement
         /// <summary>
         /// Put all blocks into destroyed state
         /// </summary>
-        /// <param name="field"></param>
         /// <param name="blocks"></param>
         /// <param name="destroyedState"></param>
-        public void DestroyBlocks(Field field, IEnumerable<Block> blocks, BlockState destroyedState)
+        public void DestroyBlocks(IEnumerable<Block> blocks, BlockState destroyedState)
         {
             foreach (Block block in blocks)
             {
                 if (!block.IsLastDestroyedState())
                     block.RememberState(destroyedState);
+            }
+        }
+
+        /// <summary>
+        /// Put all blocks into flipped over state
+        /// </summary>
+        /// <param name="blocks"></param>
+        public void FlipBlocks(IEnumerable<Block> blocks)
+        {
+            foreach (Block block in blocks)
+            {
+                block.RememberState(BlockState.FlippedOver);
             }
         }
 
@@ -300,6 +339,16 @@ namespace MatchServer.FieldManagement
                 for (int j = 0; j < h; j++)
                 {
                     Block block = field.Blocks[i, j];
+
+                    if (block.IsLastFlippedOverState())
+                    {
+                        Block newBlock = Block.GetRandomBlock(random);
+                        newBlock.ReplacedBlock = field.Blocks[i, j];
+                        field.Blocks[i, j] = newBlock;
+                        field.Blocks[i, j].SetXY(i, j);
+                        field.Blocks[i, j].RememberState(BlockState.CreatedFromFlip);
+                    }
+
                     if (block.IsLastDestroyedState())
                     {
                         offset++;

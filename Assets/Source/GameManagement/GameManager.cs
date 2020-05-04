@@ -65,7 +65,24 @@ namespace Assets.Source.GameManagement
         {
             Debug.Log("Queue game");
 
-            PutPlayerIntoQueueRequest request = new PutPlayerIntoQueueRequest();
+            PutPlayerIntoQueueRequest request = new PutPlayerIntoQueueRequest
+            {
+                DebugMode = false,
+            };
+            NetworkManager.Instance.SendPutPlayerIntoQueueRequestRequest(request);
+        }
+
+        /// <summary>
+        /// Puts player into the game queue with single player option as debug mode
+        /// </summary>
+        public void QueueDebugGame()
+        {
+            Debug.Log("Queue game");
+
+            PutPlayerIntoQueueRequest request = new PutPlayerIntoQueueRequest
+            {
+                DebugMode = true,
+            };
             NetworkManager.Instance.SendPutPlayerIntoQueueRequestRequest(request);
         }
 

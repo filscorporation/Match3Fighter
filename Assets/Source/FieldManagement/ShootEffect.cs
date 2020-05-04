@@ -12,7 +12,7 @@ namespace Assets.Source.FieldManagement
     /// Effect when block shoots something
     /// </summary>
     [RequireComponent(typeof(LineRenderer))]
-    public class ShootEffect : MonoBehaviour
+    public class ShootEffect : MonoBehaviour, IPointToPointEffect
     {
         private LineRenderer lineRenderer;
         private const float shootDelay = 0.1F;

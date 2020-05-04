@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -44,6 +45,7 @@ namespace Assets.Source.FieldManagement
         private float mv = 30F;
 
         private const float destroyDelay = 0.1F;
+        private const float flipDelay = 0.1F;
         private const float dropDelay = 0.4F;
         private const float appearDelay = 0.35F;
 
@@ -97,16 +99,12 @@ namespace Assets.Source.FieldManagement
             }
         }
 
-        public void AnimateDestroyed()
+        public IEnumerator AnimateDestroyed()
         {
             gameObject.name += " Destroy";
 
-            CancelInvoke(nameof(AnimateDestroyedDelayed));
-            Invoke(nameof(AnimateDestroyedDelayed), destroyDelay);
-        }
+            yield return new WaitForSeconds(destroyDelay);
 
-        private void AnimateDestroyedDelayed()
-        {
             Animation.PlayQueued(destroyedAnimationName);
             Destroy(gameObject, 2.5F);
 
@@ -115,18 +113,24 @@ namespace Assets.Source.FieldManagement
             Destroy(eff, 2F);
         }
 
-        public void AnimateAppeared()
+        public IEnumerator AnimateFlipped()
+        {
+            gameObject.name += " Flipped";
+
+            yield return new WaitForSeconds(flipDelay);
+
+            Animation.PlayQueued(destroyedAnimationName);
+            Destroy(gameObject, 2.5F);
+        }
+
+        public IEnumerator AnimateAppeared()
         {
             gameObject.GetComponent<SpriteRenderer>().enabled = false;
 
             gameObject.name += " Appear";
 
-            CancelInvoke(nameof(AnimateAppearedDelayed));
-            Invoke(nameof(AnimateAppearedDelayed), appearDelay);
-        }
+            yield return new WaitForSeconds(appearDelay);
 
-        public void AnimateAppearedDelayed()
-        {
             gameObject.GetComponent<SpriteRenderer>().enabled = true;
             Animation.PlayQueued(appearedAnimationName);
         }
@@ -140,19 +144,14 @@ namespace Assets.Source.FieldManagement
             gameObject.name += " Swap";
         }
 
-        public void AnimateDropped(Vector2 startingPosition, bool isNew = false)
+        public IEnumerator AnimateDropped(Vector2 startingPosition, bool isNew = false)
         {
             dropTargetPosition = transform.position;
             transform.position = startingPosition;
 
             gameObject.name += " Drop";
 
-            CancelInvoke(nameof(AnimateDroppedDelayed));
-            Invoke(nameof(AnimateDroppedDelayed), dropDelay);
-        }
-
-        public void AnimateDroppedDelayed()
-        {
+            yield return new WaitForSeconds(dropDelay);
             dv = 0;
             needToDrop = true;
             needToMove = false;

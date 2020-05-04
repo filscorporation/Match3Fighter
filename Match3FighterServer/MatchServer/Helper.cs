@@ -10,7 +10,7 @@ namespace MatchServer
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
-        public static void Shuffle<T>(this IList<T> list)
+        public static IList<T> Shuffle<T>(this IList<T> list)
         {
             Random rng = new Random();
 
@@ -23,6 +23,8 @@ namespace MatchServer
                 list[k] = list[n];
                 list[n] = value;
             }
+
+            return list;
         }
     }
 }

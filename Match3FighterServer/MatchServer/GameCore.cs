@@ -20,11 +20,6 @@ namespace MatchServer
     {
         public static GameCore Instance;
 
-        /// <summary>
-        /// For debug purposes, allows to start match with one player taking both players slots
-        /// </summary>
-        public const bool AllowOnePlayerMode = false;
-
         public bool IsRunning = false;
         public const int TicksPerSec = 30;
         public const int MsPerTick = 1000 / TicksPerSec;
@@ -160,6 +155,12 @@ namespace MatchServer
                 Console.WriteLine($"Can't find player {clientID}");
                 return;
             }
+            if (request.DebugMode)
+            {
+                player.IsInDebugMode = true;
+                Console.WriteLine($"Player {clientID} is in debug mode");
+            }
+
             Console.WriteLine($"Putting player {clientID} into queue");
             PlayersManager.PutPlayerIntoQueue(player);
         }
@@ -214,7 +215,7 @@ namespace MatchServer
             List<Combo> combos = FieldManager.CheckForCombos(playerField, blocks);
             foreach (Combo combo in combos)
             {
-                FieldManager.DestroyBlocks(playerField, combo.Blocks, BlockState.DestroyedAsCombo);
+                FieldManager.DestroyBlocks(combo.Blocks, BlockState.DestroyedAsCombo);
                 effectsData.AddRange(BlockEffectsManager.ApplyEffectsFromCombo(match, match.Player1 == player ? 1 : 2, combo));
             }
 
@@ -227,7 +228,7 @@ namespace MatchServer
             };
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
 
-            if (GameCore.AllowOnePlayerMode && match.Player1 == match.Player2)
+            if (match.Player1 == match.Player2)
             {
                 FieldManager.SetDefaultState(playerField);
                 FieldManager.SetDefaultState(enemyField);
@@ -249,7 +250,7 @@ namespace MatchServer
                 MatchManager.DropMatch(player.CurrentMatch);
 
                 Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameEndResponse, gameEndResponse);
-                if (GameCore.AllowOnePlayerMode && match.Player1 == match.Player2)
+                if (match.Player1 == match.Player2)
                 {
                     return;
                 }
@@ -281,7 +282,7 @@ namespace MatchServer
             StartGameResponse response = new StartGameResponse { GameState = GetPlayer1MatchStateData(match) };
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.StartGameResponse, response);
 
-            if (AllowOnePlayerMode && match.Player1 == match.Player2)
+            if (match.Player1 == match.Player2)
                 return;
 
             response = new StartGameResponse { GameState = GetPlayer2MatchStateData(match) };

@@ -11,6 +11,8 @@ namespace NetworkShared.Data.Field
         Damaged,
         DestroyedByDamage,
         CreatedAsComboResult,
+        CreatedFromFlip,
+        FlippedOver,
     }
 
     [Serializable]

@@ -104,6 +104,21 @@ namespace MatchServer.FieldManagement
             return false;
         }
 
+        /// <summary>
+        /// Returns if block state is flipped over
+        /// </summary>
+        /// <returns></returns>
+        public bool IsLastFlippedOverState()
+        {
+            if (PreviousStates.Any())
+            {
+                BlockState state = PreviousStates.Peek().State;
+                return state == BlockState.FlippedOver;
+            }
+
+            return false;
+        }
+
         public void RemoveExpiredEffects()
         {
             OnBlockEffects.RemoveAll(e => 
