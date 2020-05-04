@@ -8,10 +8,8 @@ namespace MatchServer.FieldManagement.Effects
 {
     public class ArcaneBlockEffect : Effect
     {
-        public int BlocksToAttackCount = 1;
-        public float DamageToBlockHealth = 0.7F;
-        public float DamageToEnemyHealth = 5F;
-        public float HealthToRestore = 5F;
+        public float DamageToEnemyHealth = 10F;
+        public float HealthToRestore = 10F;
         public float ManaToRestore = 15F;
 
         public override BlockTypes ComboEffectType => BlockTypes.Arcane;

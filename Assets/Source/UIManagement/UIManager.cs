@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace Assets.Source.UIManagement
 {
     /// <summary>
-    /// Controlls UI elements
+    /// Controls UI elements
     /// </summary>
     public class UIManager : MonoBehaviour
     {
@@ -34,6 +34,8 @@ namespace Assets.Source.UIManagement
         public Text EnemyMPText;
         public GameObject EnemyShieldIcon;
         public GameObject PlayerShieldIcon;
+        public GameObject LostUI;
+        public GameObject WonUI;
 
         public GameObject PlayerStatsEffect;
         public List<GameObject> PlayerHPEffects = new List<GameObject>();
@@ -156,6 +158,16 @@ namespace Assets.Source.UIManagement
         public void ActivateEnemyShieldEffect(bool isActive = true)
         {
             EnemyShieldIcon.SetActive(isActive);
+        }
+
+        public void ActivateLostUI()
+        {
+            LostUI.SetActive(true);
+        }
+
+        public void ActivateWonUI()
+        {
+            WonUI.SetActive(true);
         }
     }
 }

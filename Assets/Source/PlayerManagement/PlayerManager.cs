@@ -60,11 +60,13 @@ namespace Assets.Source.PlayerManagement
         {
             if (player.InGameID == playerID)
             {
+                UIManager.Instance.ActivateWonUI();
                 // You won
                 Debug.Log("You won");
             }
             else
             {
+                UIManager.Instance.ActivateLostUI();
                 // You lost
                 Debug.Log("You lost");
             }

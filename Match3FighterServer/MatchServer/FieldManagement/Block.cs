@@ -24,10 +24,10 @@ namespace MatchServer.FieldManagement
 
         public List<OnBlockEffect> OnBlockEffects = new List<OnBlockEffect>();
 
-        private const float AttackBlockChance = 0.36F;
-        private const float HealBlockChance = 0.23F;
-        private const float ManaBlockChance = 0.23F;
-        private const float ArcaneBlockChance = 1F - AttackBlockChance - HealBlockChance - ManaBlockChance;
+        private const float attackBlockChance = 0.29F;
+        private const float healBlockChance = 0.26F;
+        private const float manaBlockChance = 0.26F;
+        private const float arcaneBlockChance = 1F - attackBlockChance - healBlockChance - manaBlockChance;
 
         /// <summary>
         /// Returns true if block is unique
@@ -64,11 +64,11 @@ namespace MatchServer.FieldManagement
             Block block = new Block();
 
             double n = random.NextDouble();
-            if (n < AttackBlockChance)
+            if (n < attackBlockChance)
                 block.Type = BlockTypes.Attack;
-            else if (n < AttackBlockChance + HealBlockChance)
+            else if (n < attackBlockChance + healBlockChance)
                 block.Type = BlockTypes.Health;
-            else if (n < AttackBlockChance + HealBlockChance + ManaBlockChance)
+            else if (n < attackBlockChance + healBlockChance + manaBlockChance)
                 block.Type = BlockTypes.Mana;
             else
                 block.Type = BlockTypes.Arcane;
