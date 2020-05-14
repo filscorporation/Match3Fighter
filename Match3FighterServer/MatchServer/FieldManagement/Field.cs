@@ -13,13 +13,15 @@ namespace MatchServer.FieldManagement
     public class Field
     {
         /// <summary>
-        /// Ingame unique identifier
+        /// In game unique identifier
         /// </summary>
         public int InGameID;
 
         public List<GlobalEffect> GlobalEffects = new List<GlobalEffect>();
 
         public Block[,] Blocks;
+
+        public List<Block> DestroyedBlocks = new List<Block>();
 
         /// <summary>
         /// Checks if index outside borders and returns block if not

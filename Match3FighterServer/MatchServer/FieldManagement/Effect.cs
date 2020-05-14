@@ -46,13 +46,13 @@ namespace MatchServer.FieldManagement
             return mData;
         }
 
-        protected EffectData GlobalEffectRemovedData(Player player, GlobalEffect effect)
+        protected EffectData GlobalEffectRemovedData(Player player, GlobalEffectType type)
         {
             EffectData geData = new EffectData();
             geData.EffectType = EffectType.GlobalEffect;
             geData.Data = new Dictionary<string, object>();
             geData.Data["Target"] = player.InGameID;
-            geData.Data["Type"] = effect.Type;
+            geData.Data["Type"] = type;
             geData.Data["Created"] = false;
             return geData;
         }

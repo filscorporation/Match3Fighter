@@ -148,11 +148,44 @@ namespace Assets.Source.GameManagement
                         FieldManager.Instance.DrawShootEffect(effect);
                         break;
                     case EffectType.GlobalEffect:
-                        PlayerManager.Instance.ActivateShieldEffect(effect);
+                        ProcessGlobalEffect(effect);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+            }
+        }
+
+        private void ProcessGlobalEffect(EffectData effect)
+        {
+            GlobalEffectType type = (GlobalEffectType)effect.Data["Type"];
+            bool created = (bool)effect.Data["Created"];
+            int target;
+            float value;
+
+            switch (type)
+            {
+                case GlobalEffectType.Shield:
+                    PlayerManager.Instance.ActivateShieldEffect(effect);
+                    break;
+                case GlobalEffectType.HealOverTime:
+                    target = (int)effect.Data["Target"];
+                    value = (float)effect.Data["Value"];
+                    if (created)
+                        PlayerManager.Instance.GetPlayerByID(target).HealthPerSecondFromEffect += value;
+                    else
+                        PlayerManager.Instance.GetPlayerByID(target).HealthPerSecondFromEffect -= value;
+                    break;
+                case GlobalEffectType.ManaOverTime:
+                    target = (int)effect.Data["Target"];
+                    value = (float)effect.Data["Value"];
+                    if (created)
+                        PlayerManager.Instance.GetPlayerByID(target).ManaPerSecondFromEffects += value;
+                    else
+                        PlayerManager.Instance.GetPlayerByID(target).ManaPerSecondFromEffects -= value;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 

@@ -15,6 +15,36 @@ namespace MatchServer.FieldManagement
 
         public abstract BlockTypes BaseType { get; }
 
+        public GlobalEffect AttachedGlobalEffect;
+
+        /// <summary>
+        /// Applies unique block effect on its creation
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="random"></param>
+        /// <param name="match"></param>
+        /// <param name="user"></param>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public virtual List<EffectData> OnCreate(FieldManager manager, Random random, GameMatch match, Player user, Block block)
+        {
+            return new List<EffectData>();
+        }
+
+        /// <summary>
+        /// Applies unique block effect on its destruction
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="random"></param>
+        /// <param name="match"></param>
+        /// <param name="user"></param>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public virtual List<EffectData> OnDelete(FieldManager manager, Random random, GameMatch match, Player user, Block block)
+        {
+            return new List<EffectData>();
+        }
+
         /// <summary>
         /// Applies effect from a combo to the game match
         /// </summary>
@@ -23,6 +53,7 @@ namespace MatchServer.FieldManagement
         /// <param name="match"></param>
         /// <param name="playerUserIndex"></param>
         /// <param name="combo"></param>
+        /// <param name="block"></param>
         public abstract List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo, Block block);
 
         protected EffectData HealthData(Player player, float value)
@@ -52,6 +83,7 @@ namespace MatchServer.FieldManagement
             geData.Data = new Dictionary<string, object>();
             geData.Data["Target"] = player.InGameID;
             geData.Data["Type"] = effect.Type;
+            geData.Data["Value"] = effect.Value;
             geData.Data["Created"] = true;
             return geData;
         }
@@ -63,6 +95,7 @@ namespace MatchServer.FieldManagement
             geData.Data = new Dictionary<string, object>();
             geData.Data["Target"] = player.InGameID;
             geData.Data["Type"] = effect.Type;
+            geData.Data["Value"] = effect.Value;
             geData.Data["Created"] = false;
             return geData;
         }

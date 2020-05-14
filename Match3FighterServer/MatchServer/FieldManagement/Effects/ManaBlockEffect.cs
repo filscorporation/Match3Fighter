@@ -33,7 +33,7 @@ namespace MatchServer.FieldManagement.Effects
 
             if (combo.Blocks.Count > 3)
             {
-                BlockEffectsHelper.CreateUniqueBlock(manager, playerField, player, combo, ComboEffectType);
+                data.AddRange(BlockEffectsHelper.CreateUniqueBlock(manager, random, playerField, player, combo, ComboEffectType));
             }
 
             return data;

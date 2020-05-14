@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MatchServer.Players;
+using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
 
 namespace MatchServer.FieldManagement
@@ -60,6 +62,27 @@ namespace MatchServer.FieldManagement
         }
 
         /// <summary>
+        /// Clears destroyed blocks list and calls their on destroy methods
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="match"></param>
+        /// <param name="user"></param>
+        public List<EffectData> ClearDestroyedBlocks(Field field, GameMatch match, Player user)
+        {
+            List<EffectData> data = new List<EffectData>();
+
+            foreach (Block block in field.DestroyedBlocks)
+            {
+                if (block.UniqueBlock != null)
+                    data.AddRange(block.UniqueBlock.OnDelete(this, random, match, user, block));
+            }
+
+            field.DestroyedBlocks.Clear();
+
+            return data;
+        }
+
+        /// <summary>
         /// Removes expired effects from field and blocks
         /// </summary>
         /// <param name="field"></param>
@@ -70,6 +93,31 @@ namespace MatchServer.FieldManagement
                 for (int j = 0; j < fieldHeight; j++)
                 {
                     field.Blocks[i, j].RemoveExpiredEffects();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates global effects with over time value
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="player"></param>
+        public void RefreshGlobalEffects(Field field, Player player)
+        {
+            foreach (GlobalEffect globalEffect in field.GlobalEffects)
+            {
+                switch (globalEffect.Type)
+                {
+                    case GlobalEffectType.Shield:
+                        break;
+                    case GlobalEffectType.HealOverTime:
+                        player.GainHealth(globalEffect.UpdateValue());
+                        break;
+                    case GlobalEffectType.ManaOverTime:
+                        player.GainMana(globalEffect.UpdateValue());
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }
@@ -277,14 +325,18 @@ namespace MatchServer.FieldManagement
         /// <summary>
         /// Put all blocks into destroyed state
         /// </summary>
+        /// <param name="field"></param>
         /// <param name="blocks"></param>
         /// <param name="destroyedState"></param>
-        public void DestroyBlocks(IEnumerable<Block> blocks, BlockState destroyedState)
+        public void DestroyBlocks(Field field, IEnumerable<Block> blocks, BlockState destroyedState)
         {
             foreach (Block block in blocks)
             {
                 if (!block.IsLastDestroyedState())
+                {
                     block.RememberState(destroyedState);
+                    field.DestroyedBlocks.Add(block);
+                }
             }
         }
 

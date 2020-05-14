@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using MatchServer.FieldManagement;
 using MatchServer.FieldManagement.UniqueEffect;
 using MatchServer.Players;
@@ -25,7 +24,7 @@ namespace MatchServer
         public string PlayerID;
 
         /// <summary>
-        /// Ingame unique identifier
+        /// In game unique identifier
         /// </summary>
         public int InGameID;
 
@@ -101,10 +100,10 @@ namespace MatchServer
 
             Dictionary<string, UniqueBlock> uBlocks = GameCore.Instance.BlockEffectsManager.UniqueBlocks;
             
-            UniqueBlockCollection.Level1Blocks[BlockTypes.Attack] = uBlocks[nameof(ChameleonBlock)];
-            UniqueBlockCollection.Level1Blocks[BlockTypes.Health] = uBlocks[nameof(ChameleonBlock)];
-            UniqueBlockCollection.Level1Blocks[BlockTypes.Mana] = uBlocks[nameof(ChameleonBlock)];
-            UniqueBlockCollection.Level1Blocks[BlockTypes.Arcane] = uBlocks[nameof(ChameleonBlock)];
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Attack] = uBlocks[nameof(MachineGunBlock)];
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Health] = uBlocks[nameof(InfinityBlock)];
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Mana] = uBlocks[nameof(ManaSourceBlock)];
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Arcane] = uBlocks[nameof(ShotgunBlock)];
 
             UniqueBlockCollection.Level2Blocks[BlockTypes.Attack] = uBlocks[nameof(BoulderBlock)];
             UniqueBlockCollection.Level2Blocks[BlockTypes.Health] = uBlocks[nameof(LifeBlock)];

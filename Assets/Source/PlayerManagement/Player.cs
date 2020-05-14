@@ -13,10 +13,14 @@
 
         public float Health;
 
+        public float HealthPerSecondFromEffect;
+
         public float MaxMana;
 
         public float Mana;
 
         public float ManaPerSecond;
+
+        public float ManaPerSecondFromEffects;
     }
 }

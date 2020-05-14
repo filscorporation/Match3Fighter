@@ -194,7 +194,11 @@ namespace MatchServer
             GameMatch match = player.CurrentMatch;
             Field playerField = match.Player1 == player ? match.Field1 : match.Field2;
             Field enemyField = match.Player1 == player ? match.Field2 : match.Field1;
+            Player enemy = match.Player1 == player ? match.Player2 : match.Player1;
             List<EffectData> effectsData = new List<EffectData>();
+
+            FieldManager.RefreshGlobalEffects(playerField, player);
+            FieldManager.RefreshGlobalEffects(enemyField, enemy);
 
             if (!player.TrySpendMana(player.BlockSwapCost))
             {
@@ -222,9 +226,12 @@ namespace MatchServer
             List<Combo> combos = FieldManager.CheckForCombos(playerField, blocks);
             foreach (Combo combo in combos)
             {
-                FieldManager.DestroyBlocks(combo.Blocks, BlockState.DestroyedAsCombo);
+                FieldManager.DestroyBlocks(enemyField, combo.Blocks, BlockState.DestroyedAsCombo);
                 effectsData.AddRange(BlockEffectsManager.ApplyEffectsFromCombo(match, match.Player1 == player ? 1 : 2, combo));
             }
+
+            effectsData.AddRange(FieldManager.ClearDestroyedBlocks(playerField, match, player));
+            effectsData.AddRange(FieldManager.ClearDestroyedBlocks(enemyField, match, enemy));
 
             FieldManager.FillHoles(playerField);
             FieldManager.FillHoles(enemyField);
@@ -250,7 +257,9 @@ namespace MatchServer
             Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameStateResponse, response);
             
             FieldManager.SetDefaultState(playerField);
+            effectsData.AddRange(FieldManager.ClearDestroyedBlocks(playerField, match, player));
             FieldManager.SetDefaultState(enemyField);
+            effectsData.AddRange(FieldManager.ClearDestroyedBlocks(enemyField, match, enemy));
 
             if (CheckForGameEnd(match, out var gameEndResponse))
             {
@@ -290,9 +299,12 @@ namespace MatchServer
             GameMatch match = player.CurrentMatch;
             Field playerField = match.Player1 == player ? match.Field1 : match.Field2;
             Field enemyField = match.Player1 == player ? match.Field2 : match.Field1;
+            Player enemy = match.Player1 == player ? match.Player2 : match.Player1;
 
             FieldManager.RefreshDurationEffects(playerField);
             FieldManager.RefreshDurationEffects(enemyField);
+            FieldManager.RefreshGlobalEffects(playerField, player);
+            FieldManager.RefreshGlobalEffects(enemyField, enemy);
 
             UpgradeRequestResponse upgradeResponse = UpgradeManager.ProcessUpgradeRequest(match, player, request.UpgradeBlockType);
 

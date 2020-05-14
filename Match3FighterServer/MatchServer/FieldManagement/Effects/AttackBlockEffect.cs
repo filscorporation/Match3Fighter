@@ -30,7 +30,7 @@ namespace MatchServer.FieldManagement.Effects
 
             if (enemyField.TryBlock(out var effect))
             {
-                data.Add(GlobalEffectRemovedData(enemy, effect));
+                data.Add(GlobalEffectRemovedData(enemy, effect.Type));
             }
             else
             {
@@ -46,7 +46,7 @@ namespace MatchServer.FieldManagement.Effects
                         Block block = manager.GetRandomNonDestroyedBlocks(enemyField).FirstOrDefault();
                         if (block != null)
                         {
-                            manager.DestroyBlocks(new List<Block> { block }, BlockState.DestroyedByDamage);
+                            manager.DestroyBlocks(enemyField, new List<Block> { block }, BlockState.DestroyedByDamage);
                             data.Add(ShotData(playerField, enemyField, combo.Blocks.First(), block, -DamageToBlockHealth));
                         }
                     }
@@ -55,7 +55,7 @@ namespace MatchServer.FieldManagement.Effects
 
             if (combo.Blocks.Count > 3)
             {
-                BlockEffectsHelper.CreateUniqueBlock(manager, playerField, player, combo, ComboEffectType);
+                data.AddRange(BlockEffectsHelper.CreateUniqueBlock(manager, random, playerField, player, combo, ComboEffectType));
             }
 
             return data;

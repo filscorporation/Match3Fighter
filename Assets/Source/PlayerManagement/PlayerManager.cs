@@ -39,8 +39,24 @@ namespace Assets.Source.PlayerManagement
 
         public void EstimatePlayersStats(Player p)
         {
-            float mana = Time.deltaTime * p.ManaPerSecond;
+            float mana = Time.deltaTime * (p.ManaPerSecond + p.ManaPerSecondFromEffects);
             p.Mana = Math.Min(p.Mana + mana, p.MaxMana);
+            float health = Time.deltaTime * p.HealthPerSecondFromEffect;
+            p.Health = Math.Min(p.Health + health, p.MaxHealth);
+        }
+
+        /// <summary>
+        /// Returns player or enemy matching id
+        /// </summary>
+        /// <param name="ingameID"></param>
+        /// <returns></returns>
+        public Player GetPlayerByID(int ingameID)
+        {
+            if (player.InGameID == ingameID)
+                return player;
+            if (enemy.InGameID == ingameID)
+                return enemy;
+            return null;
         }
         
         /// <summary>
