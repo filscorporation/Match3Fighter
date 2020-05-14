@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using MatchServer.Players;
+using MatchServer.UpgradesManagement;
 using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
 
 namespace MatchServer.FieldManagement
 {
     /// <summary>
-    /// Some ingame effect after event - deal damage, add health, add mana..
+    /// Some in game effect after event - deal damage, add health, add mana..
     /// </summary>
     public abstract class Effect
     {
@@ -18,38 +19,12 @@ namespace MatchServer.FieldManagement
         /// Applies effect from a combo to the game match
         /// </summary>
         /// <param name="manager"></param>
+        /// <param name="upgradeManager"></param>
         /// <param name="random"></param>
         /// <param name="match"></param>
         /// <param name="playerUserIndex"></param>
         /// <param name="combo"></param>
-        public abstract List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo);
-
-        protected void CreateUniqueBlock(FieldManager manager, Field field, Player player, Combo combo, BlockTypes type)
-        {
-            //if (combo.Blocks.Any(b => b.IsUnique && b.Type != BlockTypes.Chameleon))
-            //{
-            //    // Unique block is not created from combo with already unique
-            //    return;
-            //}
-
-            UniqueBlock block;
-            switch (combo.Blocks.Count)
-            {
-                case 4:
-                    block = player.UniqueBlockCollection.Level1Blocks[type];
-                    break;
-                case 5:
-                    block = player.UniqueBlockCollection.Level2Blocks[type];
-                    break;
-                case 6:
-                    block = player.UniqueBlockCollection.Level3Blocks[type];
-                    break;
-                default:
-                    return;
-            }
-
-            manager.CreateBlockInRange(field, block, combo.Blocks);
-        }
+        public abstract List<EffectData> Apply(FieldManager manager, UpgradeManager upgradeManager, Random random, GameMatch match, int playerUserIndex, Combo combo);
 
         protected EffectData HealthData(Player player, float value)
         {

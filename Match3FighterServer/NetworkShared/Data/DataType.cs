@@ -18,6 +18,7 @@
         BlockSwapRequest = 20,
         GameStateResponse = 21,
         GameEndResponse = 22,
+        UpgradeRequest = 23,
 
         // Error
         ErrorResponse = 1000,

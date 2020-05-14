@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MatchServer.FieldManagement;
+using MatchServer.UpgradesManagement;
 
 namespace MatchServer.Players
 {
@@ -34,6 +35,8 @@ namespace MatchServer.Players
             player2.CurrentMatch = match;
             player2.InGameID = 2;
             player2.Refresh();
+            match.Player1Upgrades = new UpgradesInfo();
+            match.Player2Upgrades = new UpgradesInfo();
 
             match.Field1 = fieldManager.GenerateFieldForPlayer(player1);
             match.Field1.InGameID = 1;

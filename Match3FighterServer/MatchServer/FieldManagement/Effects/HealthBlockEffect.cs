@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MatchServer.Players;
+using MatchServer.UpgradesManagement;
 using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
 
@@ -15,39 +16,30 @@ namespace MatchServer.FieldManagement.Effects
 
         public override BlockTypes ComboEffectType => BlockTypes.Health;
 
-        public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo)
+        public override List<EffectData> Apply(FieldManager manager, UpgradeManager upgradeManager, Random random, GameMatch match, int playerUserIndex, Combo combo)
         {
             Player player = playerUserIndex == 1 ? match.Player1 : match.Player2;
             Field playerField = playerUserIndex == 1 ? match.Field1 : match.Field2;
+            UpgradesInfo playerUpgradesInfo = playerUserIndex == 1 ? match.Player1Upgrades : match.Player2Upgrades;
 
             int effectsCount = Math.Max(1, combo.Blocks.Count - FieldManager.MinComboCount);
 
             List<EffectData> data = new List<EffectData>();
-            data.Add(HealthData(player, HealthToRestore * effectsCount * combo.EffectScale));
+            float health = HealthToRestore * combo.EffectScale
+                           * upgradeManager.GetHealthBlockUpgradeBonus(playerUpgradesInfo);
+            data.Add(HealthData(player, health * effectsCount));
 
             for (int i = 0; i < effectsCount; i++)
             {
-                Action(manager, data, player, playerField, combo);
+                player.GainHealth(health);
             }
 
             if (combo.Blocks.Count > 3)
             {
-                CreateUniqueBlock(manager, playerField, player, combo, ComboEffectType);
+                BlockEffectsHelper.CreateUniqueBlock(manager, playerField, player, combo, ComboEffectType);
             }
 
             return data;
-        }
-
-        private void Action(FieldManager manager, List<EffectData> data, Player player, Field playerField, Combo combo)
-        {
-            player.GainHealth(HealthToRestore * combo.EffectScale);
-
-            //for (int i = 0; i < BlocksToGainArmourCount; i++)
-            //{
-            //    Block block = manager.GetRandomNonDestroyedBlocks(playerField).FirstOrDefault();
-            //    // TODO: block armour
-
-            //}
         }
     }
 }

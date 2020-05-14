@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.Source.GameManagement;
 using Assets.Source.PlayerManagement;
+using Assets.Source.UpgradeManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,6 +43,12 @@ namespace Assets.Source.UIManagement
         public List<GameObject> PlayerMPEffects = new List<GameObject>();
         public List<GameObject> EnemyHPEffects = new List<GameObject>();
         public List<GameObject> EnemyMPEffects = new List<GameObject>();
+
+        public GameObject AttackUpgradeButton;
+        public GameObject HealthUpgradeButton;
+        public GameObject ManaUpgradeButton;
+        public GameObject ArcaneUpgradeButton;
+        public GameObject UpgradeMenu;
 
         public void StartGameButtonClick()
         {
@@ -92,8 +99,8 @@ namespace Assets.Source.UIManagement
 
             GameObject go = Instantiate(PlayerStatsEffect, Vector3.zero, Quaternion.identity, PlayerHPText.transform);
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.offsetMin = new Vector2(0, (i + 1) * 80);
-            rect.offsetMax = new Vector2(0, (i + 1) * 80);
+            rect.offsetMin = new Vector2(-120, (i + 1) * 80);
+            rect.offsetMax = new Vector2(120, (i + 1) * 80);
             Text text = go.GetComponent<Text>();
             text.text = value.ToString("F1");
             text.color = value < 0 ? Color.red : Color.green;
@@ -108,8 +115,8 @@ namespace Assets.Source.UIManagement
 
             GameObject go = Instantiate(PlayerStatsEffect, Vector3.zero, Quaternion.identity, EnemyHPText.transform);
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.offsetMin = new Vector2(0, (i + 1) * 80);
-            rect.offsetMax = new Vector2(0, (i + 1) * 80);
+            rect.offsetMin = new Vector2(-120, (i + 1) * 80);
+            rect.offsetMax = new Vector2(120, (i + 1) * 80);
             Text text = go.GetComponent<Text>();
             text.text = value.ToString("F1");
             text.color = value < 0 ? Color.red : Color.green;
@@ -124,8 +131,8 @@ namespace Assets.Source.UIManagement
 
             GameObject go = Instantiate(PlayerStatsEffect, Vector3.zero, Quaternion.identity, PlayerMPText.transform);
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.offsetMin = new Vector2(0, (i + 1) * 80);
-            rect.offsetMax = new Vector2(0, (i + 1) * 80);
+            rect.offsetMin = new Vector2(-120, (i + 1) * 80);
+            rect.offsetMax = new Vector2(120, (i + 1) * 80);
             Text text = go.GetComponent<Text>();
             text.text = value.ToString("F1");
             text.color = value < 0 ? Color.black : Color.blue;
@@ -140,8 +147,8 @@ namespace Assets.Source.UIManagement
 
             GameObject go = Instantiate(PlayerStatsEffect, Vector3.zero, Quaternion.identity, EnemyMPText.transform);
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.offsetMin = new Vector2(0, (i + 1) * 80);
-            rect.offsetMax = new Vector2(0, (i + 1) * 80);
+            rect.offsetMin = new Vector2(-120, (i + 1) * 80);
+            rect.offsetMax = new Vector2(120, (i + 1) * 80);
             Text text = go.GetComponent<Text>();
             text.text = value.ToString("F1");
             text.color = value < 0 ? Color.black : Color.blue;
@@ -168,6 +175,51 @@ namespace Assets.Source.UIManagement
         public void ActivateWonUI()
         {
             WonUI.SetActive(true);
+        }
+
+        public void UpgradeButtonClick()
+        {
+            UpgradeMenu.SetActive(!UpgradeMenu.activeSelf);
+        }
+
+        public void SetAttackUpgradeCost(int cost)
+        {
+            AttackUpgradeButton.transform.GetChild(0).GetComponent<Text>().text = cost.ToString();
+        }
+
+        public void AttackUpgradeButtonClick()
+        {
+            UpgradeManager.Instance.AttackBlockUpgrade();
+        }
+
+        public void SetHealthUpgradeCost(int cost)
+        {
+            HealthUpgradeButton.transform.GetChild(0).GetComponent<Text>().text = cost.ToString();
+        }
+
+        public void HealthUpgradeButtonClick()
+        {
+            UpgradeManager.Instance.HealthBlockUpgrade();
+        }
+
+        public void SetManaUpgradeCost(int cost)
+        {
+            ManaUpgradeButton.transform.GetChild(0).GetComponent<Text>().text = cost.ToString();
+        }
+
+        public void ManaUpgradeButtonClick()
+        {
+            UpgradeManager.Instance.ManaBlockUpgrade();
+        }
+
+        public void SetArcaneUpgradeCost(int cost)
+        {
+            ArcaneUpgradeButton.transform.GetChild(0).GetComponent<Text>().text = cost.ToString();
+        }
+
+        public void ArcaneUpgradeButtonClick()
+        {
+            UpgradeManager.Instance.ArcaneBlockUpgrade();
         }
     }
 }

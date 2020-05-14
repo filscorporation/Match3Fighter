@@ -4,8 +4,10 @@ using Assets.Source.InputManagement;
 using Assets.Source.NetworkManagement;
 using Assets.Source.PlayerManagement;
 using Assets.Source.UIManagement;
+using Assets.Source.UpgradeManagement;
 using NetworkShared.Data;
 using NetworkShared.Data.Effects;
+using NetworkShared.Data.Field;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -39,7 +41,11 @@ namespace Assets.Source.GameManagement
             if (SceneManager.GetActiveScene().name == GameSceneName)
             {
                 if (GameDataToStart == null)
-                    throw new Exception("No game data to start game");
+                {
+                    Debug.LogError("No game data to start game");
+                    FinishGame();
+                    return;
+                }
 
                 StartGame(GameDataToStart);
             }
@@ -122,6 +128,8 @@ namespace Assets.Source.GameManagement
             FieldManager.Instance.GenerateMainField(data.GameState.MainField);
             FieldManager.Instance.GenerateEnemyField(data.GameState.EnemyField);
 
+            UpgradeManager.Instance.ApplyUpgradeInfo(data.GameState.MainUpgradesInfo);
+
             foreach (EffectData effect in data.Effects)
             {
                 switch (effect.EffectType)
@@ -172,6 +180,18 @@ namespace Assets.Source.GameManagement
             request.Direction = (int) direction;
 
             NetworkManager.Instance.SendBlockSwapData(request);
+        }
+
+        /// <summary>
+        /// Request to upgrade block type
+        /// </summary>
+        /// <param name="blockType"></param>
+        public void OnPlayerUpgrade(BlockTypes blockType)
+        {
+            UpgradeRequest request = new UpgradeRequest();
+            request.UpgradeBlockType = blockType;
+
+            NetworkManager.Instance.SendUpgradeData(request);
         }
     }
 }

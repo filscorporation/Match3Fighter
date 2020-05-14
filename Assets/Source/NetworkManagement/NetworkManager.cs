@@ -124,6 +124,11 @@ namespace Assets.Source.NetworkManagement
             client.SendData((int)DataTypes.BlockSwapRequest, request);
         }
 
+        public void SendUpgradeData(UpgradeRequest request)
+        {
+            client.SendData((int)DataTypes.UpgradeRequest, request);
+        }
+
         #endregion
     }
 }

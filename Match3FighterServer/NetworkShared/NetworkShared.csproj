@@ -60,12 +60,15 @@
     <Compile Include="Data\Player\PlayerData.cs" />
     <Compile Include="Data\PutPlayerIntoQueueRequest.cs" />
     <Compile Include="Data\StartGameResponse.cs" />
+    <Compile Include="Data\UpgradeRequest.cs" />
+    <Compile Include="Data\Upgrades\UpgradesInfoData.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="Network\IConnectionHandler.cs" />
     <Compile Include="Network\Packet.cs" />
     <Compile Include="Network\Server.cs" />
     <Compile Include="Network\TCPConnection.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)\$(ProjectName)\bin\Debug\*" "$(SolutionDir)..\Assets\ServerShared\"</PostBuildEvent>

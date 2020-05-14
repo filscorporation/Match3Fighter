@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MatchServer.FieldManagement;
+using MatchServer.UpgradesManagement;
 
 namespace MatchServer.Players
 {
@@ -19,5 +20,9 @@ namespace MatchServer.Players
         public Field Field1;
 
         public Field Field2;
+
+        public UpgradesInfo Player1Upgrades;
+
+        public UpgradesInfo Player2Upgrades;
     }
 }

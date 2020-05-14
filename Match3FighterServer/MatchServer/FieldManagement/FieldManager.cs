@@ -479,7 +479,7 @@ namespace MatchServer.FieldManagement
                 if (comboType == BlockTypes.Chameleon)
                     comboType = block.Type;
                 if (block != null && block.CanCombo(comboType))
-                    outResult.Add(block);
+                    altResult.Add(block);
                 else
                     break;
             }

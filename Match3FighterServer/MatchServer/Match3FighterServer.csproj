@@ -64,6 +64,7 @@
     <Compile Include="FieldManagement\Effect.cs" />
     <Compile Include="FieldManagement\Effects\ArcaneBlockEffect.cs" />
     <Compile Include="FieldManagement\Effects\AttackBlockEffect.cs" />
+    <Compile Include="FieldManagement\Effects\BlockEffectsHelper.cs" />
     <Compile Include="FieldManagement\Effects\ChameleonBlockEffect.cs" />
     <Compile Include="FieldManagement\Effects\HealthBlockEffect.cs" />
     <Compile Include="FieldManagement\Effects\ManaBlockEffect.cs" />
@@ -92,6 +93,8 @@
     <Compile Include="Players\UniqueBlockCollection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UpgradesManagement\UpgradeManager.cs" />
+    <Compile Include="UpgradesManagement\UpgradesInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NetworkShared\NetworkShared.csproj">

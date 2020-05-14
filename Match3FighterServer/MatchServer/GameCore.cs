@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Remoting.Channels;
 using System.Threading;
 using MatchServer.FieldManagement;
 using MatchServer.Players;
+using MatchServer.UpgradesManagement;
 using NetworkShared.Core;
 using NetworkShared.Data;
 using NetworkShared.Data.Effects;
@@ -26,6 +28,7 @@ namespace MatchServer
 
         public Server Server;
         public FieldManager FieldManager;
+        public UpgradeManager UpgradeManager;
         public MatchManager MatchManager;
         public PlayersManager PlayersManager;
         public BlockEffectsManager BlockEffectsManager;
@@ -39,9 +42,10 @@ namespace MatchServer
             Instance = this;
 
             FieldManager = new FieldManager();
+            UpgradeManager = new UpgradeManager();
             MatchManager = new MatchManager(FieldManager);
             PlayersManager = new PlayersManager(MatchManager);
-            BlockEffectsManager = new BlockEffectsManager(FieldManager);
+            BlockEffectsManager = new BlockEffectsManager(FieldManager, UpgradeManager);
         }
 
         public void Start()
@@ -126,6 +130,9 @@ namespace MatchServer
                         break;
                     case DataTypes.BlockSwapRequest:
                         ProcessBlockSwap(clientID, (BlockSwapRequest) data);
+                        break;
+                    case DataTypes.UpgradeRequest:
+                        ProcessUpgradeRequest(clientID, (UpgradeRequest)data);
                         break;
                     case DataTypes.LogInResponse:
                     case DataTypes.ConnectResponse:
@@ -260,6 +267,66 @@ namespace MatchServer
             }
         }
 
+        /// <summary>
+        /// Players upgrade request processing
+        /// </summary>
+        /// <param name="clientID"></param>
+        /// <param name="request"></param>
+        public void ProcessUpgradeRequest(int clientID, UpgradeRequest request)
+        {
+            Player player = PlayersManager.GetPlayer(clientID);
+
+            if (player == null)
+            {
+                Console.WriteLine($"Can't find player {clientID}");
+                return;
+            }
+            if (player.CurrentMatch == null)
+            {
+                Console.WriteLine($"Player {player.ClientID} is not in the game");
+                return;
+            }
+
+            GameMatch match = player.CurrentMatch;
+            Field playerField = match.Player1 == player ? match.Field1 : match.Field2;
+            Field enemyField = match.Player1 == player ? match.Field2 : match.Field1;
+
+            FieldManager.RefreshDurationEffects(playerField);
+            FieldManager.RefreshDurationEffects(enemyField);
+
+            UpgradeRequestResponse upgradeResponse = UpgradeManager.ProcessUpgradeRequest(match, player, request.UpgradeBlockType);
+
+            switch (upgradeResponse)
+            {
+                case UpgradeRequestResponse.Ok:
+                    break;
+                case UpgradeRequestResponse.NotEnoughMana:
+                    SendError(player.ClientID, ErrorType.NotEnoughMana);
+                    return;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            GameStateResponse response = new GameStateResponse
+            {
+                GameState = GetPlayer1MatchStateData(match),
+                Effects = new EffectData[0],
+            };
+            Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
+
+            if (match.Player1 == match.Player2)
+            {
+                return;
+            }
+
+            response = new GameStateResponse
+            {
+                GameState = GetPlayer2MatchStateData(match),
+                Effects = new EffectData[0]
+            };
+            Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameStateResponse, response);
+        }
+
         private void SendError(int clientID, ErrorType type)
         {
             ErrorResponse error = new ErrorResponse();
@@ -327,6 +394,8 @@ namespace MatchServer
             data.EnemyPlayer = match.Player2.ToData();
             data.MainField = match.Field1.ToData();
             data.EnemyField = match.Field2.ToData();
+            data.MainUpgradesInfo = match.Player1Upgrades.ToData();
+            data.EnemyUpgradesInfo= match.Player2Upgrades.ToData();
             return data;
         }
 
@@ -337,6 +406,8 @@ namespace MatchServer
             data.EnemyPlayer = match.Player1.ToData();
             data.MainField = match.Field2.ToData();
             data.EnemyField = match.Field1.ToData();
+            data.MainUpgradesInfo = match.Player2Upgrades.ToData();
+            data.EnemyUpgradesInfo = match.Player1Upgrades.ToData();
             return data;
         }
 

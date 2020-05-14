@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MatchServer.Players;
+using MatchServer.UpgradesManagement;
 using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
 
@@ -14,6 +15,7 @@ namespace MatchServer.FieldManagement
     public class BlockEffectsManager
     {
         private readonly FieldManager fieldManager;
+        private readonly UpgradeManager upgradeManager;
 
         private readonly Random random;
 
@@ -21,9 +23,10 @@ namespace MatchServer.FieldManagement
 
         public readonly Dictionary<string, UniqueBlock> UniqueBlocks = new Dictionary<string, UniqueBlock>();
 
-        public BlockEffectsManager(FieldManager fieldManager)
+        public BlockEffectsManager(FieldManager fieldManager, UpgradeManager upgradeManager)
         {
             this.fieldManager = fieldManager;
+            this.upgradeManager = upgradeManager;
 
             random = new Random();
 
@@ -69,7 +72,7 @@ namespace MatchServer.FieldManagement
             }
 
             Effect effect = effects[combo.Type];
-            data.AddRange(effect.Apply(fieldManager, random, match, playerUserIndex, combo));
+            data.AddRange(effect.Apply(fieldManager, upgradeManager, random, match, playerUserIndex, combo));
             
             return data;
         }

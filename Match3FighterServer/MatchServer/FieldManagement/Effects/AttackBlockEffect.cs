@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MatchServer.Players;
+using MatchServer.UpgradesManagement;
 using NetworkShared.Data.Effects;
 using NetworkShared.Data.Field;
 
@@ -15,12 +16,13 @@ namespace MatchServer.FieldManagement.Effects
 
         public override BlockTypes ComboEffectType => BlockTypes.Attack;
 
-        public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo)
+        public override List<EffectData> Apply(FieldManager manager, UpgradeManager upgradeManager, Random random, GameMatch match, int playerUserIndex, Combo combo)
         {
             Player player = playerUserIndex == 1 ? match.Player1 : match.Player2;
             Field playerField = playerUserIndex == 1 ? match.Field1 : match.Field2;
             Player enemy = playerUserIndex == 1 ? match.Player2 : match.Player1;
             Field enemyField = playerUserIndex == 1 ? match.Field2 : match.Field1;
+            UpgradesInfo playerUpgradesInfo = playerUserIndex == 1 ? match.Player1Upgrades : match.Player2Upgrades;
 
             int effectsCount = Math.Max(1, combo.Blocks.Count - FieldManager.MinComboCount);
 
@@ -32,35 +34,31 @@ namespace MatchServer.FieldManagement.Effects
             }
             else
             {
-                data.Add(HealthData(enemy, -DamageToEnemyHealth * effectsCount * combo.EffectScale));
+                float damage = DamageToEnemyHealth * combo.EffectScale
+                               * upgradeManager.GetAttackBlockUpgradeBonus(playerUpgradesInfo);
+                data.Add(HealthData(enemy, -damage * effectsCount));
                 for (int i = 0; i < effectsCount; i++)
                 {
-                    Action(manager, data, playerField, enemy, enemyField, combo.Blocks.First(), combo);
+                    enemy.TakeDamage(damage);
+
+                    for (int j = 0; j < BlocksToAttackCount; j++)
+                    {
+                        Block block = manager.GetRandomNonDestroyedBlocks(enemyField).FirstOrDefault();
+                        if (block != null)
+                        {
+                            manager.DestroyBlocks(new List<Block> { block }, BlockState.DestroyedByDamage);
+                            data.Add(ShotData(playerField, enemyField, combo.Blocks.First(), block, -DamageToBlockHealth));
+                        }
+                    }
                 }
             }
 
             if (combo.Blocks.Count > 3)
             {
-                CreateUniqueBlock(manager, playerField, player, combo, ComboEffectType);
+                BlockEffectsHelper.CreateUniqueBlock(manager, playerField, player, combo, ComboEffectType);
             }
 
             return data;
-        }
-
-        private void Action(FieldManager manager, List<EffectData> data, Field playerField, Player enemy, Field enemyField, Block init, Combo combo)
-        {
-            enemy.TakeDamage(DamageToEnemyHealth * combo.EffectScale);
-
-            for (int i = 0; i < BlocksToAttackCount; i++)
-            {
-                Block block = manager.GetRandomNonDestroyedBlocks(enemyField).FirstOrDefault();
-                // TODO: block damage
-                if (block != null)
-                {
-                    manager.DestroyBlocks(new List<Block> {block}, BlockState.DestroyedByDamage);
-                    data.Add(ShotData(playerField, enemyField, init, block, -DamageToBlockHealth));
-                }
-            }
         }
     }
 }
