@@ -10,6 +10,8 @@ namespace MatchServer.FieldManagement.UniqueEffect
     {
         public override string Name => nameof(SuperManaBlock);
 
+        public override int Level => 3;
+
         public override BlockTypes BaseType => BlockTypes.Mana;
 
         public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo, Block block)

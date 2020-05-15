@@ -1,5 +1,6 @@
 ﻿using System;
 using Assets.Source.GameManagement;
+using Assets.Source.PlayerManagement;
 using NetworkShared.Core;
 using NetworkShared.Data;
 using UnityEngine;
@@ -27,12 +28,16 @@ namespace Assets.Source.NetworkManagement
 
         private static Client client;
 
+        public bool IsConnected { get; private set; } = false;
+
         #region Core
 
         public void Awake()
         {
             if (client == null || !client.IsConnected())
                 ConnectPlayer();
+            else
+                IsConnected = true;
         }
 
         public void Update()
@@ -67,6 +72,7 @@ namespace Assets.Source.NetworkManagement
             switch ((DataTypes)type)
             {
                 case DataTypes.ConnectResponse:
+                    IsConnected = true;
                     break;
                 case DataTypes.LogInResponse:
                     break;
@@ -74,7 +80,7 @@ namespace Assets.Source.NetworkManagement
                     HandleStartGameResponse((StartGameResponse) data);
                     break;
                 case DataTypes.GameStateResponse:
-                    HandleGameStateResponse((GameStateResponse) data);
+                    HandleGameStateResponse((GameStateResponse)data);
                     break;
                 case DataTypes.GameEndResponse:
                     HandleGameEndResponse((GameEndResponse)data);
@@ -82,6 +88,12 @@ namespace Assets.Source.NetworkManagement
                 case DataTypes.ErrorResponse:
                     Debug.Log(((ErrorResponse)data).Type);
                     break;
+                case DataTypes.PlayerStatsResponse:
+                    HandlePlayerStatsResponse((PlayerStatsResponse)data);
+                    break;
+                case DataTypes.UpgradeRequest:
+                case DataTypes.GetPlayerStatsRequest:
+                case DataTypes.SetPlayerStatsRequest:
                 case DataTypes.LogInRequest:
                 case DataTypes.PutPlayerIntoQueueRequest:
                 case DataTypes.BlockSwapRequest:
@@ -100,6 +112,11 @@ namespace Assets.Source.NetworkManagement
             GameManager.Instance.ChangeGameState(response);
         }
 
+        public void HandlePlayerStatsResponse(PlayerStatsResponse response)
+        {
+            PlayerStatsManager.Instance.SetPlayerStats(response.PlayerStats);
+        }
+
         public void HandleGameEndResponse(GameEndResponse response)
         {
             GameManager.Instance.EndGame(response);
@@ -114,8 +131,11 @@ namespace Assets.Source.NetworkManagement
 
         #region Send
 
-        public void SendPutPlayerIntoQueueRequestRequest(PutPlayerIntoQueueRequest request)
+        public void SendPutPlayerIntoQueueRequest(PutPlayerIntoQueueRequest request)
         {
+            if (!IsConnected)
+                return;
+
             client.SendData((int)DataTypes.PutPlayerIntoQueueRequest, request);
         }
 
@@ -127,6 +147,22 @@ namespace Assets.Source.NetworkManagement
         public void SendUpgradeData(UpgradeRequest request)
         {
             client.SendData((int)DataTypes.UpgradeRequest, request);
+        }
+
+        public void SendGetPlayerStatsRequest()
+        {
+            if (!IsConnected)
+                return;
+
+            client.SendData((int)DataTypes.GetPlayerStatsRequest, new GetPlayerStatsRequest());
+        }
+
+        public void SendSetPlayerStatsRequest(SetPlayerStatsRequest request)
+        {
+            if (!IsConnected)
+                return;
+
+            client.SendData((int)DataTypes.SetPlayerStatsRequest, request);
         }
 
         #endregion

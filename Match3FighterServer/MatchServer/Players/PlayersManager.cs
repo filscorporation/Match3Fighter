@@ -1,5 +1,10 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using MatchServer.FieldManagement;
+using NetworkShared.Data.Field;
+using NetworkShared.Data.Player;
 
 namespace MatchServer.Players
 {
@@ -84,6 +89,49 @@ namespace MatchServer.Players
                 queue.TryTake(out Player player1);
                 queue.TryTake(out Player player2);
                 matchManager.MakeMatch(player1, player2);
+            }
+        }
+
+        /// <summary>
+        /// Validate and set player stats
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="data"></param>
+        public void TrySetPlayerStats(Player player, PlayerStatsData data)
+        {
+            Dictionary<string, UniqueBlock> uBlocks = GameCore.Instance.BlockEffectsManager.UniqueBlocks;
+
+            foreach (KeyValuePair<BlockTypes, UniqueBlockData> pair in data.UniqueBlockCollection.Level1Blocks)
+            {
+                if (pair.Value.Level != 1)
+                    throw new NotSupportedException();
+
+                if (player.UniqueBlockCollection.Collection.All(b => b.Name != pair.Value.Name))
+                    throw new NotSupportedException();
+
+                player.UniqueBlockCollection.Level1Blocks[pair.Key] = uBlocks[pair.Value.Name];
+            }
+
+            foreach (KeyValuePair<BlockTypes, UniqueBlockData> pair in data.UniqueBlockCollection.Level2Blocks)
+            {
+                if (pair.Value.Level != 2)
+                    throw new NotSupportedException();
+
+                if (player.UniqueBlockCollection.Collection.All(b => b.Name != pair.Value.Name))
+                    throw new NotSupportedException();
+
+                player.UniqueBlockCollection.Level2Blocks[pair.Key] = uBlocks[pair.Value.Name];
+            }
+
+            foreach (KeyValuePair<BlockTypes, UniqueBlockData> pair in data.UniqueBlockCollection.Level3Blocks)
+            {
+                if (pair.Value.Level != 3)
+                    throw new NotSupportedException();
+
+                if (player.UniqueBlockCollection.Collection.All(b => b.Name != pair.Value.Name))
+                    throw new NotSupportedException();
+
+                player.UniqueBlockCollection.Level3Blocks[pair.Key] = uBlocks[pair.Value.Name];
             }
         }
     }

@@ -10,6 +10,9 @@ namespace MatchServer.FieldManagement.UniqueEffect
     public class InfinityBlock : UniqueBlock
     {
         public override string Name => nameof(InfinityBlock);
+
+        public override int Level => 3;
+
         public override BlockTypes BaseType => BlockTypes.Health;
 
         public float HealOverTimeAmount = 1;

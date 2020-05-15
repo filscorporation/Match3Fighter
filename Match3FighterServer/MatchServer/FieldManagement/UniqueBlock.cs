@@ -13,6 +13,8 @@ namespace MatchServer.FieldManagement
     {
         public abstract string Name { get; }
 
+        public abstract int Level { get; }
+
         public abstract BlockTypes BaseType { get; }
 
         public GlobalEffect AttachedGlobalEffect;
@@ -113,6 +115,16 @@ namespace MatchServer.FieldManagement
             sData.Data["TargetField"] = toField.InGameID;
             sData.Data["Value"] = name;
             return sData;
+        }
+
+        public UniqueBlockData ToData()
+        {
+            return new UniqueBlockData
+            {
+                Name = Name,
+                Level = Level,
+                Type = BaseType,
+            };
         }
     }
 }

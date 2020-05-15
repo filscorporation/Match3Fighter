@@ -3,7 +3,6 @@ using Assets.Source.FieldManagement;
 using Assets.Source.InputManagement;
 using Assets.Source.NetworkManagement;
 using Assets.Source.PlayerManagement;
-using Assets.Source.UIManagement;
 using Assets.Source.UpgradeManagement;
 using NetworkShared.Data;
 using NetworkShared.Data.Effects;
@@ -75,7 +74,7 @@ namespace Assets.Source.GameManagement
             {
                 DebugMode = false,
             };
-            NetworkManager.Instance.SendPutPlayerIntoQueueRequestRequest(request);
+            NetworkManager.Instance.SendPutPlayerIntoQueueRequest(request);
         }
 
         /// <summary>
@@ -89,7 +88,7 @@ namespace Assets.Source.GameManagement
             {
                 DebugMode = true,
             };
-            NetworkManager.Instance.SendPutPlayerIntoQueueRequestRequest(request);
+            NetworkManager.Instance.SendPutPlayerIntoQueueRequest(request);
         }
 
         /// <summary>

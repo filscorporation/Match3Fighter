@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MatchServer.FieldManagement;
 using MatchServer.FieldManagement.UniqueEffect;
 using MatchServer.Players;
@@ -99,20 +100,22 @@ namespace MatchServer
             // TODO: refactoring
 
             Dictionary<string, UniqueBlock> uBlocks = GameCore.Instance.BlockEffectsManager.UniqueBlocks;
-            
-            UniqueBlockCollection.Level1Blocks[BlockTypes.Attack] = uBlocks[nameof(MachineGunBlock)];
-            UniqueBlockCollection.Level1Blocks[BlockTypes.Health] = uBlocks[nameof(InfinityBlock)];
-            UniqueBlockCollection.Level1Blocks[BlockTypes.Mana] = uBlocks[nameof(ManaSourceBlock)];
-            UniqueBlockCollection.Level1Blocks[BlockTypes.Arcane] = uBlocks[nameof(ShotgunBlock)];
 
-            UniqueBlockCollection.Level2Blocks[BlockTypes.Attack] = uBlocks[nameof(BoulderBlock)];
+            UniqueBlockCollection.Collection = uBlocks.Values.ToList();
+
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Attack] = uBlocks[nameof(ChameleonBlock)];
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Health] = uBlocks[nameof(ChameleonBlock)];
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Mana] = uBlocks[nameof(ChameleonBlock)];
+            UniqueBlockCollection.Level1Blocks[BlockTypes.Arcane] = uBlocks[nameof(ChameleonBlock)];
+
+            UniqueBlockCollection.Level2Blocks[BlockTypes.Attack] = uBlocks[nameof(ShotgunBlock)];
             UniqueBlockCollection.Level2Blocks[BlockTypes.Health] = uBlocks[nameof(LifeBlock)];
-            UniqueBlockCollection.Level2Blocks[BlockTypes.Mana] = uBlocks[nameof(FreezeBlock)];
+            UniqueBlockCollection.Level2Blocks[BlockTypes.Mana] = uBlocks[nameof(ManaSourceBlock)];
             UniqueBlockCollection.Level2Blocks[BlockTypes.Arcane] = uBlocks[nameof(MassFlipBlock)];
 
             UniqueBlockCollection.Level3Blocks[BlockTypes.Attack] = uBlocks[nameof(KillerBlock)];
             UniqueBlockCollection.Level3Blocks[BlockTypes.Health] = uBlocks[nameof(ShieldBlock)];
-            UniqueBlockCollection.Level3Blocks[BlockTypes.Mana] = uBlocks[nameof(SuperManaBlock)];
+            UniqueBlockCollection.Level3Blocks[BlockTypes.Mana] = uBlocks[nameof(BlizzardBlock)];
             UniqueBlockCollection.Level3Blocks[BlockTypes.Arcane] = uBlocks[nameof(Arcane6Block)];
         }
 

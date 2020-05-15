@@ -11,6 +11,9 @@ namespace MatchServer.FieldManagement.UniqueEffect
         public float FreezeDuration = 15F;
 
         public override string Name => nameof(FreezeBlock);
+
+        public override int Level => 1;
+
         public override BlockTypes BaseType => BlockTypes.Mana;
 
         public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo, Block block)

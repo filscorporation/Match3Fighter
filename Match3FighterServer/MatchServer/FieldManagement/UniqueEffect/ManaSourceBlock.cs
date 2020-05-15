@@ -9,6 +9,9 @@ namespace MatchServer.FieldManagement.UniqueEffect
     public class ManaSourceBlock : UniqueBlock
     {
         public override string Name => nameof(ManaSourceBlock);
+
+        public override int Level => 2;
+
         public override BlockTypes BaseType => BlockTypes.Mana;
 
         public float ManaOverTimeAmount = 1;

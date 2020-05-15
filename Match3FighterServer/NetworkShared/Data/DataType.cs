@@ -20,6 +20,11 @@
         GameEndResponse = 22,
         UpgradeRequest = 23,
 
+        // Player setup
+        GetPlayerStatsRequest = 30,
+        SetPlayerStatsRequest = 31,
+        PlayerStatsResponse = 32,
+
         // Error
         ErrorResponse = 1000,
     }

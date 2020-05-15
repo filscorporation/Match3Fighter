@@ -10,6 +10,9 @@ namespace MatchServer.FieldManagement.UniqueEffect
     public class MachineGunBlock : UniqueBlock
     {
         public override string Name => nameof(MachineGunBlock);
+
+        public override int Level => 3;
+
         public override BlockTypes BaseType => BlockTypes.Attack;
 
         public int ShotsAmount = 13;

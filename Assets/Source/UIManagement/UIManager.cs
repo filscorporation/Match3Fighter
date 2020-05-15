@@ -50,16 +50,6 @@ namespace Assets.Source.UIManagement
         public GameObject ArcaneUpgradeButton;
         public GameObject UpgradeMenu;
 
-        public void StartGameButtonClick()
-        {
-            GameManager.Instance.QueueGame();
-        }
-
-        public void DebugButtonClick()
-        {
-            GameManager.Instance.QueueDebugGame();
-        }
-
         public void BackGameButtonClick()
         {
             GameManager.Instance.FinishGame();

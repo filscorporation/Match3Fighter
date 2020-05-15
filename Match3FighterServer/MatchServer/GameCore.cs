@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.Remoting.Channels;
 using System.Threading;
 using MatchServer.FieldManagement;
 using MatchServer.Players;
@@ -92,6 +90,9 @@ namespace MatchServer
             string playerID = Guid.NewGuid().ToString();
 
             PlayersManager.LogIn(clientID, playerID);
+
+            ConnectResponse response = new ConnectResponse();
+            Server.SendDataToClient(clientID, (int)DataTypes.ConnectResponse, response);
         }
 
         /// <summary>
@@ -134,6 +135,14 @@ namespace MatchServer
                     case DataTypes.UpgradeRequest:
                         ProcessUpgradeRequest(clientID, (UpgradeRequest)data);
                         break;
+                    case DataTypes.GetPlayerStatsRequest:
+                        ProcessGetPlayerStatsRequest(clientID,(GetPlayerStatsRequest)data);
+                        break;
+                    case DataTypes.SetPlayerStatsRequest:
+                        ProcessSetPlayerStatsRequest(clientID, (SetPlayerStatsRequest)data);
+                        break;
+                    case DataTypes.PlayerStatsResponse:
+                    case DataTypes.GameEndResponse:
                     case DataTypes.LogInResponse:
                     case DataTypes.ConnectResponse:
                     case DataTypes.StartGameResponse:
@@ -337,6 +346,64 @@ namespace MatchServer
                 Effects = new EffectData[0]
             };
             Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameStateResponse, response);
+        }
+
+        /// <summary>
+        /// Player requests to get his info - collection, active hero..
+        /// </summary>
+        /// <param name="clientID"></param>
+        /// <param name="request"></param>
+        public void ProcessGetPlayerStatsRequest(int clientID, GetPlayerStatsRequest request)
+        {
+            Player player = PlayersManager.GetPlayer(clientID);
+
+            if (player == null)
+            {
+                Console.WriteLine($"Can't find player {clientID}");
+                return;
+            }
+
+            PlayerStatsData data = new PlayerStatsData
+            {
+                UniqueBlockCollection = player.UniqueBlockCollection.ToData(),
+            };
+
+            PlayerStatsResponse response = new PlayerStatsResponse
+            {
+                PlayerStats = data,
+            };
+
+            Server.SendDataToClient(player.ClientID, (int)DataTypes.PlayerStatsResponse, response);
+        }
+
+        /// <summary>
+        /// Player requests to set his info - collection, active hero..
+        /// </summary>
+        /// <param name="clientID"></param>
+        /// <param name="request"></param>
+        public void ProcessSetPlayerStatsRequest(int clientID, SetPlayerStatsRequest request)
+        {
+            Player player = PlayersManager.GetPlayer(clientID);
+
+            if (player == null)
+            {
+                Console.WriteLine($"Can't find player {clientID}");
+                return;
+            }
+
+            PlayersManager.TrySetPlayerStats(player, request.PlayerStats);
+
+            PlayerStatsData data = new PlayerStatsData
+            {
+                UniqueBlockCollection = player.UniqueBlockCollection.ToData(),
+            };
+
+            PlayerStatsResponse response = new PlayerStatsResponse
+            {
+                PlayerStats = data,
+            };
+
+            Server.SendDataToClient(player.ClientID, (int)DataTypes.PlayerStatsResponse, response);
         }
 
         private void SendError(int clientID, ErrorType type)

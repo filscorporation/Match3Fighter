@@ -12,6 +12,8 @@ namespace MatchServer.FieldManagement.UniqueEffect
 
         public override string Name => nameof(LifeBlock);
 
+        public override int Level => 2;
+
         public override BlockTypes BaseType => BlockTypes.Health;
 
         public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo, Block block)
