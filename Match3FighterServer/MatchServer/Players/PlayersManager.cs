@@ -16,7 +16,7 @@ namespace MatchServer.Players
 
         private readonly ConcurrentDictionary<int, string> Sessions = new ConcurrentDictionary<int, string>();
 
-        private readonly ConcurrentBag<Player> queue = new ConcurrentBag<Player>();
+        private readonly ConcurrentDictionary<int, Player> queue = new ConcurrentDictionary<int, Player>();
 
         public PlayersManager(MatchManager matchManager)
         {
@@ -44,6 +44,7 @@ namespace MatchServer.Players
         /// <param name="clientID"></param>
         public void LogOut(int clientID)
         {
+            queue.TryRemove(clientID, out _);
             Sessions.TryRemove(clientID, out _);
         }
 
@@ -66,16 +67,18 @@ namespace MatchServer.Players
         /// <param name="player"></param>
         public void PutPlayerIntoQueue(Player player)
         {
-            if (queue.Contains(player))
-                return;
-
             if (player.IsInDebugMode)
             {
+                queue.TryRemove(player.ClientID, out _);
                 matchManager.MakeMatch(player, player);
             }
             else
             {
-                queue.Add(player);
+                if (queue.ContainsKey(player.ClientID))
+                    return;
+
+                if (!queue.TryAdd(player.ClientID, player))
+                    throw new Exception("Error adding player into queue");
             }
         }
 
@@ -86,8 +89,8 @@ namespace MatchServer.Players
         {
             if (queue.Count >= 2)
             {
-                queue.TryTake(out Player player1);
-                queue.TryTake(out Player player2);
+                queue.TryRemove(queue.First().Key, out Player player1);
+                queue.TryRemove(queue.First().Key, out Player player2);
                 matchManager.MakeMatch(player1, player2);
             }
         }

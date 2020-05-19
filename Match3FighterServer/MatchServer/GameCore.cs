@@ -176,6 +176,10 @@ namespace MatchServer
                 player.IsInDebugMode = true;
                 Console.WriteLine($"Player {clientID} is in debug mode");
             }
+            else
+            {
+                player.IsInDebugMode = false;
+            }
 
             Console.WriteLine($"Putting player {clientID} into queue");
             PlayersManager.PutPlayerIntoQueue(player);
