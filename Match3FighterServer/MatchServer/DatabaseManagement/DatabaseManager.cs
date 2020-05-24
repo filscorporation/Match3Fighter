@@ -157,8 +157,9 @@ values (@id, @player_id, @name, @collection, @active_hero, @currency, @rating, @
 
         private const string sqlUpdatePlayer = @"
 update dbo.Players
-set ID = @id, PlayerID = @player_id, Name = @name, UniqueBlockCollection = @collection, ActiveHero = @active_hero,
-    Currency = @currency, Rating = @rating, RegistrationDate = @registration_date;
+set PlayerID = @player_id, Name = @name, UniqueBlockCollection = @collection, ActiveHero = @active_hero,
+    Currency = @currency, Rating = @rating, RegistrationDate = @registration_date
+where ID = @id;
 ";
 
         /// <summary>
@@ -345,7 +346,8 @@ values (@id, @level1_blocks, @level2_blocks, @level3_blocks, @blocks);
 
         private const string sqlUpdateCollection = @"
 update dbo.Collections
-set ID = @id, Level1Blocks = @level1_blocks, Level2Blocks = @level2_blocks, Level3Blocks = @level3_blocks, Collection = @blocks;
+set Level1Blocks = @level1_blocks, Level2Blocks = @level2_blocks, Level3Blocks = @level3_blocks, Collection = @blocks
+where ID = @id;
 ";
 
         /// <summary>

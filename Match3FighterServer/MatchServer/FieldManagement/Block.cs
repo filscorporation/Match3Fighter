@@ -24,8 +24,8 @@ namespace MatchServer.FieldManagement
 
         public List<OnBlockEffect> OnBlockEffects = new List<OnBlockEffect>();
 
-        private const float attackBlockChance = 0.52F;
-        private const float healBlockChance = 0.05F;
+        private const float attackBlockChance = 0.32F;
+        private const float healBlockChance = 0.25F;
         private const float manaBlockChance = 0.25F;
         private const float arcaneBlockChance = 1F - attackBlockChance - healBlockChance - manaBlockChance;
 

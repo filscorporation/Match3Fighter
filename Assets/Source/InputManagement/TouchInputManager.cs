@@ -22,7 +22,7 @@ namespace Assets.Source.InputManagement
             foreach (Touch touch in Input.touches.Where(t => t.phase == TouchPhase.Ended))
             {
                 if (touch.fingerId == touchID)
-                    ProcessInputBegin(touch.position);
+                    ProcessInputEnd(touch.position);
                 touchID = -1;
             }
         }
