@@ -75,8 +75,7 @@
     <Compile Include="FieldManagement\OnBlockEffect.cs" />
     <Compile Include="FieldManagement\Swap.cs" />
     <Compile Include="FieldManagement\UniqueBlock.cs" />
-    <Compile Include="FieldManagement\UniqueEffect\Arcane5Block.cs" />
-    <Compile Include="FieldManagement\UniqueEffect\Arcane6Block.cs" />
+    <Compile Include="FieldManagement\UniqueEffect\ArcanePlusBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\BlizzardBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\BoulderBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\ChameleonBlock.cs" />
@@ -92,7 +91,7 @@
     <Compile Include="FieldManagement\UniqueEffect\SuperManaBlock.cs" />
     <Compile Include="GameCore.cs" />
     <Compile Include="Helper.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="Players\Player.cs" />
     <Compile Include="FieldManagement\FieldManager.cs" />
     <Compile Include="Players\GameMatch.cs" />
     <Compile Include="Players\MatchManager.cs" />

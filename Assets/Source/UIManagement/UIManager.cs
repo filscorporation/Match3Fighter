@@ -89,10 +89,10 @@ namespace Assets.Source.UIManagement
 
             GameObject go = Instantiate(PlayerStatsEffect, Vector3.zero, Quaternion.identity, PlayerHPText.transform);
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.offsetMin = new Vector2(-120, (i + 1) * 80);
-            rect.offsetMax = new Vector2(120, (i + 1) * 80);
+            rect.offsetMin = new Vector2(-120, i * 80);
+            rect.offsetMax = new Vector2(120, i * 80);
             Text text = go.GetComponent<Text>();
-            text.text = value.ToString("F1");
+            text.text = ((int)value).ToString();
             text.color = value < 0 ? Color.red : Color.green;
             PlayerHPEffects.Add(go);
 
@@ -105,10 +105,10 @@ namespace Assets.Source.UIManagement
 
             GameObject go = Instantiate(PlayerStatsEffect, Vector3.zero, Quaternion.identity, EnemyHPText.transform);
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.offsetMin = new Vector2(-120, (i + 1) * 80);
-            rect.offsetMax = new Vector2(120, (i + 1) * 80);
+            rect.offsetMin = new Vector2(-120, i * 80);
+            rect.offsetMax = new Vector2(120, i * 80);
             Text text = go.GetComponent<Text>();
-            text.text = value.ToString("F1");
+            text.text = ((int)value).ToString();
             text.color = value < 0 ? Color.red : Color.green;
             EnemyHPEffects.Add(go);
 
@@ -121,10 +121,10 @@ namespace Assets.Source.UIManagement
 
             GameObject go = Instantiate(PlayerStatsEffect, Vector3.zero, Quaternion.identity, PlayerMPText.transform);
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.offsetMin = new Vector2(-120, (i + 1) * 80);
-            rect.offsetMax = new Vector2(120, (i + 1) * 80);
+            rect.offsetMin = new Vector2(-120, i * 80);
+            rect.offsetMax = new Vector2(120, i * 80);
             Text text = go.GetComponent<Text>();
-            text.text = value.ToString("F1");
+            text.text = ((int)value).ToString();
             text.color = value < 0 ? Color.black : Color.blue;
             PlayerMPEffects.Add(go);
 
@@ -137,10 +137,10 @@ namespace Assets.Source.UIManagement
 
             GameObject go = Instantiate(PlayerStatsEffect, Vector3.zero, Quaternion.identity, EnemyMPText.transform);
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.offsetMin = new Vector2(-120, (i + 1) * 80);
-            rect.offsetMax = new Vector2(120, (i + 1) * 80);
+            rect.offsetMin = new Vector2(-120, i * 80);
+            rect.offsetMax = new Vector2(120, i * 80);
             Text text = go.GetComponent<Text>();
-            text.text = value.ToString("F1");
+            text.text = ((int)value).ToString();
             text.color = value < 0 ? Color.black : Color.blue;
             EnemyMPEffects.Add(go);
 

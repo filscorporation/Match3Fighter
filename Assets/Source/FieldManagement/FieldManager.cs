@@ -34,6 +34,11 @@ namespace Assets.Source.FieldManagement
         public GameObject BlockPrefab;
         public GameObject ShootEffectPrefab;
 
+        public Transform PlayerFieldCenter;
+        public float PlayerFieldScale = 1F;
+        public Transform EnemyFieldCenter;
+        public float EnemyFieldScale = 1F;
+
         private Field mainField;
         private Field enemyField;
 
@@ -78,7 +83,7 @@ namespace Assets.Source.FieldManagement
         /// <param name="data"></param>
         public void GenerateMainField(FieldData data)
         {
-            mainField = GenerateField(data, FieldType.Player, new Vector2(0, -data.Blocks.GetLength(1) / 2F));
+            mainField = GenerateField(data, FieldType.Player, PlayerFieldCenter.position, PlayerFieldScale, PlayerFieldCenter);
             mainField.InGameID = data.InGameID;
         }
 
@@ -88,38 +93,27 @@ namespace Assets.Source.FieldManagement
         /// <param name="data"></param>
         public void GenerateEnemyField(FieldData data)
         {
-            enemyField = GenerateField(data, FieldType.Enemy, new Vector2(0, data.Blocks.GetLength(1) / 2F + 1));
+            enemyField = GenerateField(data, FieldType.Enemy, EnemyFieldCenter.position, EnemyFieldScale, EnemyFieldCenter);
             enemyField.InGameID = data.InGameID;
         }
 
-        private Vector2 GetPositionForPlayerBlock(int i, int j)
+        private Vector2 GetPositionForBlock(int i, int j, Vector2 center, float scale)
         {
             float w = mainField.Blocks.GetLength(0);
             float h = mainField.Blocks.GetLength(1);
-            Vector2 center = new Vector2(0, -h / 2F);
-            float x = i + center.x - w / 2F + 0.5F;
-            float y = j + center.y - h / 2F - 0.5F;
+            float x = center.x + (i - w / 2F + 0.5F) * scale;
+            float y = center.y + (j - h / 2F + 0.5F) * scale;
             return new Vector2(x, y);
         }
 
-        private Vector2 GetPositionForEnemyBlock(int i, int j)
-        {
-            float w = enemyField.Blocks.GetLength(0);
-            float h = enemyField.Blocks.GetLength(1);
-            Vector2 center = new Vector2(0, h / 2F + 1);
-            float x = i + center.x - w / 2F + 0.5F;
-            float y = j + center.y - h / 2F - 0.5F;
-            return new Vector2(x, y);
-        }
-
-        private Field GenerateField(FieldData data, FieldType type, Vector2 center)
+        private Field GenerateField(FieldData data, FieldType type, Vector2 center, float scale, Transform parent)
         {
             Field field = new Field(type);
             
             int w = data.Blocks.GetLength(0);
             int h = data.Blocks.GetLength(1);
 
-            float dropY = h + center.y - h / 2F - 0.5F;
+            float dropY = center.y + (h / 2F + 0.5F) * scale;
             int[] dropYoffset = new int[w];
             for (int i = 0; i < w; i++)
             {
@@ -131,8 +125,8 @@ namespace Assets.Source.FieldManagement
             {
                 for (int j = 0; j < h; j++)
                 {
-                    float x = i + center.x - w / 2F + 0.5F;
-                    float y = j + center.y - h / 2F - 0.5F;
+                    float x = center.x + (i - w / 2F + 0.5F) * scale;
+                    float y = center.y + (j - h / 2F + 0.5F) * scale;
 
                     void AnimateAllBlockTransitions(Block block, BlockData blockData)
                     {
@@ -151,16 +145,16 @@ namespace Assets.Source.FieldManagement
                             // Block was moved
                             if (prevState.State == BlockState.Moved)
                             {
-                                float oldx = prevState.X + center.x - w / 2F + 0.5F;
-                                float oldy = prevState.Y + center.y - h / 2F - 0.5F;
+                                float oldx = center.x + (prevState.X - w / 2F + 0.5F) * scale;
+                                float oldy = center.y + (prevState.Y - h / 2F + 0.5F) * scale;
                                 StartCoroutine(block.AnimateDropped(new Vector2(oldx, oldy)));
                             }
 
                             // Blocks that swapped
                             if (prevState.State == BlockState.Swapped)
                             {
-                                float oldx = prevState.X + center.x - w / 2F + 0.5F;
-                                float oldy = prevState.Y + center.y - h / 2F - 0.5F;
+                                float oldx = center.x + (prevState.X - w / 2F + 0.5F) * scale;
+                                float oldy = center.y + (prevState.Y - h / 2F + 0.5F) * scale;
                                 block.AnimateSwap(new Vector2(oldx, oldy));
                             }
 
@@ -196,16 +190,16 @@ namespace Assets.Source.FieldManagement
 
                             if (blockData.ReplacedBlock != null)
                             {
-                                float oldx = blockData.ReplacedBlock.X + center.x - w / 2F + 0.5F;
-                                float oldy = blockData.ReplacedBlock.Y + center.y - h / 2F - 0.5F;
-                                Block destroyedBlock = InstantiateBlock(field, oldx, oldy, i, j, blockData.ReplacedBlock);
+                                float oldx = center.x + (blockData.ReplacedBlock.X - w / 2F + 0.5F) * scale;
+                                float oldy = center.y + (blockData.ReplacedBlock.Y - h / 2F + 0.5F) * scale;
+                                Block destroyedBlock = InstantiateBlock(field, oldx, oldy, i, j, blockData.ReplacedBlock, scale, parent);
                                 
                                 AnimateAllBlockTransitions(destroyedBlock, blockData.ReplacedBlock);
                             }
                         }
                     }
 
-                    Block newBlock = InstantiateBlock(field, x, y, i, j, data.Blocks[i, j]);
+                    Block newBlock = InstantiateBlock(field, x, y, i, j, data.Blocks[i, j], scale, parent);
                     field.Blocks[i, j] = newBlock;
 
                     AnimateAllBlockTransitions(newBlock, data.Blocks[i, j]);
@@ -217,9 +211,11 @@ namespace Assets.Source.FieldManagement
             return field;
         }
 
-        private Block InstantiateBlock(Field field, float x, float y, int i, int j, BlockData data)
+        private Block InstantiateBlock(Field field, float x, float y, int i, int j, BlockData data, float scale, Transform parent)
         {
-            GameObject go = Instantiate(BlockPrefab, new Vector2(x, y), Quaternion.identity, transform);
+            GameObject go = Instantiate(BlockPrefab, new Vector2(x, y), Quaternion.identity);
+            go.transform.localScale = Vector3.one * scale;
+            go.transform.SetParent(parent);
             Block block = go.GetComponent<Block>();
             go.name = $"Block {i} {j}";
             block.Field = field;
@@ -274,11 +270,11 @@ namespace Assets.Source.FieldManagement
         public void DrawShootEffect(EffectData data)
         {
             Vector2 from = (int)data.Data["InitField"] == mainField.InGameID ?
-                GetPositionForPlayerBlock((int)data.Data["InitX"], (int)data.Data["InitY"]) :
-                GetPositionForEnemyBlock((int)data.Data["TargetX"], (int)data.Data["TargetY"]);
+                GetPositionForBlock((int)data.Data["InitX"], (int)data.Data["InitY"], PlayerFieldCenter.position, PlayerFieldScale) :
+                GetPositionForBlock((int)data.Data["TargetX"], (int)data.Data["TargetY"], EnemyFieldCenter.position, EnemyFieldScale);
             Vector2 to = (int)data.Data["TargetField"] == enemyField.InGameID ?
-                GetPositionForEnemyBlock((int)data.Data["TargetX"], (int)data.Data["TargetY"]) :
-                GetPositionForPlayerBlock((int)data.Data["InitX"], (int)data.Data["InitY"]);
+                GetPositionForBlock((int)data.Data["TargetX"], (int)data.Data["TargetY"], EnemyFieldCenter.position, EnemyFieldScale) :
+                GetPositionForBlock((int)data.Data["InitX"], (int)data.Data["InitY"], PlayerFieldCenter.position, PlayerFieldScale);
             GameObject go = Instantiate(ShootEffectPrefab, Vector3.zero, Quaternion.identity, transform);
             StartCoroutine(go.GetComponent<IPointToPointEffect>().Initialize(from, to));
         }
