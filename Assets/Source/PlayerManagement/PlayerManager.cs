@@ -31,10 +31,25 @@ namespace Assets.Source.PlayerManagement
 
         public void Update()
         {
-            EstimatePlayersStats(player);
-            UIManager.Instance.SetPlayerUI(player);
-            EstimatePlayersStats(enemy);
-            UIManager.Instance.SetEnemyUI(enemy);
+            if (player.State == PlayerState.InGame)
+            {
+                EstimatePlayersStats(player);
+                UIManager.Instance.SetPlayerUI(player);
+            }
+            if (enemy.State == PlayerState.InGame)
+            {
+                EstimatePlayersStats(enemy);
+                UIManager.Instance.SetEnemyUI(enemy);
+            }
+        }
+
+        /// <summary>
+        /// Sets players to state dead
+        /// </summary>
+        public void PlayersDead()
+        {
+            player.State = PlayerState.Dead;
+            enemy.State = PlayerState.Dead;
         }
 
         public void EstimatePlayersStats(Player p)

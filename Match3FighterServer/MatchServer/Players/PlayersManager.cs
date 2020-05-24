@@ -2,7 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using MatchServer.DatabaseManagement;
 using MatchServer.FieldManagement;
+using NetworkShared.Data;
 using NetworkShared.Data.Field;
 using NetworkShared.Data.Player;
 
@@ -11,6 +13,7 @@ namespace MatchServer.Players
     public class PlayersManager
     {
         private readonly MatchManager matchManager;
+        private readonly DatabaseManager databaseManager;
 
         public ConcurrentDictionary<string, Player> Players = new ConcurrentDictionary<string, Player>();
 
@@ -18,9 +21,10 @@ namespace MatchServer.Players
 
         private readonly ConcurrentDictionary<int, Player> queue = new ConcurrentDictionary<int, Player>();
 
-        public PlayersManager(MatchManager matchManager)
+        public PlayersManager(MatchManager matchManager, DatabaseManager databaseManager)
         {
             this.matchManager = matchManager;
+            this.databaseManager = databaseManager;
         }
 
         /// <summary>
@@ -28,14 +32,33 @@ namespace MatchServer.Players
         /// </summary>
         /// <param name="clientID"></param>
         /// <param name="playerID"></param>
-        public void LogIn(int clientID, string playerID)
+        /// <param name="player"></param>
+        public LogInType LogIn(int clientID, string playerID, out Player player)
         {
             Sessions.TryAdd(clientID, playerID);
+            LogInType logInType;
 
-            // TODO: temp, players will be stored
-            Player player = new Player(clientID);
-            player.PlayerID = playerID;
+            player = databaseManager.GetPlayer(playerID);
+            if (player == null)
+            {
+                player = new Player(clientID);
+                player.SetDefaultUniqueBlocks();
+                player.PlayerID = playerID;
+                databaseManager.AddPlayer(player);
+                databaseManager.AddCollection(player.UniqueBlockCollection);
+                logInType = LogInType.Registered;
+                Console.WriteLine($"Registration for player {player.PlayerID}");
+            }
+            else
+            {
+                player.UniqueBlockCollection = databaseManager.GetCollection(player.UniqueBlockCollection.ID);
+                player.ClientID = clientID;
+                logInType = LogInType.SignedIn;
+                Console.WriteLine($"Login for player {player.PlayerID}");
+            }
+
             Players.TryAdd(playerID, player);
+            return logInType;
         }
 
         /// <summary>
@@ -96,13 +119,24 @@ namespace MatchServer.Players
         }
 
         /// <summary>
+        /// Saves updated player stats
+        /// </summary>
+        public void UpdatePlayer(Player player)
+        {
+            databaseManager.UpdatePlayer(player);
+        }
+
+        /// <summary>
         /// Validate and set player stats
         /// </summary>
         /// <param name="player"></param>
         /// <param name="data"></param>
         public void TrySetPlayerStats(Player player, PlayerStatsData data)
         {
-            Dictionary<string, UniqueBlock> uBlocks = GameCore.Instance.BlockEffectsManager.UniqueBlocks;
+            player.Name = data.PlayerName;
+            player.ActiveHero = data.ActiveHero;
+
+            Dictionary<string, UniqueBlock> uBlocks = BlockEffectsManager.UniqueBlocks;
 
             foreach (KeyValuePair<BlockTypes, UniqueBlockData> pair in data.UniqueBlockCollection.Level1Blocks)
             {
@@ -136,6 +170,9 @@ namespace MatchServer.Players
 
                 player.UniqueBlockCollection.Level3Blocks[pair.Key] = uBlocks[pair.Value.Name];
             }
+
+            databaseManager.UpdatePlayer(player);
+            databaseManager.UpdateCollection(player.UniqueBlockCollection);
         }
     }
 }

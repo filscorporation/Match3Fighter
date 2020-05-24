@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using MatchServer.DatabaseManagement;
 using MatchServer.FieldManagement;
 using MatchServer.Players;
 using MatchServer.UpgradesManagement;
@@ -25,6 +26,7 @@ namespace MatchServer
         public const int MsPerTick = 1000 / TicksPerSec;
 
         public Server Server;
+        public DatabaseManager DatabaseManager;
         public FieldManager FieldManager;
         public UpgradeManager UpgradeManager;
         public MatchManager MatchManager;
@@ -39,10 +41,13 @@ namespace MatchServer
                 throw new Exception("GameCore instance already exists");
             Instance = this;
 
+            DatabaseManager = new DatabaseManager();
+            DatabaseManager.Connect();
+
             FieldManager = new FieldManager();
             UpgradeManager = new UpgradeManager();
             MatchManager = new MatchManager(FieldManager);
-            PlayersManager = new PlayersManager(MatchManager);
+            PlayersManager = new PlayersManager(MatchManager, DatabaseManager);
             BlockEffectsManager = new BlockEffectsManager(FieldManager, UpgradeManager);
         }
 
@@ -86,11 +91,6 @@ namespace MatchServer
         /// <param name="clientID"></param>
         public void ClientConnected(int clientID)
         {
-            // TODO: device ID from client
-            string playerID = Guid.NewGuid().ToString();
-
-            PlayersManager.LogIn(clientID, playerID);
-
             ConnectResponse response = new ConnectResponse();
             Server.SendDataToClient(clientID, (int)DataTypes.ConnectResponse, response);
         }
@@ -102,7 +102,7 @@ namespace MatchServer
         public void ClientDisconnected(int clientID)
         {
             Player player = PlayersManager.GetPlayer(clientID);
-            if (player.CurrentMatch != null)
+            if (player?.CurrentMatch != null)
                 MatchManager.DropMatch(player.CurrentMatch);
 
             PlayersManager.LogOut(clientID);
@@ -125,12 +125,13 @@ namespace MatchServer
                 switch ((DataTypes)dataType)
                 {
                     case DataTypes.LogInRequest:
+                        LogIn(clientID, (LogInRequest)data);
                         break;
                     case DataTypes.PutPlayerIntoQueueRequest:
-                        PutPlayerIntoQueue(clientID, (PutPlayerIntoQueueRequest) data);
+                        PutPlayerIntoQueue(clientID, (PutPlayerIntoQueueRequest)data);
                         break;
                     case DataTypes.BlockSwapRequest:
-                        ProcessBlockSwap(clientID, (BlockSwapRequest) data);
+                        ProcessBlockSwap(clientID, (BlockSwapRequest)data);
                         break;
                     case DataTypes.UpgradeRequest:
                         ProcessUpgradeRequest(clientID, (UpgradeRequest)data);
@@ -156,6 +157,34 @@ namespace MatchServer
             {
                 Console.WriteLine($"Error processing message from client {clientID}:{e}");
             }
+        }
+
+        /// <summary>
+        /// Logs player in
+        /// </summary>
+        /// <param name="clientID"></param>
+        /// <param name="request"></param>
+        public void LogIn(int clientID, LogInRequest request)
+        {
+            Player player;
+            LogInType logInType;
+            try
+            {
+                logInType = PlayersManager.LogIn(clientID, request.PlayerID, out player);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error logging in client {clientID}: {e}");
+                ErrorResponse error = new ErrorResponse();
+                error.Type = ErrorType.LogInFailed;
+                Server.SendDataToClient(clientID, (int)DataTypes.ErrorResponse, error);
+                return;
+            }
+
+            LogInResponse response = new LogInResponse();
+            response.Type = logInType;
+            response.PlayerStats = player.GetStatsData();
+            Server.SendDataToClient(clientID, (int)DataTypes.LogInResponse, response);
         }
 
         /// <summary>
@@ -259,6 +288,18 @@ namespace MatchServer
             {
                 FieldManager.SetDefaultState(playerField);
                 FieldManager.SetDefaultState(enemyField);
+
+                if (CheckForGameEnd(match, out GameEndResponse gameEndResponseDebug))
+                {
+                    GiveMatchReward(match, gameEndResponseDebug.PlayerWon);
+                    RecalculateRating(match, gameEndResponseDebug.PlayerWon);
+                    PlayersManager.UpdatePlayer(match.Player1);
+
+                    MatchManager.DropMatch(player.CurrentMatch);
+
+                    gameEndResponseDebug.PlayerStats = match.Player1.GetStatsData();
+                    Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameEndResponse, gameEndResponseDebug);
+                }
                 return;
             }
 
@@ -274,15 +315,19 @@ namespace MatchServer
             FieldManager.SetDefaultState(enemyField);
             effectsData.AddRange(FieldManager.ClearDestroyedBlocks(enemyField, match, enemy));
 
-            if (CheckForGameEnd(match, out var gameEndResponse))
+            if (CheckForGameEnd(match, out GameEndResponse gameEndResponse))
             {
+                GiveMatchReward(match, gameEndResponse.PlayerWon);
+                RecalculateRating(match, gameEndResponse.PlayerWon);
+                PlayersManager.UpdatePlayer(match.Player1);
+                PlayersManager.UpdatePlayer(match.Player2);
+
                 MatchManager.DropMatch(player.CurrentMatch);
 
+                gameEndResponse.PlayerStats = match.Player1.GetStatsData();
                 Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameEndResponse, gameEndResponse);
-                if (match.Player1 == match.Player2)
-                {
-                    return;
-                }
+
+                gameEndResponse.PlayerStats = match.Player2.GetStatsData();
                 Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameEndResponse, gameEndResponse);
 
                 return;
@@ -367,10 +412,7 @@ namespace MatchServer
                 return;
             }
 
-            PlayerStatsData data = new PlayerStatsData
-            {
-                UniqueBlockCollection = player.UniqueBlockCollection.ToData(),
-            };
+            PlayerStatsData data = player.GetStatsData();
 
             PlayerStatsResponse response = new PlayerStatsResponse
             {
@@ -397,10 +439,7 @@ namespace MatchServer
 
             PlayersManager.TrySetPlayerStats(player, request.PlayerStats);
 
-            PlayerStatsData data = new PlayerStatsData
-            {
-                UniqueBlockCollection = player.UniqueBlockCollection.ToData(),
-            };
+            PlayerStatsData data = player.GetStatsData();
 
             PlayerStatsResponse response = new PlayerStatsResponse
             {
@@ -468,6 +507,47 @@ namespace MatchServer
 
             response = null;
             return false;
+        }
+
+        /// <summary>
+        /// Recalculates players rating from match results
+        /// </summary>
+        /// <param name="match"></param>
+        /// <param name="playerWonID"></param>
+        private void RecalculateRating(GameMatch match, int playerWonID)
+        {
+            // TODO: elo
+            if (playerWonID == match.Player1.InGameID)
+            {
+                match.Player1.Rating += 2;
+                match.Player2.Rating -= 1;
+            }
+            else
+            {
+                match.Player1.Rating -= 1;
+                match.Player2.Rating += 2;
+            }
+        }
+
+        /// <summary>
+        /// Gives both players reward from match results
+        /// </summary>
+        /// <param name="match"></param>
+        /// <param name="playerWonID"></param>
+        private void GiveMatchReward(GameMatch match, int playerWonID)
+        {
+            const int winnerReward = 10;
+            const int loserReward = 5;
+            if (playerWonID == match.Player1.InGameID)
+            {
+                match.Player1.Currency += winnerReward;
+                match.Player2.Currency += loserReward;
+            }
+            else
+            {
+                match.Player1.Currency += loserReward;
+                match.Player2.Currency += winnerReward;
+            }
         }
 
         private GameStateData GetPlayer1MatchStateData(GameMatch match)

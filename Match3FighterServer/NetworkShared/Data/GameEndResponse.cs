@@ -1,4 +1,5 @@
 ﻿using System;
+using NetworkShared.Data.Player;
 
 namespace NetworkShared.Data
 {
@@ -6,5 +7,7 @@ namespace NetworkShared.Data
     public class GameEndResponse
     {
         public int PlayerWon;
+
+        public PlayerStatsData PlayerStats;
     }
 }

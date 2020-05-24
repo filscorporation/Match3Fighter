@@ -21,7 +21,7 @@ namespace MatchServer.FieldManagement
 
         private Dictionary<BlockTypes, Effect> effects;
 
-        public readonly Dictionary<string, UniqueBlock> UniqueBlocks = new Dictionary<string, UniqueBlock>();
+        public static readonly Dictionary<string, UniqueBlock> UniqueBlocks = new Dictionary<string, UniqueBlock>();
 
         public BlockEffectsManager(FieldManager fieldManager, UpgradeManager upgradeManager)
         {

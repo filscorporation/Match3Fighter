@@ -1,16 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NetworkShared.Data.Player;
 
 namespace NetworkShared.Data
 {
+    public enum LogInType
+    {
+        Registered,
+        SignedIn,
+    }
+
     /// <summary>
     /// Response to clients attempt to login
     /// </summary>
     [Serializable]
     public class LogInResponse
     {
+        public LogInType Type;
+
+        public PlayerStatsData PlayerStats;
     }
 }

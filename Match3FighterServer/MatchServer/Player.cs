@@ -15,6 +15,11 @@ namespace MatchServer
     public class Player
     {
         /// <summary>
+        /// Unique identifier
+        /// </summary>
+        public Guid ID;
+
+        /// <summary>
         /// ID of client connection
         /// </summary>
         public int ClientID;
@@ -50,6 +55,21 @@ namespace MatchServer
         public UniqueBlockCollection UniqueBlockCollection;
 
         /// <summary>
+        /// Active hero
+        /// </summary>
+        public string ActiveHero;
+
+        /// <summary>
+        /// Ingame currency
+        /// </summary>
+        public int Currency;
+
+        /// <summary>
+        /// Rating
+        /// </summary>
+        public int Rating;
+
+        /// <summary>
         /// Player starts fight with that much hp
         /// </summary>
         public float MaxHealth;
@@ -78,28 +98,43 @@ namespace MatchServer
 
         private DateTime lastUpdate;
 
+        public Player()
+        {
+            Initialize();
+        }
+
         public Player(int clientID)
         {
             ClientID = clientID;
+            Initialize();
+        }
 
-            Name = "Player" + clientID;
+        private void Initialize()
+        {
+            ID = Guid.NewGuid();
+
+            Name = string.Empty;
             MaxHealth = 100F;
             Health = MaxHealth;
             MaxMana = 100F;
             Mana = MaxMana;
             ManaPerSecond = 1.5F;
-
-            UniqueBlockCollection = new UniqueBlockCollection();
-            SetDefaultUniqueBlocks();
+            ActiveHero = string.Empty;
 
             lastUpdate = DateTime.UtcNow;
         }
 
-        private void SetDefaultUniqueBlocks()
+        /// <summary>
+        /// Sets collection to default value
+        /// </summary>
+        public void SetDefaultUniqueBlocks()
         {
             // TODO: refactoring
 
-            Dictionary<string, UniqueBlock> uBlocks = GameCore.Instance.BlockEffectsManager.UniqueBlocks;
+            UniqueBlockCollection = new UniqueBlockCollection();
+            UniqueBlockCollection.ID = Guid.NewGuid();
+
+            Dictionary<string, UniqueBlock> uBlocks = BlockEffectsManager.UniqueBlocks;
 
             UniqueBlockCollection.Collection = uBlocks.Values.ToList();
 
@@ -198,6 +233,18 @@ namespace MatchServer
                 MaxMana = MaxMana,
                 Mana = Mana,
                 ManaPerSecond = ManaPerSecond,
+            };
+        }
+
+        public PlayerStatsData GetStatsData()
+        {
+            return new PlayerStatsData
+            {
+                PlayerName = Name,
+                UniqueBlockCollection = UniqueBlockCollection.ToData(),
+                ActiveHero = ActiveHero,
+                Currency = Currency,
+                Rating = Rating,
             };
         }
     }

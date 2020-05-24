@@ -2,42 +2,71 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Source.GameManagement;
 using Assets.Source.NetworkManagement;
 using Assets.Source.UIManagement;
 using NetworkShared.Data;
 using NetworkShared.Data.Field;
 using NetworkShared.Data.Player;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Assets.Source.PlayerManagement
 {
     public class PlayerStatsManager : MonoBehaviour
     {
-        private static PlayerStatsManager instance;
-
-        public static PlayerStatsManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = FindObjectOfType<PlayerStatsManager>();
-                }
-                return instance;
-            }
-        }
+        public static PlayerStatsManager Instance;
 
         public PlayerStats PlayerStats = null;
 
-        public void Start()
+        private void Awake()
         {
-            StartCoroutine(LoadStatsDelayed());
+            if (Instance == null)
+            {
+                Instance = this;
+                SceneManager.sceneLoaded += OnSceneLoaded;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (Instance != this)
+                Destroy(gameObject);
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (scene.name == GameManager.MainMenuSceneName)
+                StartCoroutine(LoadStatsDelayed());
+        }
+
+        /// <summary>
+        /// Shows whenever player logged in or just registered
+        /// </summary>
+        /// <param name="logInType"></param>
+        public void ShowPlayerLoggedIn(LogInType logInType)
+        {
+            switch (logInType)
+            {
+                case LogInType.Registered:
+                    Debug.Log("Welcome to Match3Fighter, new player!");
+                    break;
+                case LogInType.SignedIn:
+                    Debug.Log("Welcome back!");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(logInType), logInType, null);
+            }
         }
 
         private IEnumerator LoadStatsDelayed()
         {
-            yield return new WaitUntil(() => NetworkManager.Instance.IsConnected);
-            LoadPlayerStats();
+            yield return new WaitUntil(() => NetworkManager.Instance.IsLoggedIn);
+            if (PlayerStats == null)
+            {
+                LoadPlayerStats();
+            }
+            else
+            {
+                DrawPlayerStats();
+            }
         }
 
         /// <summary>
@@ -57,6 +86,10 @@ namespace Assets.Source.PlayerManagement
         {
             PlayerStats = new PlayerStats
             {
+                PlayerName = data.PlayerName,
+                ActiveHero = data.ActiveHero,
+                Currency = data.Currency,
+                Rating = data.Rating,
                 Collection = data.UniqueBlockCollection.Collection.ToList(),
                 Level1Blocks = data.UniqueBlockCollection.Level1Blocks,
                 Level2Blocks = data.UniqueBlockCollection.Level2Blocks,
@@ -68,6 +101,19 @@ namespace Assets.Source.PlayerManagement
         /// Draw player stats on UI
         /// </summary>
         public void DrawPlayerStats()
+        {
+            if (PlayerStats == null)
+                return;
+
+            MainMenuUIManager.Instance.SetPlayerName(PlayerStats.PlayerName);
+            MainMenuUIManager.Instance.SetCurrency(PlayerStats.Currency);
+            MainMenuUIManager.Instance.SetRating(PlayerStats.Rating);
+        }
+
+        /// <summary>
+        /// Draw player blocks collection UI
+        /// </summary>
+        public void DrawPlayerBlocksCollection()
         {
             if (PlayerStats == null)
                 return;
@@ -136,7 +182,35 @@ namespace Assets.Source.PlayerManagement
         }
 
         /// <summary>
-        /// Sends players stats to server
+        /// Set player name
+        /// </summary>
+        /// <param name="playerName"></param>
+        public void SetPlayerName(string playerName)
+        {
+            if (playerName.Equals(PlayerStats.PlayerName))
+                return;
+
+            PlayerStats.PlayerName = playerName;
+
+            SavePlayerStats();
+        }
+
+        /// <summary>
+        /// Set player active hero
+        /// </summary>
+        /// <param name="activeHero"></param>
+        public void SetActiveHero(string activeHero)
+        {
+            if (activeHero.Equals(PlayerStats.ActiveHero))
+                return;
+
+            PlayerStats.ActiveHero = activeHero;
+
+            SavePlayerStats();
+        }
+
+        /// <summary>
+        /// Sends player stats to server
         /// </summary>
         /// <returns></returns>
         public void SavePlayerStats()

@@ -11,6 +11,7 @@ namespace NetworkShared.Data
         Default,
         ImpossibleTurn,
         NotEnoughMana,
+        LogInFailed,
     }
 
     [Serializable]

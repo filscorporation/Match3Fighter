@@ -30,8 +30,8 @@ namespace Assets.Source.GameManagement
 
         public InputManagerBase InputManager;
 
-        private const string MainMenuSceneName = "MainMenuScene";
-        private const string GameSceneName = "GameScene";
+        public const string MainMenuSceneName = "MainMenuScene";
+        public const string GameSceneName = "GameScene";
 
         public static StartGameResponse GameDataToStart;
 
@@ -194,8 +194,9 @@ namespace Assets.Source.GameManagement
         /// <param name="data"></param>
         public void EndGame(GameEndResponse data)
         {
+            PlayerStatsManager.Instance.SetPlayerStats(data.PlayerStats);
             FieldManager.Instance.CanControl = false;
-
+            PlayerManager.Instance.PlayersDead();
             PlayerManager.Instance.ShowPlayerWonOrLost(data.PlayerWon);
         }
 

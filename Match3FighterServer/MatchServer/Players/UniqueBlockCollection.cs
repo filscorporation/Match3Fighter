@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MatchServer.FieldManagement;
 using NetworkShared.Data.Field;
@@ -11,6 +12,11 @@ namespace MatchServer.Players
     /// </summary>
     public class UniqueBlockCollection
     {
+        /// <summary>
+        /// Unique identifier
+        /// </summary>
+        public Guid ID;
+
         /// <summary>
         /// All available block for the player
         /// </summary>

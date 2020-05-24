@@ -1,10 +1,18 @@
 ﻿namespace Assets.Source.PlayerManagement
 {
+    public enum PlayerState
+    {
+        InGame,
+        Dead,
+    }
+
     /// <summary>
     /// Players stats in game
     /// </summary>
     public class Player
     {
+        public PlayerState State = PlayerState.InGame;
+
         public int InGameID;
 
         public string Name;

@@ -9,6 +9,14 @@ namespace Assets.Source.PlayerManagement
     /// </summary>
     public class PlayerStats
     {
+        public string PlayerName;
+
+        public string ActiveHero;
+
+        public int Currency;
+
+        public int Rating;
+
         public List<UniqueBlockData> Collection;
 
         public Dictionary<BlockTypes, UniqueBlockData> Level1Blocks;
@@ -21,6 +29,8 @@ namespace Assets.Source.PlayerManagement
         {
             return new PlayerStatsData
             {
+                PlayerName = PlayerName,
+                ActiveHero = ActiveHero,
                 UniqueBlockCollection = new UniqueBlockCollectionData
                 {
                     Collection = Collection.ToArray(),

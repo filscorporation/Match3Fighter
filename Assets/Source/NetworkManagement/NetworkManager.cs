@@ -29,6 +29,7 @@ namespace Assets.Source.NetworkManagement
         private static Client client;
 
         public bool IsConnected { get; private set; } = false;
+        public bool IsLoggedIn { get; private set; } = false;
 
         #region Core
 
@@ -37,7 +38,11 @@ namespace Assets.Source.NetworkManagement
             if (client == null || !client.IsConnected())
                 ConnectPlayer();
             else
+            {
                 IsConnected = true;
+                // TODO: maybe player it not loged in...
+                IsLoggedIn = true;
+            }
         }
 
         public void Update()
@@ -73,8 +78,10 @@ namespace Assets.Source.NetworkManagement
             {
                 case DataTypes.ConnectResponse:
                     IsConnected = true;
+                    LogIn();
                     break;
                 case DataTypes.LogInResponse:
+                    HandleLogInResponse((LogInResponse)data);
                     break;
                 case DataTypes.StartGameResponse:
                     HandleStartGameResponse((StartGameResponse) data);
@@ -102,29 +109,40 @@ namespace Assets.Source.NetworkManagement
             }
         }
 
-        public void HandleStartGameResponse(StartGameResponse response)
+        private void LogIn()
+        {
+            LogInRequest request = new LogInRequest();
+            request.PlayerID = SystemInfo.deviceUniqueIdentifier;
+            client.SendData((int)DataTypes.LogInRequest, request);
+        }
+
+        private void HandleLogInResponse(LogInResponse response)
+        {
+            IsLoggedIn = true;
+            PlayerStatsManager.Instance.ShowPlayerLoggedIn(response.Type);
+            PlayerStatsManager.Instance.SetPlayerStats(response.PlayerStats);
+            PlayerStatsManager.Instance.DrawPlayerStats();
+        }
+
+        private void HandleStartGameResponse(StartGameResponse response)
         {
             GameManager.Instance.LoadGameScene(response);
         }
 
-        public void HandleGameStateResponse(GameStateResponse response)
+        private void HandleGameStateResponse(GameStateResponse response)
         {
             GameManager.Instance.ChangeGameState(response);
         }
 
-        public void HandlePlayerStatsResponse(PlayerStatsResponse response)
+        private void HandlePlayerStatsResponse(PlayerStatsResponse response)
         {
             PlayerStatsManager.Instance.SetPlayerStats(response.PlayerStats);
+            PlayerStatsManager.Instance.DrawPlayerStats();
         }
 
-        public void HandleGameEndResponse(GameEndResponse response)
+        private void HandleGameEndResponse(GameEndResponse response)
         {
             GameManager.Instance.EndGame(response);
-        }
-
-        public void HandleGameStateResponse(StartGameResponse response)
-        {
-            GameManager.Instance.LoadGameScene(response);
         }
 
         #endregion
