@@ -43,6 +43,8 @@ namespace Assets.Source.FieldManagement
         private Field enemyField;
 
         public List<Sprite> BlockSprites;
+        public GameObject LockedFramePrefab;
+        private GameObject lockedFrame;
         private const string uniqueBlockSpritesPath = "UniqueBlockSprites";
         private const string onBlockEffectsSpritesPath = "Prefabs";
         private const string onBlockEffectsSpritesPostfix = "Effect";
@@ -59,6 +61,8 @@ namespace Assets.Source.FieldManagement
         /// </summary>
         public void DeleteFields()
         {
+            if (lockedFrame != null)
+                Destroy(lockedFrame);
             DeleteField(mainField);
             DeleteField(enemyField);
         }
@@ -119,6 +123,8 @@ namespace Assets.Source.FieldManagement
             {
                 dropYoffset[i] = 0;
             }
+
+            List<Block> lockedBlocks = new List<Block>();
 
             field.Blocks = new Block[w, h];
             for (int i = 0; i < w; i++)
@@ -201,9 +207,16 @@ namespace Assets.Source.FieldManagement
 
                     Block newBlock = InstantiateBlock(field, x, y, i, j, data.Blocks[i, j], scale, parent);
                     field.Blocks[i, j] = newBlock;
+                    if (newBlock.IsLocked)
+                        lockedBlocks.Add(newBlock);
 
                     AnimateAllBlockTransitions(newBlock, data.Blocks[i, j]);
                 }
+            }
+
+            if (lockedBlocks.Any())
+            {
+                DrawLockedFrame(lockedBlocks, parent);
             }
 
             AutoInputInitializer.InputManager.FreezeFor(0.5F);
@@ -225,6 +238,7 @@ namespace Assets.Source.FieldManagement
                 block.SetEnemyLayer();
 
             block.Type = (BlockTypes)data.ID;
+            block.IsLocked = data.IsLocked;
             block.X = i;
             block.Y = j;
             
@@ -263,6 +277,25 @@ namespace Assets.Source.FieldManagement
             return Resources.Load<Sprite>(Path.Combine(uniqueBlockSpritesPath, blockName));
         }
 
+        private void DrawLockedFrame(List<Block> lockedBlocks, Transform parent)
+        {
+            lockedFrame = Instantiate(LockedFramePrefab);
+            lockedFrame.transform.SetParent(parent);
+            lockedFrame.transform.localScale = Vector3.one;
+            lockedFrame.transform.SetAsFirstSibling();
+
+            float leftMost = lockedBlocks.Min(b => b.transform.position.x);
+            float rightMost = lockedBlocks.Max(b => b.transform.position.x);
+            float downMost = lockedBlocks.Min(b => b.transform.position.y);
+            float upMost = lockedBlocks.Max(b => b.transform.position.y);
+            int verCount = (rightMost - leftMost) > (upMost - downMost) ? 1 : lockedBlocks.Count;
+            int horCount = verCount == 1 ? lockedBlocks.Count : 1;
+            lockedFrame.transform.position = new Vector3((rightMost + leftMost) / 2F, (upMost + downMost) / 2F);
+            Vector2 baseSize = lockedFrame.GetComponent<SpriteRenderer>().size;
+            lockedFrame.GetComponent<SpriteRenderer>().size =
+                new Vector2(baseSize.x * horCount, baseSize.y * verCount);
+        }
+
         /// <summary>
         /// Draws effect of block shooting another block
         /// </summary>
@@ -288,20 +321,25 @@ namespace Assets.Source.FieldManagement
             if (!CanControl)
                 return;
 
-            if (input is BlockSwipeEvent swipe)
+            Block block = input.InputObject.GetComponent<Block>();
+            if (block.Field == null)
             {
-                Block block = input.InputObject.GetComponent<Block>();
-                if (block.Field == null)
-                {
-                    // Destroyed block
-                    return;
-                }
-                if (block.Field.Type == FieldType.Enemy)
-                {
-                    return;
-                }
+                // Destroyed block
+                return;
+            }
+            if (block.Field.Type == FieldType.Enemy)
+            {
+                return;
+            }
 
-                GameManager.Instance.OnPlayerBlockSwap(block.X, block.Y, swipe.Direction);
+            switch (input)
+            {
+                case BlockSwipeEvent swipe:
+                    GameManager.Instance.OnPlayerBlockSwap(block.X, block.Y, swipe.Direction);
+                    break;
+                case BlockTapEvent tap:
+                    GameManager.Instance.OnPlayerBlockTap(block.X, block.Y);
+                    break;
             }
         }
 

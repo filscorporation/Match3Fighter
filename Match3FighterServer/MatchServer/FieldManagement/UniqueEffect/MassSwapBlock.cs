@@ -22,7 +22,7 @@ namespace MatchServer.FieldManagement.UniqueEffect
 
             List<EffectData> data = new List<EffectData>();
 
-            manager.FlipBlocks(manager.GetRandomNonDestroyedBlocks(enemyField, FlipAmount));
+            manager.FlipBlocks(enemyField, manager.GetRandomNonDestroyedBlocks(enemyField, FlipAmount));
 
             return data;
         }

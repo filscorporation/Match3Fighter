@@ -16,6 +16,8 @@ namespace Assets.Source.FieldManagement
 
         public BlockTypes Type;
 
+        public bool IsLocked = false;
+
         public List<OnBlockEffect> OnBlockEffects = new List<OnBlockEffect>();
 
         public Field Field;

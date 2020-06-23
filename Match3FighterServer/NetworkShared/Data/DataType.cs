@@ -19,6 +19,7 @@
         GameStateResponse = 21,
         GameEndResponse = 22,
         UpgradeRequest = 23,
+        BlockTapRequest = 24,
 
         // Player setup
         GetPlayerStatsRequest = 30,

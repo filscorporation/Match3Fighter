@@ -28,6 +28,8 @@ namespace NetworkShared.Data.Field
 
         public BlockStateData[] PreviousStates;
 
+        public bool IsLocked;
+
         public BlockData ReplacedBlock;
 
         public OnBlockEffectData[] OnBlockEffects;

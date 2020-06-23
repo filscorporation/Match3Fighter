@@ -158,6 +158,12 @@ namespace MatchServer.FieldManagement
                 || blockB.OnBlockEffects.Any(e => e.Type == OnBlockEffectType.Frozen))
                 return false;
 
+            // Remove lock from swapped
+            if (blockA.IsLocked || blockB.IsLocked)
+            {
+                ClearLockedBlocks(field);
+            }
+
             field.Blocks[swap.X, swap.Y] = blockB;
             blockB.RememberState(BlockState.Swapped);
             blockB.SetXY(swap.X, swap.Y);
@@ -169,6 +175,63 @@ namespace MatchServer.FieldManagement
             affected.Add(blockB);
 
             return true;
+        }
+
+        /// <summary>
+        /// Processes block lock
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public bool TryLockBlock(Field field, int x, int y)
+        {
+            Block block = field.GetBlock(x, y);
+            bool preferHor = false;
+            bool preferVer = false;
+
+            if (field.LockedBlocks.Any())
+            {
+                if (block.IsLocked && field.LockedBlocks.Count > 1)
+                {
+                    // Rotate locked selection
+                    if (field.LockedBlocks[0].X == field.LockedBlocks[1].X)
+                    {
+                        preferHor = true;
+                    }
+                    else
+                    {
+                        preferVer = true;
+                    }
+                }
+
+                ClearLockedBlocks(field);
+            }
+
+            List<Block> hor = AddAllSameHorizontally(field, block);
+            List<Block> ver = AddAllSameVertically(field, block);
+            List<Block> toLock;
+            if (preferHor && hor.Count > 1)
+                toLock = hor;
+            else if (preferVer && ver.Count > 1)
+                toLock = ver;
+            else
+                toLock = hor.Count >= ver.Count ? hor : ver;
+            foreach (Block blockToLock in toLock)
+            {
+                blockToLock.IsLocked = true;
+            }
+            field.LockedBlocks.AddRange(toLock);
+
+            return true;
+        }
+
+        private void ClearLockedBlocks(Field field)
+        {
+            foreach (Block lockedBlock in field.LockedBlocks)
+            {
+                lockedBlock.IsLocked = false;
+            }
+            field.LockedBlocks.Clear();
         }
 
         /// <summary>
@@ -310,8 +373,8 @@ namespace MatchServer.FieldManagement
 
             foreach (Block block in includeAny)
             {
-                List<Block> ver = AddAllSameVertically(field, block);
-                List<Block> hor = AddAllSameHorizontally(field, block);
+                List<Block> ver = AddAllSameVertically(field, block, true);
+                List<Block> hor = AddAllSameHorizontally(field, block, true);
 
                 if (Math.Max(ver.Count, hor.Count) >= MinComboCount)
                 {
@@ -336,6 +399,8 @@ namespace MatchServer.FieldManagement
                 {
                     block.RememberState(destroyedState);
                     field.DestroyedBlocks.Add(block);
+                    if (block.IsLocked)
+                        ClearLockedBlocks(field);
                 }
             }
         }
@@ -343,12 +408,15 @@ namespace MatchServer.FieldManagement
         /// <summary>
         /// Put all blocks into flipped over state
         /// </summary>
+        /// <param name="field"></param>
         /// <param name="blocks"></param>
-        public void FlipBlocks(IEnumerable<Block> blocks)
+        public void FlipBlocks(Field field, IEnumerable<Block> blocks)
         {
             foreach (Block block in blocks)
             {
                 block.RememberState(BlockState.FlippedOver);
+                if (block.IsLocked)
+                    ClearLockedBlocks(field);
             }
         }
 
@@ -419,6 +487,9 @@ namespace MatchServer.FieldManagement
                             field.Blocks[i, j - offset] = block;
                             block.RememberState(BlockState.Moved);
                             block.SetXY(i, j - offset);
+
+                            if (block.IsLocked)
+                                ClearLockedBlocks(field);
                         }
                     }
                 }
@@ -438,7 +509,7 @@ namespace MatchServer.FieldManagement
         }
 
         // TODO: merge next two methods
-        private List<Block> AddAllSameHorizontally(Field field, Block start)
+        private List<Block> AddAllSameHorizontally(Field field, Block start, bool excludeLocked = false)
         {
             List<Block> outResult = new List<Block>();
             outResult.Add(start);
@@ -449,7 +520,7 @@ namespace MatchServer.FieldManagement
                 Block block = field.GetBlock(i, start.Y);
                 if (comboType == BlockTypes.Chameleon)
                     comboType = block.Type;
-                if (block != null && block.CanCombo(comboType))
+                if (block != null && block.CanCombo(comboType) && !(excludeLocked && block.IsLocked))
                     outResult.Add(block);
                 else
                     break;
@@ -464,7 +535,7 @@ namespace MatchServer.FieldManagement
                 Block block = field.GetBlock(i, start.Y);
                 if (comboType == BlockTypes.Chameleon)
                     comboType = block.Type;
-                if (block != null && block.CanCombo(comboType))
+                if (block != null && block.CanCombo(comboType) && !(excludeLocked && block.IsLocked))
                     altResult.Add(block);
                 else
                     break;
@@ -504,7 +575,7 @@ namespace MatchServer.FieldManagement
             return outResult;
         }
 
-        private List<Block> AddAllSameVertically(Field field, Block start)
+        private List<Block> AddAllSameVertically(Field field, Block start, bool excludeLocked = false)
         {
             List<Block> outResult = new List<Block>();
             outResult.Add(start);
@@ -515,7 +586,7 @@ namespace MatchServer.FieldManagement
                 Block block = field.GetBlock(start.X, j);
                 if (comboType == BlockTypes.Chameleon)
                     comboType = block.Type;
-                if (block != null && block.CanCombo(comboType))
+                if (block != null && block.CanCombo(comboType) && !(excludeLocked && block.IsLocked))
                     outResult.Add(block);
                 else
                     break;
@@ -530,7 +601,7 @@ namespace MatchServer.FieldManagement
                 Block block = field.GetBlock(start.X, j);
                 if (comboType == BlockTypes.Chameleon)
                     comboType = block.Type;
-                if (block != null && block.CanCombo(comboType))
+                if (block != null && block.CanCombo(comboType) && !(excludeLocked && block.IsLocked))
                     altResult.Add(block);
                 else
                     break;

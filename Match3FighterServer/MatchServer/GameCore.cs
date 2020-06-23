@@ -133,6 +133,9 @@ namespace MatchServer
                     case DataTypes.BlockSwapRequest:
                         ProcessBlockSwap(clientID, (BlockSwapRequest)data);
                         break;
+                    case DataTypes.BlockTapRequest:
+                        ProcesBlockTap(clientID, (BlockTapRequest)data);
+                        break;
                     case DataTypes.UpgradeRequest:
                         ProcessUpgradeRequest(clientID, (UpgradeRequest)data);
                         break;
@@ -332,6 +335,61 @@ namespace MatchServer
 
                 return;
             }
+        }
+
+        /// <summary>
+        /// Players tap turn processing
+        /// </summary>
+        /// <param name="clientID"></param>
+        /// <param name="request"></param>
+        public void ProcesBlockTap(int clientID, BlockTapRequest request)
+        {
+            Player player = PlayersManager.GetPlayer(clientID);
+            if (player == null)
+            {
+                Console.WriteLine($"Can't find player {clientID}");
+                return;
+            }
+            if (player.CurrentMatch == null)
+            {
+                Console.WriteLine($"Player {player.ClientID} is not in the game");
+                return;
+            }
+
+            GameMatch match = player.CurrentMatch;
+            Field playerField = match.Player1 == player ? match.Field1 : match.Field2;
+            Field enemyField = match.Player1 == player ? match.Field2 : match.Field1;
+            Player enemy = match.Player1 == player ? match.Player2 : match.Player1;
+
+            FieldManager.RefreshGlobalEffects(playerField, player);
+            FieldManager.RefreshGlobalEffects(enemyField, enemy);
+            
+            FieldManager.RefreshDurationEffects(playerField);
+            FieldManager.RefreshDurationEffects(enemyField);
+
+            if (!FieldManager.TryLockBlock(playerField, request.X, request.Y))
+            {
+                SendError(player.ClientID, ErrorType.ImpossibleTurn);
+            }
+            
+            GameStateResponse response = new GameStateResponse
+            {
+                GameState = GetPlayer1MatchStateData(match),
+                Effects = new EffectData[0],
+            };
+            Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
+
+            if (match.Player1 == match.Player2)
+            {
+                return;
+            }
+
+            response = new GameStateResponse
+            {
+                GameState = GetPlayer2MatchStateData(match),
+                Effects = new EffectData[0],
+            };
+            Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameStateResponse, response);
         }
 
         /// <summary>

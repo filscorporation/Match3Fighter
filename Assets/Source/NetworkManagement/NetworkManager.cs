@@ -162,6 +162,11 @@ namespace Assets.Source.NetworkManagement
             client.SendData((int)DataTypes.BlockSwapRequest, request);
         }
 
+        public void SendBlockTapData(BlockTapRequest request)
+        {
+            client.SendData((int)DataTypes.BlockTapRequest, request);
+        }
+
         public void SendUpgradeData(UpgradeRequest request)
         {
             client.SendData((int)DataTypes.UpgradeRequest, request);

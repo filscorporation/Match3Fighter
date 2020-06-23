@@ -43,11 +43,12 @@
     <Compile Include="Core\IServerListener.cs" />
     <Compile Include="Core\ThreadManager.cs" />
     <Compile Include="Data\BlockSwapRequest.cs" />
+    <Compile Include="Data\BlockTapRequest.cs" />
     <Compile Include="Data\Effects\EffectData.cs" />
     <Compile Include="Data\ErrorResponse.cs" />
     <Compile Include="Data\Field\BlockData.cs" />
     <Compile Include="Data\Field\BlockTypes.cs" />
-    <Compile Include="Data\Field\FeildData.cs" />
+    <Compile Include="Data\Field\FieldData.cs" />
     <Compile Include="Data\Field\GlobalEffectData.cs" />
     <Compile Include="Data\Field\OnBlockEffectData.cs" />
     <Compile Include="Data\Field\UniqueBlockData.cs" />

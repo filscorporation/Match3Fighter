@@ -18,16 +18,19 @@ namespace MatchServer.FieldManagement
 
         public int Y;
 
+        public bool IsLocked = false;
+
         public Stack<BlockPreviousState> PreviousStates = new Stack<BlockPreviousState>();
 
         public Block ReplacedBlock;
 
         public List<OnBlockEffect> OnBlockEffects = new List<OnBlockEffect>();
 
-        private const float attackBlockChance = 0.32F;
-        private const float healBlockChance = 0.25F;
-        private const float manaBlockChance = 0.25F;
-        private const float arcaneBlockChance = 1F - attackBlockChance - healBlockChance - manaBlockChance;
+        private const float attackBlockChance = 0.295F;
+        private const float healBlockChance = 0.225F;
+        private const float manaBlockChance = 0.225F;
+        private const float arcaneBlockChance = 0.155F;
+        private const float chameleonBlockChance = 0.1F;
 
         /// <summary>
         /// Returns true if block is unique
@@ -70,8 +73,10 @@ namespace MatchServer.FieldManagement
                 block.Type = BlockTypes.Health;
             else if (n < attackBlockChance + healBlockChance + manaBlockChance)
                 block.Type = BlockTypes.Mana;
-            else
+            else if (n < attackBlockChance + healBlockChance + manaBlockChance + arcaneBlockChance)
                 block.Type = BlockTypes.Arcane;
+            else
+                block.Type = BlockTypes.Chameleon;
 
             return block;
         }
@@ -134,6 +139,7 @@ namespace MatchServer.FieldManagement
                 ID = (int) Type,
                 UniqueBlock = UniqueBlock?.Name,
                 PreviousStates = PreviousStates.Select(s => s.ToData()).ToArray(),
+                IsLocked = IsLocked,
                 ReplacedBlock = ReplacedBlock?.ToData() ?? null,
                 OnBlockEffects = OnBlockEffects.Select(e => e.ToData()).ToArray(),
             };

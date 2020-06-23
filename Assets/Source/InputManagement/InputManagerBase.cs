@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,6 +16,8 @@ namespace Assets.Source.InputManagement
         public bool IsNeedToCheckForInput = true;
 
         private const float minSwipeDistance = 0.5F;
+        private const float tapTimeOut = 1F;
+        private bool canTap = true;
         private GameObject swipeStartObject;
         private Vector2 swipeStartPoint;
 
@@ -74,30 +77,45 @@ namespace Assets.Source.InputManagement
         /// </summary>
         /// <param name="inputPoint"></param>
         /// <returns></returns>
-        protected bool ProcessInputEnd(Vector2 inputPoint)
+        protected void ProcessInputEnd(Vector2 inputPoint)
         {
             if (swipeStartObject == null)
-                return false;
+                return;
 
             var wp = Camera.main.ScreenToWorldPoint(inputPoint);
             var position = new Vector2(wp.x, wp.y);
 
+            InputEvent inputEvent;
             if (Vector2.Distance(position, swipeStartPoint) > minSwipeDistance)
             {
                 BlockSwipeDirection direction = GetDirection(swipeStartPoint.x, swipeStartPoint.y, position.x, position.y);
 
-                InputEvent inputEvent = new BlockSwipeEvent() { InputObject = swipeStartObject,  Direction = direction };
-                foreach (IInputSubscriber subscriber in subs)
+                inputEvent = new BlockSwipeEvent() { InputObject = swipeStartObject,  Direction = direction };
+            }
+            else
+            {
+                if (!canTap)
                 {
-                    subscriber.Handle(inputEvent);
+                    swipeStartObject = null;
+                    return;
                 }
 
-                swipeStartObject = null;
-                return true;
+                inputEvent = new BlockTapEvent() { InputObject = swipeStartObject };
+                StartCoroutine(DelayTap());
+            }
+            foreach (IInputSubscriber subscriber in subs)
+            {
+                subscriber.Handle(inputEvent);
             }
 
             swipeStartObject = null;
-            return false;
+        }
+
+        private IEnumerator DelayTap()
+        {
+            canTap = false;
+            yield return new WaitForSeconds(tapTimeOut);
+            canTap = true;
         }
 
         /// <summary>

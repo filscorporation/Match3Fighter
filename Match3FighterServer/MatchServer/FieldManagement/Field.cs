@@ -23,6 +23,8 @@ namespace MatchServer.FieldManagement
 
         public List<Block> DestroyedBlocks = new List<Block>();
 
+        public List<Block> LockedBlocks = new List<Block>();
+
         /// <summary>
         /// Checks if index outside borders and returns block if not
         /// </summary>

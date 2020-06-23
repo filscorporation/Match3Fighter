@@ -216,6 +216,20 @@ namespace Assets.Source.GameManagement
         }
 
         /// <summary>
+        /// Request field state after block tap
+        /// </summary>
+        public void OnPlayerBlockTap(int x, int y)
+        {
+            Debug.Log("Send tap");
+
+            BlockTapRequest request = new BlockTapRequest();
+            request.X = x;
+            request.Y = y;
+
+            NetworkManager.Instance.SendBlockTapData(request);
+        }
+
+        /// <summary>
         /// Request to upgrade block type
         /// </summary>
         /// <param name="blockType"></param>

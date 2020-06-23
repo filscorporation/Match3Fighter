@@ -489,7 +489,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 41.61, y: -41.61}
+  m_AnchoredPosition: {x: 41.609985, y: -41.610107}
   m_SizeDelta: {x: 72.36726, y: 72.36726}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &236778493
@@ -2290,10 +2290,12 @@ MonoBehaviour:
   EnemyFieldScale: 0.8
   BlockSprites:
   - {fileID: 21300000, guid: b7de284ead6b0d94280b909ce0e35eea, type: 3}
-  - {fileID: 21300000, guid: 9ca1bb92015e80c41953bee4843e1b79, type: 3}
   - {fileID: 21300000, guid: 7afe00d9607b9e049905ba6d85349a63, type: 3}
+  - {fileID: 21300000, guid: 9ca1bb92015e80c41953bee4843e1b79, type: 3}
   - {fileID: 21300000, guid: 45b322fcd7e15394d8347741f3699316, type: 3}
   - {fileID: 21300000, guid: ba37da7ad3d261b49a04585c2a22d4ca, type: 3}
+  LockedFramePrefab: {fileID: 6304880725592370501, guid: fc03f77deeb4a5441919e49cdb9b50f3,
+    type: 3}
 --- !u!4 &1040039773
 Transform:
   m_ObjectHideFlags: 0
@@ -3407,7 +3409,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -215.22, y: -90.89}
+  m_AnchoredPosition: {x: -215.21997, y: -90.88989}
   m_SizeDelta: {x: 430.54987, y: 181.79242}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1873298965

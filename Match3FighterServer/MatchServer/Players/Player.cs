@@ -117,7 +117,7 @@ namespace MatchServer.Players
             Health = MaxHealth;
             MaxMana = 100F;
             Mana = MaxMana;
-            ManaPerSecond = 1.5F;
+            ManaPerSecond = 15F;
             ActiveHero = string.Empty;
 
             lastUpdate = DateTime.UtcNow;
