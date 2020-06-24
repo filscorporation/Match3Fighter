@@ -514,9 +514,8 @@ namespace MatchServer.FieldManagement
         /// Returns list of all possible swaps to make
         /// </summary>
         /// <param name="field"></param>
-        /// <param name="filter">Block type of the combo to look for</param>
         /// <returns></returns>
-        public IEnumerable<Swap> GetAllPossibleSwaps(Field field, BlockTypes? filter = null)
+        public IEnumerable<Swap> GetAllPossibleSwaps(Field field)
         {
             int w = field.Blocks.GetLength(0);
             int h = field.Blocks.GetLength(1);
@@ -540,13 +539,17 @@ namespace MatchServer.FieldManagement
                             int rx = hor.Max(b => b.X);
                             int y = hor[0].Y;
                             if (field.GetBlock(lx - 1, y - 1)?.CanCombo(type) ?? false)
-                                yield return new Swap(lx - 1, y - 1, 2); // Down
+                                yield return new Swap(lx - 1, y - 1, 0); // Up
                             if (field.GetBlock(lx - 1, y + 1)?.CanCombo(type) ?? false)
-                                yield return new Swap(lx - 1, y - 1, 0); // Up
+                                yield return new Swap(lx - 1, y + 1, 2); // Down
                             if (field.GetBlock(rx + 1, y - 1)?.CanCombo(type) ?? false)
-                                yield return new Swap(lx - 1, y - 1, 2); // Down
+                                yield return new Swap(rx + 1, y - 1, 0); // Up
                             if (field.GetBlock(rx + 1, y + 1)?.CanCombo(type) ?? false)
-                                yield return new Swap(lx - 1, y - 1, 0); // Up
+                                yield return new Swap(rx + 1, y + 1, 2); // Down
+                            if (field.GetBlock(lx - 2, y)?.CanCombo(type) ?? false)
+                                yield return new Swap(lx - 2, y, 1); // Right
+                            if (field.GetBlock(rx + 2, y)?.CanCombo(type) ?? false)
+                                yield return new Swap(rx + 2, y, 3); // Left
                         }
                     }
                     if (!block.ProcessedVertically)
@@ -558,7 +561,22 @@ namespace MatchServer.FieldManagement
                         }
                         if (ver.Count >= MinComboCount - 1)
                         {
-                            // TODO
+                            BlockTypes type = ver.FirstOrDefault(b => b.Type != BlockTypes.Chameleon)?.Type ?? BlockTypes.Chameleon;
+                            int dy = ver.Min(b => b.Y);
+                            int uy = ver.Max(b => b.Y);
+                            int x = ver[0].X;
+                            if (field.GetBlock(x - 1, dy - 1)?.CanCombo(type) ?? false)
+                                yield return new Swap(x - 1, dy - 1, 1); // Right
+                            if (field.GetBlock(x + 1, dy - 1)?.CanCombo(type) ?? false)
+                                yield return new Swap(x + 1, dy - 1, 3); // Left
+                            if (field.GetBlock(x - 1, uy + 1)?.CanCombo(type) ?? false)
+                                yield return new Swap(x - 1, uy + 1, 1); // Right
+                            if (field.GetBlock(x + 1, uy + 1)?.CanCombo(type) ?? false)
+                                yield return new Swap(x + 1, uy + 1, 3); // Left
+                            if (field.GetBlock(x, dy - 2)?.CanCombo(type) ?? false)
+                                yield return new Swap(x, dy - 2, 0); // Up
+                            if (field.GetBlock(x, uy + 2)?.CanCombo(type) ?? false)
+                                yield return new Swap(x, uy + 2, 2); // Down
                         }
                     }
                 }

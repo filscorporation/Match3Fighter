@@ -33,7 +33,7 @@ namespace MatchServer.FieldManagement
         /// <returns></returns>
         public Block GetBlock(int x, int y)
         {
-            if (x < 0 || x >= Blocks.GetLength(0) || y < 0 || x >= Blocks.GetLength(1))
+            if (x < 0 || x >= Blocks.GetLength(0) || y < 0 || y >= Blocks.GetLength(1))
                 return null;
             return Blocks[x, y];
         }

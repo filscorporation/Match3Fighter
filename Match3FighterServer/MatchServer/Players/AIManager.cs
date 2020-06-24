@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MatchServer.FieldManagement;
+using NetworkShared.Data;
 
 namespace MatchServer.Players
 {
@@ -27,6 +29,7 @@ namespace MatchServer.Players
             Bot bot = new Bot();
             bot.SetDefaultUniqueBlocks();
             bot.PlayerID = Guid.NewGuid().ToString();
+            bot.Name = "Bot";
 
             bots.Add(bot);
 
@@ -62,8 +65,23 @@ namespace MatchServer.Players
                 return;
 
             bot.UpdateAct();
+            Field field = bot.InGameID == 1 ? bot.CurrentMatch.Field1 : bot.CurrentMatch.Field2;
 
+            Swap swap = fieldManager.GetAllPossibleSwaps(field).FirstOrDefault();
+            if (swap.Equals(default))
+            {
+                // No possible turns
+                return;
+            }
 
+            BlockSwapRequest request = new BlockSwapRequest
+            {
+                X = swap.X,
+                Y = swap.Y,
+                Direction = swap.Direction,
+            };
+
+            GameCore.Instance.ProcessBlockSwap(bot, request);
         }
     }
 }

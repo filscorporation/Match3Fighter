@@ -137,7 +137,7 @@ namespace MatchServer
                         ProcessBlockSwap(clientID, (BlockSwapRequest)data);
                         break;
                     case DataTypes.BlockTapRequest:
-                        ProcesBlockTap(clientID, (BlockTapRequest)data);
+                        ProcessBlockTap(clientID, (BlockTapRequest)data);
                         break;
                     case DataTypes.UpgradeRequest:
                         ProcessUpgradeRequest(clientID, (UpgradeRequest)data);
@@ -254,7 +254,7 @@ namespace MatchServer
 
             if (!player.TrySpendMana(player.BlockSwapCost))
             {
-                SendError(player.ClientID, ErrorType.NotEnoughMana);
+                SendError(player, ErrorType.NotEnoughMana);
                 return;
             }
             else
@@ -272,7 +272,7 @@ namespace MatchServer
 
             if (!FieldManager.TryRebuildFieldFromSwap(playerField, new Swap(request.X, request.Y, request.Direction), out List<Block> blocks))
             {
-                SendError(player.ClientID, ErrorType.ImpossibleTurn);
+                SendError(player, ErrorType.ImpossibleTurn);
             }
             
             List<Combo> combos = FieldManager.CheckForCombos(playerField, blocks);
@@ -294,7 +294,7 @@ namespace MatchServer
             };
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
 
-            if (match.Player1 == match.Player2)
+            if (match.GameMode == GameMode.Practice)
             {
                 FieldManager.SetDefaultState(playerField);
                 FieldManager.SetDefaultState(enemyField);
@@ -349,7 +349,7 @@ namespace MatchServer
         /// </summary>
         /// <param name="clientID"></param>
         /// <param name="request"></param>
-        public void ProcesBlockTap(int clientID, BlockTapRequest request)
+        public void ProcessBlockTap(int clientID, BlockTapRequest request)
         {
             Player player = PlayersManager.GetPlayer(clientID);
             if (player == null)
@@ -358,7 +358,7 @@ namespace MatchServer
                 return;
             }
 
-            ProcesBlockTap(player, request);
+            ProcessBlockTap(player, request);
         }
 
         /// <summary>
@@ -366,7 +366,7 @@ namespace MatchServer
         /// </summary>
         /// <param name="player"></param>
         /// <param name="request"></param>
-        public void ProcesBlockTap(Player player, BlockTapRequest request)
+        public void ProcessBlockTap(Player player, BlockTapRequest request)
         {
             if (player.CurrentMatch == null)
             {
@@ -387,7 +387,7 @@ namespace MatchServer
 
             if (!FieldManager.TryLockBlock(playerField, request.X, request.Y))
             {
-                SendError(player.ClientID, ErrorType.ImpossibleTurn);
+                SendError(player, ErrorType.ImpossibleTurn);
             }
             
             GameStateResponse response = new GameStateResponse
@@ -397,7 +397,7 @@ namespace MatchServer
             };
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
 
-            if (match.Player1 == match.Player2)
+            if (match.GameMode == GameMode.Practice)
             {
                 return;
             }
@@ -447,7 +447,7 @@ namespace MatchServer
                 case UpgradeRequestResponse.Ok:
                     break;
                 case UpgradeRequestResponse.NotEnoughMana:
-                    SendError(player.ClientID, ErrorType.NotEnoughMana);
+                    SendError(player, ErrorType.NotEnoughMana);
                     return;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -460,7 +460,7 @@ namespace MatchServer
             };
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
 
-            if (match.Player1 == match.Player2)
+            if (match.GameMode == GameMode.Practice)
             {
                 return;
             }
@@ -525,11 +525,16 @@ namespace MatchServer
             Server.SendDataToClient(player.ClientID, (int)DataTypes.PlayerStatsResponse, response);
         }
 
-        private void SendError(int clientID, ErrorType type)
+        private void SendError(Player player, ErrorType type)
         {
+            if (player is Bot)
+            {
+                Console.WriteLine($"Error: {type}");
+                return;
+            }
             ErrorResponse error = new ErrorResponse();
             error.Type = type;
-            Server.SendDataToClient(clientID, (int)DataTypes.ErrorResponse, error);
+            Server.SendDataToClient(player.ClientID, (int)DataTypes.ErrorResponse, error);
         }
 
         #endregion
@@ -547,7 +552,7 @@ namespace MatchServer
             StartGameResponse response = new StartGameResponse { GameState = GetPlayer1MatchStateData(match) };
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.StartGameResponse, response);
 
-            if (match.Player1 == match.Player2)
+            if (match.GameMode == GameMode.Practice)
                 return;
 
             response = new StartGameResponse { GameState = GetPlayer2MatchStateData(match) };
