@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MatchServer.FieldManagement;
+﻿using MatchServer.FieldManagement;
 using MatchServer.UpgradesManagement;
+using NetworkShared.Data;
 
 namespace MatchServer.Players
 {
@@ -13,6 +9,13 @@ namespace MatchServer.Players
     /// </summary>
     public class GameMatch
     {
+        public GameMatch(GameMode gameMode)
+        {
+            GameMode = gameMode;
+        }
+
+        public GameMode GameMode;
+
         public Player Player1;
 
         public Player Player2;

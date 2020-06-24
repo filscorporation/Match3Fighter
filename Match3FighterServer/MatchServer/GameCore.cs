@@ -32,6 +32,7 @@ namespace MatchServer
         public MatchManager MatchManager;
         public PlayersManager PlayersManager;
         public BlockEffectsManager BlockEffectsManager;
+        public AIManager AIManager;
 
         #region Core
 
@@ -46,7 +47,8 @@ namespace MatchServer
 
             FieldManager = new FieldManager();
             UpgradeManager = new UpgradeManager();
-            MatchManager = new MatchManager(FieldManager);
+            AIManager = new AIManager(FieldManager);
+            MatchManager = new MatchManager(FieldManager, AIManager);
             PlayersManager = new PlayersManager(MatchManager, DatabaseManager);
             BlockEffectsManager = new BlockEffectsManager(FieldManager, UpgradeManager);
         }
@@ -79,6 +81,7 @@ namespace MatchServer
             ThreadManager.UpdateMain();
 
             PlayersManager.TryMakeMatch();
+            AIManager.UpdateBots();
         }
 
         #endregion
@@ -203,17 +206,10 @@ namespace MatchServer
                 Console.WriteLine($"Can't find player {clientID}");
                 return;
             }
-            if (request.DebugMode)
-            {
-                player.IsInDebugMode = true;
-                Console.WriteLine($"Player {clientID} is in debug mode");
-            }
-            else
-            {
-                player.IsInDebugMode = false;
-            }
 
-            Console.WriteLine($"Putting player {clientID} into queue");
+            player.GameMode = request.GameMode;
+
+            Console.WriteLine($"Putting player {clientID} into queue in {player.GameMode} mode");
             PlayersManager.PutPlayerIntoQueue(player);
         }
 
@@ -230,6 +226,17 @@ namespace MatchServer
                 Console.WriteLine($"Can't find player {clientID}");
                 return;
             }
+
+            ProcessBlockSwap(player, request);
+        }
+
+        /// <summary>
+        /// Players turn processing
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="request"></param>
+        public void ProcessBlockSwap(Player player, BlockSwapRequest request)
+        {
             if (player.CurrentMatch == null)
             {
                 Console.WriteLine($"Player {player.ClientID} is not in the game");
@@ -350,6 +357,17 @@ namespace MatchServer
                 Console.WriteLine($"Can't find player {clientID}");
                 return;
             }
+
+            ProcesBlockTap(player, request);
+        }
+
+        /// <summary>
+        /// Players tap turn processing
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="request"></param>
+        public void ProcesBlockTap(Player player, BlockTapRequest request)
+        {
             if (player.CurrentMatch == null)
             {
                 Console.WriteLine($"Player {player.ClientID} is not in the game");

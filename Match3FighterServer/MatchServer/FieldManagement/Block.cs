@@ -20,6 +20,10 @@ namespace MatchServer.FieldManagement
 
         public bool IsLocked = false;
 
+        public bool ProcessedVertically = false;
+
+        public bool ProcessedHorizontally = false;
+
         public Stack<BlockPreviousState> PreviousStates = new Stack<BlockPreviousState>();
 
         public Block ReplacedBlock;

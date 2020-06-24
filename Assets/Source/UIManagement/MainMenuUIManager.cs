@@ -112,9 +112,9 @@ namespace Assets.Source.UIManagement
             GameManager.Instance.QueueGame();
         }
 
-        public void DebugButtonClick()
+        public void PracticeButtonClick()
         {
-            GameManager.Instance.QueueDebugGame();
+            GameManager.Instance.QueuePracticeGame();
         }
     }
 }

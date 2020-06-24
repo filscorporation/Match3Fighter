@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MatchServer.FieldManagement;
 using MatchServer.FieldManagement.UniqueEffect;
+using NetworkShared.Data;
 using NetworkShared.Data.Field;
 using NetworkShared.Data.Player;
 
@@ -39,9 +40,9 @@ namespace MatchServer.Players
         public GameMatch CurrentMatch;
 
         /// <summary>
-        /// Allows player to start match as single player
+        /// Game mode player is queued
         /// </summary>
-        public bool IsInDebugMode = false;
+        public GameMode GameMode;
 
         /// <summary>
         /// Shows to both players

@@ -68,11 +68,11 @@ namespace Assets.Source.GameManagement
         /// </summary>
         public void QueueGame()
         {
-            Debug.Log("Queue game");
+            Debug.Log("Queue ranked game");
 
             PutPlayerIntoQueueRequest request = new PutPlayerIntoQueueRequest
             {
-                DebugMode = false,
+                GameMode = GameMode.Ranked,
             };
             NetworkManager.Instance.SendPutPlayerIntoQueueRequest(request);
         }
@@ -80,13 +80,13 @@ namespace Assets.Source.GameManagement
         /// <summary>
         /// Puts player into the game queue with single player option as debug mode
         /// </summary>
-        public void QueueDebugGame()
+        public void QueuePracticeGame()
         {
-            Debug.Log("Queue game");
+            Debug.Log("Queue practice game");
 
             PutPlayerIntoQueueRequest request = new PutPlayerIntoQueueRequest
             {
-                DebugMode = true,
+                GameMode = GameMode.Practice,
             };
             NetworkManager.Instance.SendPutPlayerIntoQueueRequest(request);
         }

@@ -2,9 +2,15 @@
 
 namespace NetworkShared.Data
 {
+    public enum GameMode
+    {
+        Ranked,
+        Practice,
+    }
+
     [Serializable]
     public class PutPlayerIntoQueueRequest
     {
-        public bool DebugMode = false;
+        public GameMode GameMode;
     }
 }

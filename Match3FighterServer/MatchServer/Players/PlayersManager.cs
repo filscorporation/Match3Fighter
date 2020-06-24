@@ -90,18 +90,21 @@ namespace MatchServer.Players
         /// <param name="player"></param>
         public void PutPlayerIntoQueue(Player player)
         {
-            if (player.IsInDebugMode)
+            switch (player.GameMode)
             {
-                queue.TryRemove(player.ClientID, out _);
-                matchManager.MakeMatch(player, player);
-            }
-            else
-            {
-                if (queue.ContainsKey(player.ClientID))
-                    return;
+                case GameMode.Ranked:
+                    if (queue.ContainsKey(player.ClientID))
+                        return;
 
-                if (!queue.TryAdd(player.ClientID, player))
-                    throw new Exception("Error adding player into queue");
+                    if (!queue.TryAdd(player.ClientID, player))
+                        throw new Exception("Error adding player into queue");
+                    break;
+                case GameMode.Practice:
+                    queue.TryRemove(player.ClientID, out _);
+                    matchManager.MakePracticeMatch(player);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 

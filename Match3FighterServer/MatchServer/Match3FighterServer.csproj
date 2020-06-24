@@ -91,6 +91,8 @@
     <Compile Include="FieldManagement\UniqueEffect\SuperManaBlock.cs" />
     <Compile Include="GameCore.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="Players\AIManager.cs" />
+    <Compile Include="Players\Bot.cs" />
     <Compile Include="Players\Player.cs" />
     <Compile Include="FieldManagement\FieldManager.cs" />
     <Compile Include="Players\GameMatch.cs" />

@@ -57,6 +57,8 @@ namespace MatchServer.FieldManagement
                 {
                     field.Blocks[i, j].ReplacedBlock = null;
                     field.Blocks[i, j].PreviousStates.Clear();
+                    field.Blocks[i, j].ProcessedHorizontally = false;
+                    field.Blocks[i, j].ProcessedVertically = false;
                 }
             }
         }
@@ -363,7 +365,7 @@ namespace MatchServer.FieldManagement
         }
 
         /// <summary>
-        /// Returns list of possile combos, that includes any of passed blocks
+        /// Returns list of possible combos, that includes any of passed blocks
         /// </summary>
         /// <param name="field"></param>
         /// <param name="includeAny"></param>
@@ -504,6 +506,61 @@ namespace MatchServer.FieldManagement
                     field.Blocks[i, j].SetXY(i, j);
                     field.Blocks[i, j].RememberState(BlockState.DroppedAsNew);
                     offset--;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns list of all possible swaps to make
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="filter">Block type of the combo to look for</param>
+        /// <returns></returns>
+        public IEnumerable<Swap> GetAllPossibleSwaps(Field field, BlockTypes? filter = null)
+        {
+            int w = field.Blocks.GetLength(0);
+            int h = field.Blocks.GetLength(1);
+
+            for (int i = 0; i < w; i++)
+            {
+                for (int j = 0; j < h; j++)
+                {
+                    Block block = field.GetBlock(i, j);
+                    if (!block.ProcessedHorizontally)
+                    {
+                        List<Block> hor = AddAllSameHorizontally(field, block, true);
+                        foreach (Block horBlock in hor)
+                        {
+                            horBlock.ProcessedHorizontally = true;
+                        }
+                        if (hor.Count >= MinComboCount - 1)
+                        {
+                            BlockTypes type = hor.FirstOrDefault(b => b.Type != BlockTypes.Chameleon)?.Type ?? BlockTypes.Chameleon;
+                            int lx = hor.Min(b => b.X);
+                            int rx = hor.Max(b => b.X);
+                            int y = hor[0].Y;
+                            if (field.GetBlock(lx - 1, y - 1)?.CanCombo(type) ?? false)
+                                yield return new Swap(lx - 1, y - 1, 2); // Down
+                            if (field.GetBlock(lx - 1, y + 1)?.CanCombo(type) ?? false)
+                                yield return new Swap(lx - 1, y - 1, 0); // Up
+                            if (field.GetBlock(rx + 1, y - 1)?.CanCombo(type) ?? false)
+                                yield return new Swap(lx - 1, y - 1, 2); // Down
+                            if (field.GetBlock(rx + 1, y + 1)?.CanCombo(type) ?? false)
+                                yield return new Swap(lx - 1, y - 1, 0); // Up
+                        }
+                    }
+                    if (!block.ProcessedVertically)
+                    {
+                        List<Block> ver = AddAllSameVertically(field, block, true);
+                        foreach (Block verBlock in ver)
+                        {
+                            verBlock.ProcessedVertically = true;
+                        }
+                        if (ver.Count >= MinComboCount - 1)
+                        {
+                            // TODO
+                        }
+                    }
                 }
             }
         }
