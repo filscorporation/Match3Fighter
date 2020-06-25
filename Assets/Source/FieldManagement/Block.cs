@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using NetworkShared.Data.Field;
 using UnityEngine;
@@ -41,6 +42,8 @@ namespace Assets.Source.FieldManagement
         private Vector2 moveTargetPosition;
         private float mv = 30F;
 
+        private float preAnimationProgress = 0F;
+        private const float swapLength = 0.1F;
         private const float destroyDelay = 0.1F;
         private const float flipDelay = 0.1F;
         private const float dropDelay = 0.4F;
@@ -100,7 +103,7 @@ namespace Assets.Source.FieldManagement
         {
             gameObject.name += " Destroy";
 
-            yield return new WaitForSeconds(destroyDelay);
+            yield return new WaitForSeconds(destroyDelay - preAnimationProgress);
 
             Animation.PlayQueued(destroyedAnimationName);
             Destroy(gameObject, 2.5F);
@@ -114,7 +117,7 @@ namespace Assets.Source.FieldManagement
         {
             gameObject.name += " Flipped";
 
-            yield return new WaitForSeconds(flipDelay);
+            yield return new WaitForSeconds(flipDelay - preAnimationProgress);
 
             Animation.PlayQueued(destroyedAnimationName);
             Destroy(gameObject, 2.5F);
@@ -126,7 +129,7 @@ namespace Assets.Source.FieldManagement
 
             gameObject.name += " Appear";
 
-            yield return new WaitForSeconds(appearDelay);
+            yield return new WaitForSeconds(appearDelay - preAnimationProgress);
 
             gameObject.GetComponent<SpriteRenderer>().enabled = true;
             Animation.PlayQueued(appearedAnimationName);
@@ -137,8 +140,19 @@ namespace Assets.Source.FieldManagement
             moveTargetPosition = transform.position;
             transform.position = startingPosition;
             needToMove = true;
+            transform.position = Vector2.Lerp(transform.position, moveTargetPosition, mv * preAnimationProgress);
 
             gameObject.name += " Swap";
+        }
+
+        public IEnumerator StartPreAnimationTimer()
+        {
+            preAnimationProgress = 0F;
+            while (preAnimationProgress >= swapLength)
+            {
+                preAnimationProgress += Time.deltaTime;
+                yield return null;
+            }
         }
 
         public IEnumerator AnimateDropped(Vector2 startingPosition, bool isNew = false)
@@ -148,7 +162,7 @@ namespace Assets.Source.FieldManagement
 
             gameObject.name += " Drop";
 
-            yield return new WaitForSeconds(dropDelay);
+            yield return new WaitForSeconds(dropDelay - preAnimationProgress);
             dv = 0;
             needToDrop = true;
             needToMove = false;

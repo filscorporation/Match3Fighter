@@ -211,5 +211,13 @@ namespace Assets.Source.UIManagement
         {
             UpgradeManager.Instance.ArcaneBlockUpgrade();
         }
+
+        public void SlowMoButtonClick()
+        {
+            if (Mathf.Abs(Time.timeScale - 1) < Mathf.Epsilon)
+                Time.timeScale = 0.2F;
+            else
+                Time.timeScale = 1F;
+        }
     }
 }

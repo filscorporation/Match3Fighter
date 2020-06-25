@@ -82,6 +82,33 @@ namespace Assets.Source.FieldManagement
         }
 
         /// <summary>
+        /// Starts swap animation before getting server response
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="direction"></param>
+        private void PreAnimateSwap(int x, int y, BlockSwipeDirection direction)
+        {
+            Block blockFrom = mainField.Blocks[x, y];
+            Vector2Int newXY = InputManagerBase.GetPosition(x, y, direction);
+            Block blockTo = mainField.Blocks[newXY.x, newXY.y];
+            int w = mainField.Blocks.GetLength(0);
+            int h = mainField.Blocks.GetLength(1);
+
+            Vector2 oldPosition = blockFrom.transform.position;
+            float newx = PlayerFieldCenter.position.x + (newXY.x - w / 2F + 0.5F) * PlayerFieldScale;
+            float newy = PlayerFieldCenter.position.y + (newXY.y - h / 2F + 0.5F) * PlayerFieldScale;
+            blockFrom.transform.position = new Vector3(newx, newy);
+            blockFrom.AnimateSwap(oldPosition);
+
+            oldPosition = blockTo.transform.position;
+            newx = PlayerFieldCenter.position.x + (x - w / 2F + 0.5F) * PlayerFieldScale;
+            newy = PlayerFieldCenter.position.y + (y - h / 2F + 0.5F) * PlayerFieldScale;
+            blockFrom.transform.position = new Vector3(newx, newy);
+            blockFrom.AnimateSwap(oldPosition);
+        }
+
+        /// <summary>
         /// Generates players field from data
         /// </summary>
         /// <param name="data"></param>
@@ -335,6 +362,7 @@ namespace Assets.Source.FieldManagement
             switch (input)
             {
                 case BlockSwipeEvent swipe:
+                    PreAnimateSwap(block.X, block.Y, swipe.Direction);
                     GameManager.Instance.OnPlayerBlockSwap(block.X, block.Y, swipe.Direction);
                     break;
                 case BlockTapEvent tap:

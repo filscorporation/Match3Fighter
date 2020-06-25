@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -138,6 +139,30 @@ namespace Assets.Source.InputManagement
             else
             {
                 return dy > 0 ? BlockSwipeDirection.Top : BlockSwipeDirection.Bottom;
+            }
+        }
+
+        /// <summary>
+        /// Returns position moved to direction
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        public static Vector2Int GetPosition(int x, int y, BlockSwipeDirection direction)
+        {
+            switch (direction)
+            {
+                case BlockSwipeDirection.Top:
+                    return new Vector2Int(x, y + 1);
+                case BlockSwipeDirection.Right:
+                    return new Vector2Int(x + 1, y);
+                case BlockSwipeDirection.Bottom:
+                    return new Vector2Int(x, y - 1);
+                case BlockSwipeDirection.Left:
+                    return new Vector2Int(x - 1, y);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
             }
         }
 
