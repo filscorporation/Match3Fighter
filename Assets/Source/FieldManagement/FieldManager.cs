@@ -44,7 +44,6 @@ namespace Assets.Source.FieldManagement
 
         public List<Sprite> BlockSprites;
         public GameObject LockedFramePrefab;
-        private GameObject lockedFrame;
         private const string uniqueBlockSpritesPath = "UniqueBlockSprites";
         private const string onBlockEffectsSpritesPath = "Prefabs";
         private const string onBlockEffectsSpritesPostfix = "Effect";
@@ -61,14 +60,15 @@ namespace Assets.Source.FieldManagement
         /// </summary>
         public void DeleteFields()
         {
-            if (lockedFrame != null)
-                Destroy(lockedFrame);
             DeleteField(mainField);
             DeleteField(enemyField);
         }
 
         private void DeleteField(Field field)
         {
+            if (field.LockedFrame != null)
+                Destroy(field.LockedFrame);
+
             int w = field.Blocks.GetLength(0);
             int h = field.Blocks.GetLength(1);
             
@@ -243,7 +243,7 @@ namespace Assets.Source.FieldManagement
 
             if (lockedBlocks.Any())
             {
-                DrawLockedFrame(lockedBlocks, parent);
+                DrawLockedFrame(field, lockedBlocks, parent);
             }
 
             AutoInputInitializer.InputManager.FreezeFor(0.5F);
@@ -304,12 +304,12 @@ namespace Assets.Source.FieldManagement
             return Resources.Load<Sprite>(Path.Combine(uniqueBlockSpritesPath, blockName));
         }
 
-        private void DrawLockedFrame(List<Block> lockedBlocks, Transform parent)
+        private void DrawLockedFrame(Field field, List<Block> lockedBlocks, Transform parent)
         {
-            lockedFrame = Instantiate(LockedFramePrefab);
-            lockedFrame.transform.SetParent(parent);
-            lockedFrame.transform.localScale = Vector3.one;
-            lockedFrame.transform.SetAsFirstSibling();
+            field.LockedFrame = Instantiate(LockedFramePrefab);
+            field.LockedFrame.transform.SetParent(parent);
+            field.LockedFrame.transform.localScale = Vector3.one;
+            field.LockedFrame.transform.SetAsFirstSibling();
 
             float leftMost = lockedBlocks.Min(b => b.transform.position.x);
             float rightMost = lockedBlocks.Max(b => b.transform.position.x);
@@ -317,9 +317,9 @@ namespace Assets.Source.FieldManagement
             float upMost = lockedBlocks.Max(b => b.transform.position.y);
             int verCount = (rightMost - leftMost) > (upMost - downMost) ? 1 : lockedBlocks.Count;
             int horCount = verCount == 1 ? lockedBlocks.Count : 1;
-            lockedFrame.transform.position = new Vector3((rightMost + leftMost) / 2F, (upMost + downMost) / 2F);
-            Vector2 baseSize = lockedFrame.GetComponent<SpriteRenderer>().size;
-            lockedFrame.GetComponent<SpriteRenderer>().size =
+            field.LockedFrame.transform.position = new Vector3((rightMost + leftMost) / 2F, (upMost + downMost) / 2F);
+            Vector2 baseSize = field.LockedFrame.GetComponent<SpriteRenderer>().size;
+            field.LockedFrame.GetComponent<SpriteRenderer>().size =
                 new Vector2(baseSize.x * horCount, baseSize.y * verCount);
         }
 

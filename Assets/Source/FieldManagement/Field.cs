@@ -1,4 +1,6 @@
-﻿namespace Assets.Source.FieldManagement
+﻿using UnityEngine;
+
+namespace Assets.Source.FieldManagement
 {
     public enum FieldType
     {
@@ -16,6 +18,8 @@
         public Block[,] Blocks;
 
         public FieldType Type;
+
+        public GameObject LockedFrame;
 
         public Field(FieldType type)
         {

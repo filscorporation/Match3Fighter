@@ -68,7 +68,7 @@ namespace MatchServer.Players
             Field field = bot.InGameID == 1 ? bot.CurrentMatch.Field1 : bot.CurrentMatch.Field2;
 
             Swap swap = fieldManager.GetAllPossibleSwaps(field).FirstOrDefault();
-            if (swap.Equals(default))
+            if (swap.Equals(default(Swap)))
             {
                 // No possible turns
                 return;
