@@ -1,4 +1,5 @@
-﻿using MatchServer.FieldManagement;
+﻿using System;
+using MatchServer.FieldManagement;
 using MatchServer.UpgradesManagement;
 using NetworkShared.Data;
 
@@ -11,8 +12,11 @@ namespace MatchServer.Players
     {
         public GameMatch(GameMode gameMode)
         {
+            ID = Guid.NewGuid();
             GameMode = gameMode;
         }
+
+        public Guid ID;
 
         public GameMode GameMode;
 

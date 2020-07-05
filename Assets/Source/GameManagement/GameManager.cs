@@ -33,6 +33,7 @@ namespace Assets.Source.GameManagement
         public const string MainMenuSceneName = "MainMenuScene";
         public const string GameSceneName = "GameScene";
 
+        public Guid GameID;
         public static StartGameResponse GameDataToStart;
 
         public void Awake()
@@ -55,6 +56,8 @@ namespace Assets.Source.GameManagement
             Debug.Log("Starting game");
 
             PlayerManager.Instance.Initialize();
+
+            GameID = Guid.Parse(response.GameState.GameID);
 
             PlayerManager.Instance.SetPlayerState(response.GameState.MainPlayer);
             PlayerManager.Instance.SetEnemyState(response.GameState.EnemyPlayer);
@@ -120,6 +123,12 @@ namespace Assets.Source.GameManagement
         /// <param name="data"></param>
         public void ChangeGameState(GameStateResponse data)
         {
+            if (Guid.Parse(data.GameState.GameID) != GameID)
+            {
+                Debug.LogWarning($"Got game state from wrong game: {data.GameState.GameID}");
+                return;
+            }
+
             FieldManager.Instance.DeleteFields();
 
             PlayerManager.Instance.SetPlayerState(data.GameState.MainPlayer);

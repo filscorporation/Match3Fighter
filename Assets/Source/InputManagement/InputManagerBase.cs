@@ -17,7 +17,7 @@ namespace Assets.Source.InputManagement
         public bool IsNeedToCheckForInput = true;
 
         private const float minSwipeDistance = 0.5F;
-        private const float tapTimeOut = 1F;
+        private const float tapTimeOut = 0.5F;
         private bool canTap = true;
         private GameObject swipeStartObject;
         private Vector2 swipeStartPoint;

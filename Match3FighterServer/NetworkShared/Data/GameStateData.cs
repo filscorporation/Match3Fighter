@@ -8,6 +8,8 @@ namespace NetworkShared.Data
     [Serializable]
     public class GameStateData
     {
+        public string GameID;
+
         public PlayerData MainPlayer;
 
         public PlayerData EnemyPlayer;

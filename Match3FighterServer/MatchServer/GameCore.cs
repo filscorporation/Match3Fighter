@@ -685,6 +685,7 @@ namespace MatchServer
         private GameStateData GetPlayer1MatchStateData(GameMatch match)
         {
             GameStateData data = new GameStateData();
+            data.GameID = match.ID.ToString();
             data.MainPlayer = match.Player1.ToData();
             data.EnemyPlayer = match.Player2.ToData();
             data.MainField = match.Field1.ToData();
@@ -697,6 +698,7 @@ namespace MatchServer
         private GameStateData GetPlayer2MatchStateData(GameMatch match)
         {
             GameStateData data = new GameStateData();
+            data.GameID = match.ID.ToString();
             data.MainPlayer = match.Player2.ToData();
             data.EnemyPlayer = match.Player1.ToData();
             data.MainField = match.Field2.ToData();
