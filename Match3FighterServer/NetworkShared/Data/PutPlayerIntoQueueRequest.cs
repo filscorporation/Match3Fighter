@@ -12,5 +12,7 @@ namespace NetworkShared.Data
     public class PutPlayerIntoQueueRequest
     {
         public GameMode GameMode;
+
+        public GameParameters GameParameters;
     }
 }

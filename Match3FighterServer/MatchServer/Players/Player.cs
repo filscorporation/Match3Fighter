@@ -45,6 +45,11 @@ namespace MatchServer.Players
         public GameMode GameMode;
 
         /// <summary>
+        /// Game parameters that player requested
+        /// </summary>
+        public GameParameters GameParameters;
+
+        /// <summary>
         /// Shows to both players
         /// </summary>
         public string Name;

@@ -176,7 +176,31 @@ namespace MatchServer.FieldManagement
             affected.Add(blockA);
             affected.Add(blockB);
 
+            // Try include to locked
+            if (GetNeighbours(field, blockA).Any(b => b.IsLocked)
+                && blockA.CanCombo(ListType(field.LockedBlocks))
+                && InLine(field.LockedBlocks, blockA))
+            {
+                ClearLockedBlocks(field);
+                TryLockBlock(field, blockA.X, blockA.Y, out _);
+            }
+            else if (GetNeighbours(field, blockB).Any(b => b.IsLocked)
+                && blockB.CanCombo(ListType(field.LockedBlocks))
+                && InLine(field.LockedBlocks, blockB))
+            {
+                ClearLockedBlocks(field);
+                TryLockBlock(field, blockB.X, blockB.Y, out _);
+            }
+
             return true;
+        }
+
+        private bool InLine(List<Block> line, Block block)
+        {
+            if (line.Count < 2)
+                return true;
+
+            return line.All(b => b.X == block.X) || line.All(b => b.Y == block.Y);
         }
 
         /// <summary>
@@ -185,39 +209,30 @@ namespace MatchServer.FieldManagement
         /// <param name="field"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public bool TryLockBlock(Field field, int x, int y)
+        /// <param name="combo"></param>
+        public bool TryLockBlock(Field field, int x, int y, out Combo combo)
         {
+            combo = null;
             Block block = field.GetBlock(x, y);
-            bool preferHor = false;
-            bool preferVer = false;
 
             if (field.LockedBlocks.Any())
             {
-                if (block.IsLocked && field.LockedBlocks.Count > 1)
+                bool wasLocked = false;
+                if (block.IsLocked)
                 {
-                    // Rotate locked selection
-                    if (field.LockedBlocks[0].X == field.LockedBlocks[1].X)
-                    {
-                        preferHor = true;
-                    }
-                    else
-                    {
-                        preferVer = true;
-                    }
+                    wasLocked = true;
+                    combo = LockedToCombo(field);
                 }
 
                 ClearLockedBlocks(field);
+
+                if (wasLocked)
+                    return false;
             }
 
             List<Block> hor = AddAllSameHorizontally(field, block);
             List<Block> ver = AddAllSameVertically(field, block);
-            List<Block> toLock;
-            if (preferHor && hor.Count > 1)
-                toLock = hor;
-            else if (preferVer && ver.Count > 1)
-                toLock = ver;
-            else
-                toLock = hor.Count >= ver.Count ? hor : ver;
+            List<Block> toLock = hor.Count >= ver.Count ? hor : ver;
             foreach (Block blockToLock in toLock)
             {
                 blockToLock.IsLocked = true;
@@ -385,6 +400,32 @@ namespace MatchServer.FieldManagement
             }
 
             return combos;
+        }
+
+        /// <summary>
+        /// Checks if locked blocks make combo and returns it if they do
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public Combo LockedToCombo(Field field)
+        {
+            if (field.LockedBlocks == null || field.LockedBlocks.Count == 0)
+                return null;
+
+            if (field.LockedBlocks.Count < MinComboCount)
+                return null;
+
+            return new Combo(field.LockedBlocks);
+        }
+
+        /// <summary>
+        /// Returns list of blocks type
+        /// </summary>
+        /// <param name="blocks"></param>
+        /// <returns></returns>
+        public BlockTypes ListType(IEnumerable<Block> blocks)
+        {
+            return blocks.FirstOrDefault(b => b.Type != BlockTypes.Chameleon)?.Type ?? BlockTypes.Chameleon;
         }
 
         /// <summary>
@@ -638,6 +679,7 @@ namespace MatchServer.FieldManagement
                         if (outResult.Count - 1 < altResult.Count)
                         {
                             outResult = altResult;
+                            outResult.Add(start);
                         }
                     }
                 }
@@ -704,6 +746,7 @@ namespace MatchServer.FieldManagement
                         if (outResult.Count - 1 < altResult.Count)
                         {
                             outResult = altResult;
+                            outResult.Add(start);
                         }
                     }
                 }

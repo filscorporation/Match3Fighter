@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -243,7 +244,10 @@ namespace Assets.Source.FieldManagement
 
             if (lockedBlocks.Any())
             {
-                DrawLockedFrame(field, lockedBlocks, parent);
+                if (lockedBlocks.Any(b => b.WillMove))
+                    StartCoroutine(DrawLockedFrame(field, lockedBlocks, parent, 0.3F));
+                else
+                    DrawLockedFrame(field, lockedBlocks, parent);
             }
 
             AutoInputInitializer.InputManager.FreezeFor(0.5F);
@@ -302,6 +306,13 @@ namespace Assets.Source.FieldManagement
         private Sprite GetUniqueBlockSprite(string blockName)
         {
             return Resources.Load<Sprite>(Path.Combine(uniqueBlockSpritesPath, blockName));
+        }
+
+        private IEnumerator DrawLockedFrame(Field field, List<Block> lockedBlocks, Transform parent, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            DrawLockedFrame(field, lockedBlocks, parent);
         }
 
         private void DrawLockedFrame(Field field, List<Block> lockedBlocks, Transform parent)

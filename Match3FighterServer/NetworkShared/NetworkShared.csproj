@@ -53,6 +53,7 @@
     <Compile Include="Data\Field\OnBlockEffectData.cs" />
     <Compile Include="Data\Field\UniqueBlockData.cs" />
     <Compile Include="Data\GameEndResponse.cs" />
+    <Compile Include="Data\GameParameters.cs" />
     <Compile Include="Data\GameStateData.cs" />
     <Compile Include="Data\GameStateResponse.cs" />
     <Compile Include="Data\GetPlayerStatsRequest.cs" />

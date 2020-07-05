@@ -80,13 +80,14 @@ namespace Assets.Source.GameManagement
         /// <summary>
         /// Puts player into the game queue with single player option as debug mode
         /// </summary>
-        public void QueuePracticeGame()
+        public void QueuePracticeGame(PracticeMode mode)
         {
-            Debug.Log("Queue practice game");
+            Debug.Log($"Queue practice game: {mode}");
 
             PutPlayerIntoQueueRequest request = new PutPlayerIntoQueueRequest
             {
                 GameMode = GameMode.Practice,
+                GameParameters = new GameParameters { PracticeMode = mode },
             };
             NetworkManager.Instance.SendPutPlayerIntoQueueRequest(request);
         }

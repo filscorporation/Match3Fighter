@@ -2,6 +2,7 @@
 using Assets.Source.GameManagement;
 using Assets.Source.NetworkManagement;
 using Assets.Source.PlayerManagement;
+using NetworkShared.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,6 +32,9 @@ namespace Assets.Source.UIManagement
         public GameObject PlayerMenu;
 
         public InputField PlayerNameText;
+
+        public Button PracticeButton;
+        public GameObject PracticeModeMenu;
 
         public Text CurrencyText;
         private const string currencyTextString = "Gold: ";
@@ -114,7 +118,18 @@ namespace Assets.Source.UIManagement
 
         public void PracticeButtonClick()
         {
-            GameManager.Instance.QueuePracticeGame();
+            bool active = PracticeModeMenu.gameObject.activeSelf;
+            PracticeModeMenu.SetActive(!active);
+        }
+
+        public void ActivePracticeButtonClick()
+        {
+            GameManager.Instance.QueuePracticeGame(PracticeMode.Active);
+        }
+
+        public void PassivePracticeButtonClick()
+        {
+            GameManager.Instance.QueuePracticeGame(PracticeMode.Passive);
         }
     }
 }

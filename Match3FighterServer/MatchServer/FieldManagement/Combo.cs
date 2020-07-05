@@ -12,7 +12,7 @@ namespace MatchServer.FieldManagement
         public Combo(List<Block> blocks)
         {
             Type = blocks.FirstOrDefault(b => b.Type != BlockTypes.Chameleon)?.Type ?? BlockTypes.Chameleon;
-            Blocks = blocks;
+            Blocks = new List<Block>(blocks);
         }
 
         public BlockTypes Type;

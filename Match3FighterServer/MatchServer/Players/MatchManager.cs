@@ -60,6 +60,7 @@ namespace MatchServer.Players
             player.InGameID = 1;
             player.Refresh();
             Bot bot = aiManager.GetActualBot();
+            bot.BotMode = player.GameParameters.PracticeMode;
             match.Player2 = bot;
             bot.CurrentMatch = match;
             bot.InGameID = 2;

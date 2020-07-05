@@ -64,6 +64,9 @@ namespace MatchServer.Players
             if (!bot.CanAct)
                 return;
 
+            if (bot.BotMode == PracticeMode.Passive)
+                return;
+
             bot.UpdateAct();
             Field field = bot.InGameID == 1 ? bot.CurrentMatch.Field1 : bot.CurrentMatch.Field2;
 

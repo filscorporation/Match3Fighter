@@ -58,6 +58,8 @@ namespace Assets.Source.FieldManagement
             }
         }
 
+        public bool WillMove => needToMove || needToDrop;
+
         /// <summary>
         /// Sets players sorting layer to the sprite
         /// </summary>

@@ -70,7 +70,7 @@ namespace MatchServer
 
                     if (nextLoop > DateTime.Now)
                     {
-                        Thread.Sleep(nextLoop - DateTime.Now);
+                        Thread.Sleep(Math.Max(0, (nextLoop - DateTime.Now).Milliseconds));
                     }
                 }
             }
@@ -208,6 +208,7 @@ namespace MatchServer
             }
 
             player.GameMode = request.GameMode;
+            player.GameParameters = request.GameParameters;
 
             Console.WriteLine($"Putting player {clientID} into queue in {player.GameMode} mode");
             PlayersManager.PutPlayerIntoQueue(player);
@@ -378,6 +379,7 @@ namespace MatchServer
             Field playerField = match.Player1 == player ? match.Field1 : match.Field2;
             Field enemyField = match.Player1 == player ? match.Field2 : match.Field1;
             Player enemy = match.Player1 == player ? match.Player2 : match.Player1;
+            List<EffectData> effectsData = new List<EffectData>();
 
             FieldManager.RefreshGlobalEffects(playerField, player);
             FieldManager.RefreshGlobalEffects(enemyField, enemy);
@@ -385,29 +387,78 @@ namespace MatchServer
             FieldManager.RefreshDurationEffects(playerField);
             FieldManager.RefreshDurationEffects(enemyField);
 
-            if (!FieldManager.TryLockBlock(playerField, request.X, request.Y))
+            if (!FieldManager.TryLockBlock(playerField, request.X, request.Y, out Combo combo))
             {
-                SendError(player, ErrorType.ImpossibleTurn);
+                // Lock removed, try to pop combo
+                if (combo != null)
+                {
+                    // TODO: merge combo processing code
+                    FieldManager.DestroyBlocks(enemyField, combo.Blocks, BlockState.DestroyedAsCombo);
+                    effectsData.AddRange(BlockEffectsManager.ApplyEffectsFromCombo(match, match.Player1 == player ? 1 : 2, combo));
+
+                    effectsData.AddRange(FieldManager.ClearDestroyedBlocks(playerField, match, player));
+                    effectsData.AddRange(FieldManager.ClearDestroyedBlocks(enemyField, match, enemy));
+
+                    FieldManager.FillHoles(playerField);
+                    FieldManager.FillHoles(enemyField);
+                }
             }
             
             GameStateResponse response = new GameStateResponse
             {
                 GameState = GetPlayer1MatchStateData(match),
-                Effects = new EffectData[0],
+                Effects = effectsData.ToArray(),
             };
             Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
 
             if (match.GameMode == GameMode.Practice)
             {
+                FieldManager.SetDefaultState(playerField);
+                FieldManager.SetDefaultState(enemyField);
+
+                if (CheckForGameEnd(match, out GameEndResponse gameEndResponseDebug))
+                {
+                    GiveMatchReward(match, gameEndResponseDebug.PlayerWon);
+                    RecalculateRating(match, gameEndResponseDebug.PlayerWon);
+                    PlayersManager.UpdatePlayer(match.Player1);
+
+                    MatchManager.DropMatch(player.CurrentMatch);
+
+                    gameEndResponseDebug.PlayerStats = match.Player1.GetStatsData();
+                    Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameEndResponse, gameEndResponseDebug);
+                }
                 return;
             }
 
             response = new GameStateResponse
             {
                 GameState = GetPlayer2MatchStateData(match),
-                Effects = new EffectData[0],
+                Effects = effectsData.ToArray(),
             };
             Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameStateResponse, response);
+
+            FieldManager.SetDefaultState(playerField);
+            effectsData.AddRange(FieldManager.ClearDestroyedBlocks(playerField, match, player));
+            FieldManager.SetDefaultState(enemyField);
+            effectsData.AddRange(FieldManager.ClearDestroyedBlocks(enemyField, match, enemy));
+
+            if (CheckForGameEnd(match, out GameEndResponse gameEndResponse))
+            {
+                GiveMatchReward(match, gameEndResponse.PlayerWon);
+                RecalculateRating(match, gameEndResponse.PlayerWon);
+                PlayersManager.UpdatePlayer(match.Player1);
+                PlayersManager.UpdatePlayer(match.Player2);
+
+                MatchManager.DropMatch(player.CurrentMatch);
+
+                gameEndResponse.PlayerStats = match.Player1.GetStatsData();
+                Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameEndResponse, gameEndResponse);
+
+                gameEndResponse.PlayerStats = match.Player2.GetStatsData();
+                Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameEndResponse, gameEndResponse);
+
+                return;
+            }
         }
 
         /// <summary>

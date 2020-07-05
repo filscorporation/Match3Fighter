@@ -1,4 +1,5 @@
 ﻿using System;
+using NetworkShared.Data;
 
 namespace MatchServer.Players
 {
@@ -9,6 +10,8 @@ namespace MatchServer.Players
     {
         public const float BotActDelay = 3F;
         private DateTime botActDelayTimer;
+
+        public PracticeMode BotMode;
 
         public Bot() : base(0)
         {
