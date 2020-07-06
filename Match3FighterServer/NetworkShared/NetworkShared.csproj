@@ -64,12 +64,14 @@
     <Compile Include="Data\PlayerStatsResponse.cs" />
     <Compile Include="Data\Player\PlayerData.cs" />
     <Compile Include="Data\Player\PlayerStatsData.cs" />
+    <Compile Include="Data\Player\SkillData.cs" />
     <Compile Include="Data\Player\UniqueBlockCollectionData.cs" />
     <Compile Include="Data\PutPlayerIntoQueueRequest.cs" />
     <Compile Include="Data\SetPlayerStatsRequest.cs" />
     <Compile Include="Data\StartGameResponse.cs" />
     <Compile Include="Data\UpgradeRequest.cs" />
     <Compile Include="Data\Upgrades\UpgradesInfoData.cs" />
+    <Compile Include="Data\UseSkillRequest.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="Network\IConnectionHandler.cs" />
     <Compile Include="Network\Packet.cs" />

@@ -172,6 +172,11 @@ namespace Assets.Source.NetworkManagement
             client.SendData((int)DataTypes.UpgradeRequest, request);
         }
 
+        public void SendUseSkillData(UseSkillRequest request)
+        {
+            client.SendData((int)DataTypes.UseSkillRequest, request);
+        }
+
         public void SendGetPlayerStatsRequest()
         {
             if (!IsConnected)

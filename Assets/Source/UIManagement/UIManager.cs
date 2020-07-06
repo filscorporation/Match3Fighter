@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.Source.GameManagement;
 using Assets.Source.PlayerManagement;
+using Assets.Source.SkillsManagement;
 using Assets.Source.UpgradeManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -210,6 +211,16 @@ namespace Assets.Source.UIManagement
         public void ArcaneUpgradeButtonClick()
         {
             UpgradeManager.Instance.ArcaneBlockUpgrade();
+        }
+
+        public void LeftSkillButtonClick()
+        {
+            SkillsManager.Instance.UseLeftSkill();
+        }
+
+        public void RightSkillButtonClick()
+        {
+            SkillsManager.Instance.UseRightSkill();
         }
 
         public void SlowMoButtonClick()

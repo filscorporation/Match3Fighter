@@ -43,6 +43,7 @@ namespace MatchServer.Players
             {
                 player = new Player(clientID);
                 player.SetDefaultUniqueBlocks();
+                player.SetDefaultSkills();
                 player.PlayerID = playerID;
                 databaseManager.AddPlayer(player);
                 databaseManager.AddCollection(player.UniqueBlockCollection);
@@ -52,6 +53,8 @@ namespace MatchServer.Players
             else
             {
                 player.UniqueBlockCollection = databaseManager.GetCollection(player.UniqueBlockCollection.ID);
+                // TODO: load from DB
+                player.SetDefaultSkills();
                 player.ClientID = clientID;
                 logInType = LogInType.SignedIn;
                 Console.WriteLine($"Login for player {player.PlayerID}");

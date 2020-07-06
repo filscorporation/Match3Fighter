@@ -28,6 +28,7 @@ namespace MatchServer.Players
         {
             Bot bot = new Bot();
             bot.SetDefaultUniqueBlocks();
+            bot.SetDefaultSkills();
             bot.PlayerID = Guid.NewGuid().ToString();
             bot.Name = "Bot";
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace NetworkShared.Data.Player
 {
@@ -8,6 +9,10 @@ namespace NetworkShared.Data.Player
         public string PlayerName;
 
         public UniqueBlockCollectionData UniqueBlockCollection;
+
+        public SkillData[] Skills;
+
+        public SkillData[] ActiveSkills;
 
         public string ActiveHero;
 

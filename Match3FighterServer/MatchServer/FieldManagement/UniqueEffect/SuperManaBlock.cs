@@ -21,7 +21,7 @@ namespace MatchServer.FieldManagement.UniqueEffect
             List<EffectData> data = new List<EffectData>();
 
             player.GainMana(player.MaxMana);
-            data.Add(ManaData(player, player.MaxMana));
+            data.Add(EffectDataHelper.ManaData(player, player.MaxMana));
 
             return data;
         }

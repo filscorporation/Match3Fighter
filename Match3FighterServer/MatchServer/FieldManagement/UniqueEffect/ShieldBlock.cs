@@ -22,7 +22,7 @@ namespace MatchServer.FieldManagement.UniqueEffect
 
             GlobalEffect globalEffect = new GlobalEffect(GlobalEffectType.Shield);
             playerField.GlobalEffects.Add(globalEffect);
-            data.Add(GlobalEffectData(player, globalEffect));
+            data.Add(EffectDataHelper.GlobalEffectData(player, globalEffect));
 
             return data;
         }

@@ -250,5 +250,17 @@ namespace Assets.Source.GameManagement
 
             NetworkManager.Instance.SendUpgradeData(request);
         }
+
+        /// <summary>
+        /// Request to use players skill
+        /// </summary>
+        /// <param name="skillID"></param>
+        public void OnPlayerUseSkill(int skillID)
+        {
+            UseSkillRequest request = new UseSkillRequest();
+            request.SkillID = skillID;
+
+            NetworkManager.Instance.SendUseSkillData(request);
+        }
     }
 }

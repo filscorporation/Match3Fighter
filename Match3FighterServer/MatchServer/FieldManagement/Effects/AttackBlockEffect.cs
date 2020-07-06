@@ -30,13 +30,13 @@ namespace MatchServer.FieldManagement.Effects
 
             if (enemyField.TryBlock(out var effect))
             {
-                data.Add(GlobalEffectRemovedData(enemy, effect.Type));
+                data.Add(EffectDataHelper.GlobalEffectRemovedData(enemy, effect.Type));
             }
             else
             {
                 float damage = DamageToEnemyHealth * combo.EffectScale
                                * upgradeManager.GetAttackBlockUpgradeBonus(playerUpgradesInfo);
-                data.Add(HealthData(enemy, -damage * effectsCount));
+                data.Add(EffectDataHelper.HealthData(enemy, -damage * effectsCount));
                 for (int i = 0; i < effectsCount; i++)
                 {
                     enemy.TakeDamage(damage);
@@ -47,7 +47,7 @@ namespace MatchServer.FieldManagement.Effects
                         if (block != null)
                         {
                             manager.DestroyBlocks(enemyField, new List<Block> { block }, BlockState.DestroyedByDamage);
-                            data.Add(ShotData(playerField, enemyField, combo.Blocks.First(), block, -DamageToBlockHealth));
+                            data.Add(EffectDataHelper.ShotData(playerField, enemyField, combo.Blocks.First(), block, -DamageToBlockHealth));
                         }
                     }
                 }

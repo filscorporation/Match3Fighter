@@ -27,7 +27,7 @@ namespace MatchServer.FieldManagement.Effects
             List<EffectData> data = new List<EffectData>();
             float health = HealthToRestore * combo.EffectScale
                            * upgradeManager.GetHealthBlockUpgradeBonus(playerUpgradesInfo);
-            data.Add(HealthData(player, health * effectsCount));
+            data.Add(EffectDataHelper.HealthData(player, health * effectsCount));
 
             for (int i = 0; i < effectsCount; i++)
             {

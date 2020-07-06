@@ -24,7 +24,7 @@ namespace MatchServer.FieldManagement.Effects
             List<EffectData> data = new List<EffectData>();
             float mana = ManaToRestore * combo.EffectScale
                          * upgradeManager.GetManaBlockUpgradeBonus(playerUpgradesInfo);
-            data.Add(ManaData(player, mana * effectsCount));
+            data.Add(EffectDataHelper.ManaData(player, mana * effectsCount));
 
             for (int i = 0; i < effectsCount; i++)
             {

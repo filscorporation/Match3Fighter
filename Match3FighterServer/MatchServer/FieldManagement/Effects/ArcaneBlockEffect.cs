@@ -64,23 +64,23 @@ namespace MatchServer.FieldManagement.Effects
                 // Attack and small heal
                 case 0:
                     enemy.TakeDamage(damage);
-                    data.Add(HealthData(enemy, -damage));
+                    data.Add(EffectDataHelper.HealthData(enemy, -damage));
                     player.GainHealth(health);
-                    data.Add(HealthData(player, health));
+                    data.Add(EffectDataHelper.HealthData(player, health));
                     break;
                 // Attack and mana
                 case 1:
                     enemy.TakeDamage(damage);
-                    data.Add(HealthData(enemy, -damage));
+                    data.Add(EffectDataHelper.HealthData(enemy, -damage));
                     player.GainMana(mana);
-                    data.Add(ManaData(player, mana));
+                    data.Add(EffectDataHelper.ManaData(player, mana));
                     break;
                 // Heal and mana
                 case 2:
                     player.GainHealth(health);
-                    data.Add(HealthData(player, health));
+                    data.Add(EffectDataHelper.HealthData(player, health));
                     player.GainMana(mana);
-                    data.Add(ManaData(player, mana));
+                    data.Add(EffectDataHelper.ManaData(player, mana));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

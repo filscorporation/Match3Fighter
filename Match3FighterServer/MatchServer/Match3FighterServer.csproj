@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseManagement\DatabaseManager.cs" />
+    <Compile Include="EffectDataHelper.cs" />
     <Compile Include="FieldManagement\Block.cs" />
     <Compile Include="FieldManagement\BlockEffectsManager.cs" />
     <Compile Include="FieldManagement\Combo.cs" />
@@ -101,6 +102,10 @@
     <Compile Include="Players\UniqueBlockCollection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SkillsManagement\Skill.cs" />
+    <Compile Include="SkillsManagement\SkillsManager.cs" />
+    <Compile Include="SkillsManagement\Skills\HealingSkill.cs" />
+    <Compile Include="SkillsManagement\Skills\LightningSkill.cs" />
     <Compile Include="UpgradesManagement\UpgradeManager.cs" />
     <Compile Include="UpgradesManagement\UpgradesInfo.cs" />
   </ItemGroup>

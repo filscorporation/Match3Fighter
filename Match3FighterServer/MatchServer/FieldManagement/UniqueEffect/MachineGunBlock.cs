@@ -28,18 +28,18 @@ namespace MatchServer.FieldManagement.UniqueEffect
 
             if (enemyField.TryBlock(out var effect))
             {
-                data.Add(GlobalEffectRemovedData(enemy, effect));
+                data.Add(EffectDataHelper.GlobalEffectRemovedData(enemy, effect));
             }
             else
             {
                 enemy.TakeDamage(DamageToEnemyHealth);
-                data.Add(HealthData(enemy, DamageToEnemyHealth));
+                data.Add(EffectDataHelper.HealthData(enemy, DamageToEnemyHealth));
 
                 List<Block> blocks = manager.GetRandomNonDestroyedBlocks(enemyField, ShotsAmount).ToList();
                 foreach (Block blockToDestroy in blocks)
                 {
                     manager.DestroyBlocks(enemyField, blocks, BlockState.DestroyedByDamage);
-                    data.Add(UniqueShotData(playerField, enemyField, block, blockToDestroy, "MachineGunEffect"));
+                    data.Add(EffectDataHelper.UniqueShotData(playerField, enemyField, block, blockToDestroy, "MachineGunEffect"));
                 }
             }
 

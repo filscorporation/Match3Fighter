@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using MatchServer.FieldManagement;
 using MatchServer.FieldManagement.UniqueEffect;
+using MatchServer.SkillsManagement;
+using MatchServer.SkillsManagement.Skills;
 using NetworkShared.Data;
 using NetworkShared.Data.Field;
 using NetworkShared.Data.Player;
@@ -58,6 +60,16 @@ namespace MatchServer.Players
         /// Unique blocks player is using
         /// </summary>
         public UniqueBlockCollection UniqueBlockCollection;
+
+        /// <summary>
+        /// Players available skills
+        /// </summary>
+        public List<Skill> Skills;
+
+        /// <summary>
+        /// Plaers active skills
+        /// </summary>
+        public List<Skill> ActiveSkills;
 
         /// <summary>
         /// Active hero
@@ -160,6 +172,20 @@ namespace MatchServer.Players
         }
 
         /// <summary>
+        /// Sets collection to default value
+        /// </summary>
+        public void SetDefaultSkills()
+        {
+            Skills = new List<Skill>();
+            Skills.Add(SkillsManager.Skills[nameof(LightningSkill)]);
+            Skills.Add(SkillsManager.Skills[nameof(HealingSkill)]);
+
+            ActiveSkills = new List<Skill>();
+            ActiveSkills.Add(SkillsManager.Skills[nameof(LightningSkill)]);
+            ActiveSkills.Add(SkillsManager.Skills[nameof(HealingSkill)]);
+        }
+
+        /// <summary>
         /// Updates stats that has regeneration per second 
         /// </summary>
         public void Update()
@@ -247,6 +273,8 @@ namespace MatchServer.Players
             {
                 PlayerName = Name,
                 UniqueBlockCollection = UniqueBlockCollection.ToData(),
+                Skills = Skills.Select(s => s.ToData()).ToArray(),
+                ActiveSkills = ActiveSkills.Select(s => s.ToData()).ToArray(),
                 ActiveHero = ActiveHero,
                 Currency = Currency,
                 Rating = Rating,

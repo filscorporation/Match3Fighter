@@ -14,12 +14,13 @@
         PutPlayerIntoQueueRequest = 10,
         StartGameResponse = 11,
 
-        // Game process
+        // Game proccess
         BlockSwapRequest = 20,
         GameStateResponse = 21,
         GameEndResponse = 22,
         UpgradeRequest = 23,
         BlockTapRequest = 24,
+        UseSkillRequest = 25,
 
         // Player setup
         GetPlayerStatsRequest = 30,

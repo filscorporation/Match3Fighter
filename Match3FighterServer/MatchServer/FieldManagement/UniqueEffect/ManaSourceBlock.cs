@@ -24,7 +24,7 @@ namespace MatchServer.FieldManagement.UniqueEffect
             GlobalEffect globalEffect = new GlobalEffect(GlobalEffectType.ManaOverTime, ManaOverTimeAmount);
             AttachedGlobalEffect = globalEffect;
             playerField.GlobalEffects.Add(globalEffect);
-            data.Add(GlobalEffectData(user, globalEffect));
+            data.Add(EffectDataHelper.GlobalEffectData(user, globalEffect));
 
             return data;
         }
@@ -36,7 +36,7 @@ namespace MatchServer.FieldManagement.UniqueEffect
             List<EffectData> data = base.OnDelete(manager, random, match, user, block);
 
             playerField.GlobalEffects.Remove(AttachedGlobalEffect);
-            data.Add(GlobalEffectRemovedData(player, AttachedGlobalEffect));
+            data.Add(EffectDataHelper.GlobalEffectRemovedData(player, AttachedGlobalEffect));
 
             return data;
         }

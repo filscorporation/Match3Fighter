@@ -24,13 +24,13 @@ namespace MatchServer.FieldManagement.UniqueEffect
 
             if (enemyField.TryBlock(out var effect))
             {
-                data.Add(GlobalEffectRemovedData(enemy, effect));
+                data.Add(EffectDataHelper.GlobalEffectRemovedData(enemy, effect));
             }
             else
             {
                 Block toBlock = manager.GetRandomNonDestroyedBlockExceptBorders(enemyField);
                 manager.DestroyBlocks(enemyField, manager.GetNeighbours(enemyField, toBlock), BlockState.DestroyedByDamage);
-                data.Add(UniqueShotData(playerField, enemyField, block, toBlock, "BoulderEffect"));
+                data.Add(EffectDataHelper.UniqueShotData(playerField, enemyField, block, toBlock, "BoulderEffect"));
             }
 
             return data;

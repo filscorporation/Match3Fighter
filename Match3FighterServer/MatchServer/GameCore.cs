@@ -4,6 +4,7 @@ using System.Threading;
 using MatchServer.DatabaseManagement;
 using MatchServer.FieldManagement;
 using MatchServer.Players;
+using MatchServer.SkillsManagement;
 using MatchServer.UpgradesManagement;
 using NetworkShared.Core;
 using NetworkShared.Data;
@@ -28,6 +29,7 @@ namespace MatchServer
         public Server Server;
         public DatabaseManager DatabaseManager;
         public FieldManager FieldManager;
+        public SkillsManager SkillsManager;
         public UpgradeManager UpgradeManager;
         public MatchManager MatchManager;
         public PlayersManager PlayersManager;
@@ -47,6 +49,7 @@ namespace MatchServer
 
             FieldManager = new FieldManager();
             UpgradeManager = new UpgradeManager();
+            SkillsManager = new SkillsManager(FieldManager);
             AIManager = new AIManager(FieldManager);
             MatchManager = new MatchManager(FieldManager, AIManager);
             PlayersManager = new PlayersManager(MatchManager, DatabaseManager);
@@ -138,6 +141,9 @@ namespace MatchServer
                         break;
                     case DataTypes.BlockTapRequest:
                         ProcessBlockTap(clientID, (BlockTapRequest)data);
+                        break;
+                    case DataTypes.UseSkillRequest:
+                        ProcessUseSkillRequest(clientID, (UseSkillRequest)data);
                         break;
                     case DataTypes.UpgradeRequest:
                         ProcessUpgradeRequest(clientID, (UpgradeRequest)data);
@@ -404,6 +410,106 @@ namespace MatchServer
                 }
             }
             
+            GameStateResponse response = new GameStateResponse
+            {
+                GameState = GetPlayer1MatchStateData(match),
+                Effects = effectsData.ToArray(),
+            };
+            Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameStateResponse, response);
+
+            if (match.GameMode == GameMode.Practice)
+            {
+                FieldManager.SetDefaultState(playerField);
+                FieldManager.SetDefaultState(enemyField);
+
+                if (CheckForGameEnd(match, out GameEndResponse gameEndResponseDebug))
+                {
+                    GiveMatchReward(match, gameEndResponseDebug.PlayerWon);
+                    RecalculateRating(match, gameEndResponseDebug.PlayerWon);
+                    PlayersManager.UpdatePlayer(match.Player1);
+
+                    MatchManager.DropMatch(player.CurrentMatch);
+
+                    gameEndResponseDebug.PlayerStats = match.Player1.GetStatsData();
+                    Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameEndResponse, gameEndResponseDebug);
+                }
+                return;
+            }
+
+            response = new GameStateResponse
+            {
+                GameState = GetPlayer2MatchStateData(match),
+                Effects = effectsData.ToArray(),
+            };
+            Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameStateResponse, response);
+
+            FieldManager.SetDefaultState(playerField);
+            effectsData.AddRange(FieldManager.ClearDestroyedBlocks(playerField, match, player));
+            FieldManager.SetDefaultState(enemyField);
+            effectsData.AddRange(FieldManager.ClearDestroyedBlocks(enemyField, match, enemy));
+
+            if (CheckForGameEnd(match, out GameEndResponse gameEndResponse))
+            {
+                GiveMatchReward(match, gameEndResponse.PlayerWon);
+                RecalculateRating(match, gameEndResponse.PlayerWon);
+                PlayersManager.UpdatePlayer(match.Player1);
+                PlayersManager.UpdatePlayer(match.Player2);
+
+                MatchManager.DropMatch(player.CurrentMatch);
+
+                gameEndResponse.PlayerStats = match.Player1.GetStatsData();
+                Server.SendDataToClient(match.Player1.ClientID, (int)DataTypes.GameEndResponse, gameEndResponse);
+
+                gameEndResponse.PlayerStats = match.Player2.GetStatsData();
+                Server.SendDataToClient(match.Player2.ClientID, (int)DataTypes.GameEndResponse, gameEndResponse);
+
+                return;
+            }
+        }
+
+        /// <summary>
+        /// Players skill using request processing
+        /// </summary>
+        /// <param name="clientID"></param>
+        /// <param name="request"></param>
+        public void ProcessUseSkillRequest(int clientID, UseSkillRequest request)
+        {
+            Player player = PlayersManager.GetPlayer(clientID);
+            if (player == null)
+            {
+                Console.WriteLine($"Can't find player {clientID}");
+                return;
+            }
+
+            if (player.CurrentMatch == null)
+            {
+                Console.WriteLine($"Player {player.ClientID} is not in the game");
+                return;
+            }
+
+            GameMatch match = player.CurrentMatch;
+            Field playerField = match.Player1 == player ? match.Field1 : match.Field2;
+            Field enemyField = match.Player1 == player ? match.Field2 : match.Field1;
+            Player enemy = match.Player1 == player ? match.Player2 : match.Player1;
+            List<EffectData> effectsData = new List<EffectData>();
+
+            FieldManager.RefreshGlobalEffects(playerField, player);
+            FieldManager.RefreshGlobalEffects(enemyField, enemy);
+
+            FieldManager.RefreshDurationEffects(playerField);
+            FieldManager.RefreshDurationEffects(enemyField);
+
+            // TODO: spend energy
+
+            if (request.SkillID != 0 && request.SkillID != 1)
+            {
+                SendError(player, ErrorType.ImpossibleTurn);
+                return;
+            }
+
+            int playerUserIndex = match.Player1 == player ? 1 : 2;
+            effectsData.AddRange(SkillsManager.ApplySkillEffect(match, playerUserIndex, player.ActiveSkills[request.SkillID].Name));
+
             GameStateResponse response = new GameStateResponse
             {
                 GameState = GetPlayer1MatchStateData(match),
