@@ -18,5 +18,9 @@ namespace NetworkShared.Data.Player
         public float Mana;
 
         public float ManaPerSecond;
+
+        public int MaxEnergy;
+
+        public int Energy;
     }
 }

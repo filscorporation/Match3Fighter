@@ -275,7 +275,7 @@ select * from dbo.Players where PlayerID = @player_id;
 
         private IEnumerable<UniqueBlock> BlocksFromString(string data)
         {
-            return data.Split(',').Select(k => BlockEffectsManager.UniqueBlocks[k]);
+            return data.Split(',').Select(k => BlockEffectsManager.UniqueBlocks.TryGetValue(k, out var ub) ? ub : null).Where(k => k != null);
         }
 
         private string ActiveBlocksToString(Dictionary<BlockTypes, UniqueBlock> blocks)
@@ -290,7 +290,15 @@ select * from dbo.Players where PlayerID = @player_id;
             {
                 string[] parsedPair = pair.Split(',');
                 Enum.TryParse(parsedPair[0], out BlockTypes type);
-                dic.Add(type, BlockEffectsManager.UniqueBlocks[parsedPair[1]]);
+
+                // Migration
+                if (type == BlockTypes.Arcane || type == BlockTypes.Chameleon)
+                    continue;
+
+                if (BlockEffectsManager.UniqueBlocks.TryGetValue(parsedPair[1], out var ub))
+                    dic.Add(type, ub);
+                else
+                    Console.WriteLine($"Unable to find parsed block: {parsedPair[1]}");
             }
             return dic;
         }

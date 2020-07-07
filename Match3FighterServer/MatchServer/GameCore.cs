@@ -499,8 +499,6 @@ namespace MatchServer
             FieldManager.RefreshDurationEffects(playerField);
             FieldManager.RefreshDurationEffects(enemyField);
 
-            // TODO: spend energy
-
             if (request.SkillID != 0 && request.SkillID != 1)
             {
                 SendError(player, ErrorType.ImpossibleTurn);
@@ -508,7 +506,24 @@ namespace MatchServer
             }
 
             int playerUserIndex = match.Player1 == player ? 1 : 2;
-            effectsData.AddRange(SkillsManager.ApplySkillEffect(match, playerUserIndex, player.ActiveSkills[request.SkillID].Name));
+            Skill skill = player.ActiveSkills[request.SkillID];
+
+            if (!player.TrySpendEnergy(skill.Cost))
+            {
+                SendError(player, ErrorType.NotEnoughEnergy);
+                return;
+            }
+            else
+            {
+                EffectData hData = new EffectData();
+                hData.EffectType = EffectType.EnergyChanged;
+                hData.Data = new Dictionary<string, object>();
+                hData.Data["Target"] = player.InGameID;
+                hData.Data["Value"] = -skill.Cost;
+                effectsData.Add(hData);
+            }
+
+            effectsData.AddRange(SkillsManager.ApplySkillEffect(match, playerUserIndex, skill.Name));
 
             GameStateResponse response = new GameStateResponse
             {

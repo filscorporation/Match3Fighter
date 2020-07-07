@@ -8,6 +8,7 @@ namespace NetworkShared.Data.Effects
         HealthChanged = 1,
         ManaChanged = 2,
         BlockShot = 3,
+        EnergyChanged = 4,
         GlobalEffect = 10,
         UniqueEffect = 20,
     }

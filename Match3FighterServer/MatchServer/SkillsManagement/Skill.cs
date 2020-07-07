@@ -14,6 +14,8 @@ namespace MatchServer.SkillsManagement
     {
         public abstract string Name { get; }
 
+        public virtual int Cost => 12;
+
         /// <summary>
         /// Applies skill effect to the game match
         /// </summary>

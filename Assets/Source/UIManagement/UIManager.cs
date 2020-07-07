@@ -31,9 +31,11 @@ namespace Assets.Source.UIManagement
         public Text PlayerNameText;
         public Text PlayerHPText;
         public Text PlayerMPText;
+        public Text PlayerEText;
         public Text EnemyNameText;
         public Text EnemyHPText;
         public Text EnemyMPText;
+        public Text EnemyEText;
         public GameObject EnemyShieldIcon;
         public GameObject PlayerShieldIcon;
         public GameObject LostUI;
@@ -61,6 +63,7 @@ namespace Assets.Source.UIManagement
             PlayerNameText.text = player.Name;
             PlayerHPText.text = $"{Mathf.RoundToInt(player.Health)}hp";
             PlayerMPText.text = $"{Mathf.RoundToInt(player.Mana)}mp";
+            PlayerEText.text = $"{player.Energy}/{player.MaxEnergy}";
         }
 
         public void SetEnemyUI(Player player)
@@ -68,6 +71,7 @@ namespace Assets.Source.UIManagement
             EnemyNameText.text = player.Name;
             EnemyHPText.text = $"{Mathf.RoundToInt(player.Health)}hp";
             EnemyMPText.text = $"{Mathf.RoundToInt(player.Mana)}mp";
+            EnemyEText.text = $"{player.Energy}/{player.MaxEnergy}";
         }
 
         private IEnumerator DestroyAndDelete(List<GameObject> list, GameObject obj)

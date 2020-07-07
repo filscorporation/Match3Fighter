@@ -30,5 +30,9 @@
         public float ManaPerSecond;
 
         public float ManaPerSecondFromEffects;
+
+        public int MaxEnergy;
+
+        public int Energy;
     }
 }

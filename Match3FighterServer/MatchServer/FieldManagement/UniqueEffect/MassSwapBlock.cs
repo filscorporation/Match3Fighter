@@ -12,9 +12,9 @@ namespace MatchServer.FieldManagement.UniqueEffect
 
         public override string Name => nameof(MassFlipBlock);
 
-        public override int Level => 2;
+        public override int Level => 1;
 
-        public override BlockTypes BaseType => BlockTypes.Arcane;
+        public override BlockTypes BaseType => BlockTypes.Mana;
 
         public override List<EffectData> Apply(FieldManager manager, Random random, GameMatch match, int playerUserIndex, Combo combo, Block block)
         {

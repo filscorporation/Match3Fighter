@@ -149,6 +149,9 @@ namespace Assets.Source.GameManagement
                     case EffectType.ManaChanged:
                         PlayerManager.Instance.AnimateManaEffect(effect);
                         break;
+                    case EffectType.EnergyChanged:
+                        PlayerManager.Instance.AnimateEnergyEffect(effect);
+                        break;
                     case EffectType.BlockShot:
                         FieldManager.Instance.DrawShootEffect(effect);
                         break;

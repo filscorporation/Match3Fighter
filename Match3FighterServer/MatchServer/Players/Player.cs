@@ -107,6 +107,16 @@ namespace MatchServer.Players
         public float Mana;
 
         /// <summary>
+        /// Max energy player can collect
+        /// </summary>
+        public int MaxEnergy;
+
+        /// <summary>
+        /// Used to cast spells, collected from arcane blocks
+        /// </summary>
+        public int Energy;
+
+        /// <summary>
         /// Mana regeneration speed
         /// </summary>
         public float ManaPerSecond;
@@ -136,6 +146,8 @@ namespace MatchServer.Players
             MaxMana = 100F;
             Mana = MaxMana;
             ManaPerSecond = 1.5F;
+            MaxEnergy = 24;
+            Energy = 0;
             ActiveHero = string.Empty;
 
             lastUpdate = DateTime.UtcNow;
@@ -158,17 +170,14 @@ namespace MatchServer.Players
             UniqueBlockCollection.Level1Blocks[BlockTypes.Attack] = uBlocks[nameof(ChameleonBlock)];
             UniqueBlockCollection.Level1Blocks[BlockTypes.Health] = uBlocks[nameof(ChameleonBlock)];
             UniqueBlockCollection.Level1Blocks[BlockTypes.Mana] = uBlocks[nameof(ChameleonBlock)];
-            UniqueBlockCollection.Level1Blocks[BlockTypes.Arcane] = uBlocks[nameof(ChameleonBlock)];
 
             UniqueBlockCollection.Level2Blocks[BlockTypes.Attack] = uBlocks[nameof(ShotgunBlock)];
             UniqueBlockCollection.Level2Blocks[BlockTypes.Health] = uBlocks[nameof(LifeBlock)];
             UniqueBlockCollection.Level2Blocks[BlockTypes.Mana] = uBlocks[nameof(ManaSourceBlock)];
-            UniqueBlockCollection.Level2Blocks[BlockTypes.Arcane] = uBlocks[nameof(MassFlipBlock)];
 
             UniqueBlockCollection.Level3Blocks[BlockTypes.Attack] = uBlocks[nameof(KillerBlock)];
             UniqueBlockCollection.Level3Blocks[BlockTypes.Health] = uBlocks[nameof(ShieldBlock)];
             UniqueBlockCollection.Level3Blocks[BlockTypes.Mana] = uBlocks[nameof(BlizzardBlock)];
-            UniqueBlockCollection.Level3Blocks[BlockTypes.Arcane] = uBlocks[nameof(ArcanePlusBlock)];
         }
 
         /// <summary>
@@ -243,6 +252,30 @@ namespace MatchServer.Players
         }
 
         /// <summary>
+        /// Adds energy
+        /// </summary>
+        /// <param name="energy"></param>
+        public void GainEnergy(int energy)
+        {
+            Energy = Math.Min(Energy + energy, MaxEnergy);
+        }
+
+        /// <summary>
+        /// Tries to spend energy
+        /// </summary>
+        /// <param name="energy"></param>
+        /// <returns></returns>
+        public bool TrySpendEnergy(int energy)
+        {
+            if (Energy < energy)
+                return false;
+
+            Energy -= energy;
+
+            return true;
+        }
+
+        /// <summary>
         /// Makes player take damage
         /// </summary>
         /// <param name="damage"></param>
@@ -264,6 +297,8 @@ namespace MatchServer.Players
                 MaxMana = MaxMana,
                 Mana = Mana,
                 ManaPerSecond = ManaPerSecond,
+                MaxEnergy = MaxEnergy,
+                Energy = Energy,
             };
         }
 

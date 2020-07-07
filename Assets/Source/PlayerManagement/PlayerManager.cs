@@ -116,6 +116,8 @@ namespace Assets.Source.PlayerManagement
             player.MaxMana = data.MaxMana;
             player.Mana = data.Mana;
             player.ManaPerSecond = data.ManaPerSecond;
+            player.MaxEnergy = data.MaxEnergy;
+            player.Energy = data.Energy;
 
             UIManager.Instance.SetPlayerUI(player);
         }
@@ -132,6 +134,8 @@ namespace Assets.Source.PlayerManagement
             enemy.MaxMana = data.MaxMana;
             enemy.Mana = data.Mana;
             enemy.ManaPerSecond = data.ManaPerSecond;
+            enemy.MaxEnergy = data.MaxEnergy;
+            enemy.Energy = data.Energy;
 
             UIManager.Instance.SetEnemyUI(enemy);
         }
@@ -179,6 +183,23 @@ namespace Assets.Source.PlayerManagement
             else
             {
                 UIManager.Instance.AnimateEnemyManaUI(enemy, (float)data.Data["Value"]);
+            }
+        }
+
+        /// <summary>
+        /// Animates energy loss or gain
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public void AnimateEnergyEffect(EffectData data)
+        {
+            if (player.InGameID == (int)data.Data["Target"])
+            {
+                //UIManager.Instance.AnimatePlayerManaUI(player, (float)data.Data["Value"]);
+            }
+            else
+            {
+                //UIManager.Instance.AnimateEnemyManaUI(enemy, (float)data.Data["Value"]);
             }
         }
     }

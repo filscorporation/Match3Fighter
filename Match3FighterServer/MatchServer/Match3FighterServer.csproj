@@ -76,7 +76,6 @@
     <Compile Include="FieldManagement\OnBlockEffect.cs" />
     <Compile Include="FieldManagement\Swap.cs" />
     <Compile Include="FieldManagement\UniqueBlock.cs" />
-    <Compile Include="FieldManagement\UniqueEffect\ArcanePlusBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\BlizzardBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\BoulderBlock.cs" />
     <Compile Include="FieldManagement\UniqueEffect\ChameleonBlock.cs" />

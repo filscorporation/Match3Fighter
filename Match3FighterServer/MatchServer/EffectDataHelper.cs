@@ -31,6 +31,16 @@ namespace MatchServer
             return mData;
         }
 
+        public static EffectData EnergyData(Player player, int value)
+        {
+            EffectData mData = new EffectData();
+            mData.EffectType = EffectType.EnergyChanged;
+            mData.Data = new Dictionary<string, object>();
+            mData.Data["Target"] = player.InGameID;
+            mData.Data["Value"] = value;
+            return mData;
+        }
+
         public static EffectData GlobalEffectData(Player player, GlobalEffect effect)
         {
             EffectData geData = new EffectData();
